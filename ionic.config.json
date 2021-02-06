@@ -1,0 +1,8 @@
+{
+  "name": "mymacros",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "4b065579"
+}

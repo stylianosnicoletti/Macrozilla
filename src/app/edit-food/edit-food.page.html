@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home" (click)="goToFoodsDatabaseTab()"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Edit Food</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!--(keyup.enter)="submitForm()"-->
+  <div *ngIf="isFormReadyToBuild">
+  <form [formGroup]="editForm" (ngSubmit)="submitForm()" (keyup.enter)="submitForm()" novalidate>
+    <ion-item lines="full">
+      <ion-label position="floating">Name</ion-label>
+      <ion-input formControlName="name" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Calories 🔋</ion-label>
+      <ion-input formControlName="calories"type="text" inputmode="numeric" autofocus></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Fats 🐖</ion-label>
+      <ion-input formControlName="fats" type="text" inputmode="numeric"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Saturated Fats ❌</ion-label>
+      <ion-input formControlName="saturated" type="text" inputmode="numeric"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Carbohydrates 🍞</ion-label>
+      <ion-input formControlName="carbohydrates" type="text" inputmode="numeric"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Protein 🥩</ion-label>
+      <ion-input formControlName="protein" type="text" inputmode="numeric"></ion-input>
+    </ion-item>
+
+    <ion-row>
+      <ion-col>
+        <ion-button type="submit" color="danger" expand="block">Submit</ion-button>
+      </ion-col>
+    </ion-row>
+  </form>
+</div>
+  
+</ion-content>

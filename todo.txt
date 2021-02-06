@@ -1,1 +1,12 @@
-todo!!
+// Note: Someone online suggests to goOffline on pause and goOnline on resume
+// Note: We can send it back to daily entry if not network in add entry (same for edit and add food)
+
+setting to delete account/ change name/ change photo
+update register page to get name and avatar
+fix some validations messages in login ins very anoying maybe trim start and end on all input text fields
+when adding new food (100g) option 
+splash screen
+app icon 
+app name
+dark mode
+edi page being able to change name but inform that all previously added foods wills stay as entered

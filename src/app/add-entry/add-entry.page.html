@@ -1,0 +1,98 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home" (click)="goToDailyEntryTab()"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title *ngIf="!isListHidden">Select Food</ion-title>
+    <ion-title *ngIf="!isFormHidden">Enter Quantity</ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
+<!-- Searchbar with cancel button shown on focus -->
+<ion-searchbar *ngIf="!isListHidden" debounce="380" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
+</ion-searchbar>
+
+<ion-content>
+
+  <!-- Default Refresher -->
+  <ion-refresher *ngIf="!isListHidden" slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="!isListHidden">
+    <ion-list *ngIf="filteredFoodList.length > 0; else loading">
+      <ion-item *ngFor="let food of filteredFoodList" (click)="foodSelected(food)">
+        <ion-label class="ion-text-wrap">
+          <h2><strong>{{food?.name}}</strong></h2>
+        </ion-label>
+        <ion-chip slot="end" color="secondary">
+          <strong>🔋 {{food?.calories}} kcal</strong>
+        </ion-chip>
+      </ion-item>
+    </ion-list>
+      <!-- Skeleton dummy screen -->
+  <ng-template #loading>
+    <ion-list>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-template>
+  </div>
+
+  <div *ngIf="!isFormHidden">
+    <form [formGroup]="addEntryForm" (ngSubmit)="submitForm()" novalidate>
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>
+            <strong>{{food?.name}}</strong></ion-card-title>
+        </ion-card-header>
+        <ion-item>
+          <ion-label position="floating">Qty</ion-label>
+          <ion-input formControlName="qty" type="text" inputmode="numeric" #qtyInput></ion-input>
+        </ion-item>
+      </ion-card>
+      <ion-row>
+        <ion-col>
+          <ion-button type="submit" color="danger" expand="block">Submit</ion-button>
+        </ion-col>
+      </ion-row>
+    </form>
+  </div>
+
+</ion-content>

@@ -1,0 +1,91 @@
+
+<!-- Searchbar with cancel button shown on focus -->
+<ion-searchbar debounce="380" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
+</ion-searchbar>
+
+
+<ion-content padding>
+
+  <!-- Default Refresher -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Normal screen -->
+  <ion-list *ngIf="filteredFoodList.length > 0; else loading">
+    <!-- Removed virtaul scroll there was an issue with the keyboard when forwar back-->
+    <!--    <ion-virtual-scroll [items]="filteredFoodList">
+      <ion-item-sliding *virtualItem="let food" #slidingItem>
+      -->
+    <ion-item-sliding *ngFor="let food of filteredFoodList" #slidingItem>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <h2><strong>{{food.name}}</strong></h2>
+          <h3>🔋 {{food.calories}} kcal</h3>
+          <p>🥩 {{food.protein | number:'.1'}}g 🍞 {{food.carbohydrates | number:'.1'}}g 🐖
+            {{food.fats | number:'.1'}}g :
+            (✔️ {{+food.fats - +food.saturated | number:'.1'}}g ❌ {{food.saturated | number:'.1'}}g) </p>
+        </ion-label>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option color="warning" (click)="editFood(food,slidingItem)">
+          <ion-icon name="create"></ion-icon>
+          Edit
+        </ion-item-option>
+        <ion-item-option color="danger" (click)="presentAlertConfirm(food,slidingItem)">
+          <ion-icon name="trash"></ion-icon>
+          Delete
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <!-- Skeleton dummy screen -->
+  <ng-template #loading>
+    <ion-list>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-template>
+
+  <!-- Fab placed to the bottom end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="addFood()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

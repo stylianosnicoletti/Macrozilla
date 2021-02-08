@@ -106,7 +106,7 @@ export class AddFoodPage {
     };
   }
 
-  // Returns the food name after appending grams and comment
+  // Returns the food name after appending grams and comment as a whole
   prepareName(name: String, grams: String, comment: String) {
     if (comment.length > 0) {
       return name + " " + "(" + grams + "g" + " " + "-" + " " + comment + ")";

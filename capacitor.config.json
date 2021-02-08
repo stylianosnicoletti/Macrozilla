@@ -10,7 +10,6 @@
       "launchShowDuration": 0
     }
   },
-
   "cordova": {
     "preferences": {
       "ScrollEnabled": "false",

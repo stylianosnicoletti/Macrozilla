@@ -18,13 +18,16 @@ export class AddFoodPage {
   food: Food;
   addForm: FormGroup;
   isSubmitted = false;
+  gramsDefaultValue: Number;
 
   constructor(
     private _router: Router,
     private _formBuilder: FormBuilder,
     private _foodService: FoodService,
-    private _toastService: ToastService) {
+    private _toastService: ToastService,
+  ) {
     this.initialiseItems();
+    this.gramsDefaultValue = 100;
   }
 
   ionViewWillEnter() {
@@ -51,6 +54,8 @@ export class AddFoodPage {
 
     this.addForm = this._formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(5)]],
+      grams: ['', [Validators.required, Validators.minLength(1), Validators.pattern(integerRegexPattern), Validators.maxLength(6)]],
+      comment: ['', [Validators.maxLength(15)]],
       protein: ['', [Validators.required, Validators.pattern(decimalRegexPattern), Validators.maxLength(6)]],
       carbohydrates: ['', [Validators.required, Validators.pattern(decimalRegexPattern), Validators.maxLength(6)]],
       fats: ['', [Validators.required, Validators.pattern(decimalRegexPattern), Validators.maxLength(6)]],
@@ -91,7 +96,7 @@ export class AddFoodPage {
   // Fill food object from form values
   fillFood(formValue: any) {
     this.food = {
-      name: formValue.name,
+      name: this.prepareName(formValue.name, formValue.grams, formValue.comment),
       protein: formValue.protein,
       carbohydrates: formValue.carbohydrates,
       fats: formValue.fats,
@@ -99,5 +104,15 @@ export class AddFoodPage {
       calories: formValue.calories,
       key: null
     };
+  }
+
+  // Returns the food name after appending grams and comment
+  prepareName(name: String, grams: String, comment: String) {
+    if (comment.length > 0) {
+      return name + " " + "(" + grams + "g" + " " + "-" + " " + comment + ")";
+    }
+    else {
+      return name + " " + "(" + grams + "g" + ")";
+    }
   }
 }

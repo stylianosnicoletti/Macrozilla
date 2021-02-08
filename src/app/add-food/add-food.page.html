@@ -9,37 +9,50 @@
 
 <ion-content>
   <form [formGroup]="addForm" (ngSubmit)="submitForm()" (keyup.enter)="submitForm()" novalidate>
+    <ion-card>
+      <ion-item lines="full">
+        <ion-label position="floating">Name</ion-label>
+        <ion-input formControlName="name" type="text" #nameInput></ion-input>
+      </ion-item>
 
-    <ion-item lines="full">
-      <ion-label position="floating">Name</ion-label>
-      <ion-input formControlName="name" type="text" #nameInput></ion-input>
-    </ion-item>
+      <ion-item lines="full">
+        <ion-label position="floating">Comment 📝</ion-label>
+        <ion-input formControlName="comment" type="text"></ion-input>
+      </ion-item>
 
-    <ion-item lines="full">
-      <ion-label position="floating">Calories 🔋</ion-label>
-      <ion-input formControlName="calories"type="text" inputmode="numeric"></ion-input>
-    </ion-item>
+      <ion-item lines="full">
+        <ion-label position="floating">Grams ⚖️</ion-label>
+        <ion-input formControlName="grams" [(ngModel)]="gramsDefaultValue" type="text" value=100 inputmode="numeric">
+        </ion-input>
+      </ion-item>
+    </ion-card>
 
-    <ion-item lines="full">
-      <ion-label position="floating">Fats 🐖</ion-label>
-      <ion-input formControlName="fats" type="text" inputmode="numeric"></ion-input>
-    </ion-item>
+    <ion-card>
+      <ion-item lines="full">
+        <ion-label position="floating">Calories 🔋</ion-label>
+        <ion-input formControlName="calories" type="text" inputmode="numeric"></ion-input>
+      </ion-item>
 
-    <ion-item lines="full">
-      <ion-label position="floating">Saturated Fats ❌</ion-label>
-      <ion-input formControlName="saturated" type="text" inputmode="numeric"></ion-input>
-    </ion-item>
+      <ion-item lines="full">
+        <ion-label position="floating">Fats 🐖</ion-label>
+        <ion-input formControlName="fats" type="text" inputmode="numeric"></ion-input>
+      </ion-item>
 
-    <ion-item lines="full">
-      <ion-label position="floating">Carbohydrates 🍞</ion-label>
-      <ion-input formControlName="carbohydrates" type="text" inputmode="numeric"></ion-input>
-    </ion-item>
-    
-    <ion-item lines="full">
-      <ion-label position="floating">Protein 🥩</ion-label>
-      <ion-input formControlName="protein" type="text" inputmode="numeric"></ion-input>
-    </ion-item>
+      <ion-item lines="full">
+        <ion-label position="floating">Saturated Fats ❌</ion-label>
+        <ion-input formControlName="saturated" type="text" inputmode="numeric"></ion-input>
+      </ion-item>
 
+      <ion-item lines="full">
+        <ion-label position="floating">Carbohydrates 🍞</ion-label>
+        <ion-input formControlName="carbohydrates" type="text" inputmode="numeric"></ion-input>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label position="floating">Protein 🥩</ion-label>
+        <ion-input formControlName="protein" type="text" inputmode="numeric"></ion-input>
+      </ion-item>
+    </ion-card>
     <ion-row>
       <ion-col>
         <ion-button type="submit" color="danger" expand="block">Submit</ion-button>
@@ -47,5 +60,5 @@
     </ion-row>
   </form>
 
-  
+
 </ion-content>

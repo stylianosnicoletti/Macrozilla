@@ -14,7 +14,7 @@ When adding a new package
 
 To Run Andoid Version
 ---------------------
-* npx cap ini
+* npx cap init (select names,etc)
 * npx cap android
 * make sure that capacitor.config.json has the correct path for android studio
 * ionic cap sync

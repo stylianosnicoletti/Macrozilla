@@ -13,6 +13,8 @@ export class FoodService {
 
   foodsFire: AngularFireList<any>;
   foods: Observable<Food[]>;
+  servingUnitsFire: AngularFireList<any>;
+  servingUnits: Observable<ServingUnit[]>;
   foodFire: AngularFireObject<any>;
   food: Observable<Food>;
 
@@ -71,6 +73,18 @@ export class FoodService {
     });
     return timesFoodExist;
   }
+
+  // Get all serving units
+  getAllServingUnits(): Observable<ServingUnit[]> {
+      this.servingUnitsFire = this._angularFireDatabase.list('/servingUnits/');
+      this.servingUnits = this.servingUnitsFire.snapshotChanges().pipe(
+        map(changes =>
+          changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
+        )
+      );
+      return this.servingUnits;
+  }
+
 }
 
 

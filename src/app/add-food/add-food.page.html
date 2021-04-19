@@ -9,6 +9,11 @@
 
 <ion-content>
   <form [formGroup]="addForm" (ngSubmit)="submitForm()" (keyup.enter)="submitForm()" novalidate>
+    
+    <ion-item-divider>
+      <ion-label>General Inforamtion</ion-label>
+    </ion-item-divider>
+    
     <ion-card>
       <ion-item lines="full">
         <ion-label position="floating">Name</ion-label>
@@ -19,13 +24,41 @@
         <ion-label position="floating">Comment 📝</ion-label>
         <ion-input formControlName="comment" type="text"></ion-input>
       </ion-item>
-
-      <ion-item lines="full">
-        <ion-label position="floating">Grams ⚖️</ion-label>
-        <ion-input formControlName="grams" [(ngModel)]="gramsDefaultValue" type="text" value=100 inputmode="numeric">
-        </ion-input>
-      </ion-item>
     </ion-card>
+
+    <ion-item-divider>
+      <ion-label>Serving Size</ion-label>
+    </ion-item-divider>
+
+    <ion-card>
+      <ion-grid>
+        <ion-row>
+
+          <ion-col>
+            <ion-item lines="full">
+              <ion-input formControlName="servingAmount" [(ngModel)]="servingAmountDefaultValue" type="text"
+                inputmode="numeric">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <ion-col>
+            <ion-item lines="full">
+              <ion-select interface="popover" formControlName="servingUnit" placeholder="Choose Unit">
+                <ion-select-option *ngFor="let s of servingUnits" [value]="s">{{ s.Name }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col> 
+
+        </ion-row>
+      </ion-grid>
+    </ion-card>
+
+    <ion-item-divider>
+      <ion-label>Nutritional Inforamtion</ion-label>
+    </ion-item-divider>
+
+
 
     <ion-card>
       <ion-item lines="full">

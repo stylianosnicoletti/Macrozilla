@@ -28,3 +28,11 @@ export interface Summary {
   totalCalories: number;
 }
 
+export interface ServingUnit{
+  key: any;
+  name: string;
+  shortCode: string;
+  shortCodePlural: string;
+}
+
+

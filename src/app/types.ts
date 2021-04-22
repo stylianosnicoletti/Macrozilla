@@ -30,9 +30,9 @@ export interface Summary {
 
 export interface ServingUnit{
   key: any;
-  name: string;
-  shortCode: string;
-  shortCodePlural: string;
+  Name: string;
+  ShortCode: string;
+  ShortCodePlural: string;
 }
 
 

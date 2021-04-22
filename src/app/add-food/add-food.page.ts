@@ -1,9 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { FoodService } from '../services/food.service';
 import { ToastService } from '../services/toast.service';
-import { Food } from '../types';
+import { Food, ServingUnit } from '../types';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MyMacrosConstants } from '../my-macros-constants'
 import { IonInput } from '@ionic/angular';

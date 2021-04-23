@@ -36,3 +36,4 @@ Deployment Fireabse
 * sudo npm install -g @angular/cli
 * firebase login
 * firebase init hosting (follow steps and also create workflows for github)
+* firebase login:ci (To get token)

@@ -21,6 +21,18 @@ To Run Andoid Version
 * sudo npx cap open android
 
 Development Environment
----------------------
-* Install latest LTS NodeJs
-*  npm install -g @ionic/cli
+------------------------
+* Configure Ubuntu WSL on Windows 
+* Add Remote-WSL on VSCode
+* Install Nodejs and npm using: https://github.com/nodesource/distributions/blob/master/README.md
+* sudo npm install -g @ionic/cli
+* Pull the app in a non NTFS direcotry (E.g. home/user/) 
+* Use Remote-WSL and bash for development
+
+Deployment Fireabse
+-------------------
+* Use guide: https://ionicframework.com/docs/angular/pwa
+* sudo npm install -g firebase-tools
+* sudo npm install -g @angular/cli
+* firebase login
+* firebase init hosting (follow steps and also create workflows for github)

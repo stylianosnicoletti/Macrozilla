@@ -19,3 +19,8 @@ To Run Andoid Version
 * make sure that capacitor.config.json has the correct path for android studio
 * ionic cap sync
 * sudo npx cap open android
+
+Development Environment
+---------------------
+* Install latest LTS NodeJs
+*  npm install -g @ionic/cli

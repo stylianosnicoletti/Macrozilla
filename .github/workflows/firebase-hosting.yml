@@ -24,7 +24,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: sudo npm install -g @ionic/cli
-    - run: sudo npm install -g @angular/cli
+    #- run: sudo npm install -g @angular/cli
     - name: npm install, ionic build production
       run: |
         npm install

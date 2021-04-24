@@ -20,7 +20,7 @@ To Run Andoid Version
 * ionic cap sync
 * sudo npx cap open android
 
-Development Environment
+Development Environment in Windows
 ------------------------
 * Configure Ubuntu WSL on Windows 
 * Add Remote-WSL on VSCode
@@ -28,6 +28,7 @@ Development Environment
 * sudo npm install -g @ionic/cli
 * Pull the app in a non NTFS direcotry (E.g. home/user/) 
 * Use Remote-WSL and bash for development
+* ionic serve --external (use external ip not local since local fails ERR_CONNECTION_REFUSED)
 
 Deployment Fireabse
 -------------------

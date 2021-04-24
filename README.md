@@ -34,6 +34,8 @@ Deployment Fireabse
 * Use guide: https://ionicframework.com/docs/angular/pwa
 * sudo npm install -g firebase-tools
 * sudo npm install -g @angular/cli
+* Configure pwa angular
+* Set no cache for "ngsw-worker.js", etc in firabase.json
 * firebase login
 * firebase init hosting (follow steps and also create workflows for github)
 * firebase login:ci (To get token)

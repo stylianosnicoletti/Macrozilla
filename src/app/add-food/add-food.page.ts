@@ -6,7 +6,8 @@ import { ToastService } from '../services/toast.service';
 import { Food, ServingUnit } from '../types';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MyMacrosConstants } from '../my-macros-constants'
-import { PopoverController , IonInput } from '@ionic/angular';
+import { PopoverController, IonInput } from '@ionic/angular';
+import { UnsubscribeService } from '../services/unsubscribe.service';
 
 @Component({
   selector: 'app-add-food',
@@ -16,7 +17,7 @@ import { PopoverController , IonInput } from '@ionic/angular';
 export class AddFoodPage {
 
   @ViewChild('nameInput') nameInput: IonInput;
-  @ViewChild('servingUnitSelect') servingUnitSelect: PopoverController ;
+  @ViewChild('servingUnitSelect') servingUnitSelect: PopoverController;
 
   food: Food;
   addForm: FormGroup;
@@ -30,17 +31,33 @@ export class AddFoodPage {
     private _formBuilder: FormBuilder,
     private _foodService: FoodService,
     private _toastService: ToastService,
+    private _unsubscribeService: UnsubscribeService,
     private _popController: PopoverController
   ) {
     this.initialiseItems();
     this.servingAmountDefaultValue = MyMacrosConstants.SERVING_AMOUNT_DEFAULT_VALUE;
   }
 
+  /**
+  * Do before enter page.
+  */
   ionViewWillEnter() {
     console.log("entering add food page");
     this.setFocus();
   }
 
+  /**
+  * Do before leave page.
+  */
+  ionViewWillLeave() {
+    console.log("Leaving add food page");
+    this.closePopItems();
+    this.subscriptionsList = this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+  }
+
+  /**
+  * Initialises Items. (E.g. Serving Units)
+  */
   initialiseItems() {
     this.subscriptionsList.push(
       this._foodService.getAllServingUnits().subscribe(res => {
@@ -49,36 +66,28 @@ export class AddFoodPage {
     this.addFoodData();
   }
 
-  async ionViewWillLeave() {
-    console.log("Leaving add food page");
-    await this.closePopItems();
-    this.unsubscribeData();
-  }
-
-
-  // Closing pop items (E.g. Service Unit Select)
+  /**
+  * Closing pop items (E.g. Service Unit Select).
+  */
   async closePopItems() {
-     console.log("Close pop items.");
-     const popover = await this._popController.getTop();
-     if (popover)
-         await popover.dismiss(null);   
-    }
-
-  unsubscribeData() {
-    this.subscriptionsList.forEach(item => {
-      if (!item.closed) item.unsubscribe();
-    })
-    this.subscriptionsList = [];
+    console.log("Close pop items.");
+    const popover = await this._popController.getTop();
+    if (popover)
+      await popover.dismiss(null);
   }
 
-  // Set focus on quantity input
+  /** 
+  * Sets focus on name input.
+  */
   setFocus() {
     setTimeout(() => {
       this.nameInput.setFocus();
     });
   }
 
-  // Contains Reactive Form logic
+  /** 
+  * Contains Reactive Form logic.
+  */
   addFoodData() {
     // Validator pattern don't work with input type number
     // Use type ="text" inputmode="numeric" as quick fix
@@ -98,19 +107,24 @@ export class AddFoodPage {
     })
   }
 
-  // Route back to foods_databse tab
+  /** 
+  * Routes back to "foods_database" tab.
+  */
   goToFoodsDatabaseTab() {
     this._router.navigate(["/tabs/foods_database"]);
   }
 
-  // Submit changes
+  /** 
+  * Submits food form.
+  * Checks that all required values are entered and that food doesn't not already exist.
+  */
   async submitForm() {
     this.isSubmitted = true;
     if (!this.addForm.valid) {
       this._toastService.presentToast('Please provide all the required values!');
       return false;
     } else {
-      this.fillFood(this.addForm.value);
+      this.food = this.fillFood(this.addForm.value);
       if (await this.foodNameExistGuard(this.food)) {
         this._toastService.presentToast('Food with that name already exists!');
         return false;
@@ -122,14 +136,22 @@ export class AddFoodPage {
     }
   }
 
-  // Check if food name exist under that user
+  /** 
+  * Checks if food name exist under that user.
+  * @param {Food} food Food.
+  * @return {Promise<boolean>} True if it exists. False when it doesn't.
+  */
   async foodNameExistGuard(food: Food): Promise<boolean> {
     return (await this._foodService.doesFoodNameExist(food) != 0);
   }
 
-  // Fill food object from form values
-  fillFood(formValue: any) {
-    this.food = {
+  /** 
+  * Prepares Food with form values provided.
+  * @param {any} formValue Form value.
+  * @return {Food} Filled Food.
+  */
+  fillFood(formValue: any): Food {
+    return {
       name: this.prepareName(formValue.name, formValue.servingAmount, formValue.servingUnit, formValue.comment),
       protein: formValue.protein,
       carbohydrates: formValue.carbohydrates,
@@ -140,7 +162,14 @@ export class AddFoodPage {
     };
   }
 
-  // Returns the food name after appending grams and comment as a whole
+  /** 
+  * Prepares the food name.
+  * @param {string} name Name of food (E.g. Chocolate).
+  * @param {string} servingAmount Serving amount (E.g. 100).
+  * @param {ServingUnit} servingUnit Serving Unit (E.g Grams).
+  * @param {string} comment Serving Unit (E.g bar).
+  * @return {string} The full name (E.g. Chocolate (100g - bar)).
+  */
   prepareName(name: String, servingAmount: string, servingUnit: ServingUnit, comment: string) {
     if (comment.length > 0) {
       return name + " (" + servingAmount + this.mapServingUnitToShortCode(servingAmount, servingUnit) + " - " + comment + ")";
@@ -150,8 +179,13 @@ export class AddFoodPage {
     }
   }
 
-  // Return the shortcode or plural short code of the serving unit to be appended in the name
-  mapServingUnitToShortCode(servingAmount: string, servingUnit: ServingUnit) {
+  /** 
+  * Decides which serving unit shortcode should be used based on the amount.
+  * @param {string} servingAmount Serving amount (E.g. 100)
+  * @param {ServingUnit} servingUnit Serving Unit (E.g Grams)
+  * @return {string} The shortcode or plural short code of the serving unit to be appended in the name (E.g gram or grams)
+  */
+  mapServingUnitToShortCode(servingAmount: string, servingUnit: ServingUnit): string {
     if (Number.parseInt(servingAmount) > 1 && servingUnit.ShortCodePlural != null) {
       return servingUnit.ShortCodePlural;
     }

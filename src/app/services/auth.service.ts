@@ -12,7 +12,7 @@ export class AuthService {
     public afAuth: AngularFireAuth) {
   }
 
-  doRegister(value) {
+  doRegister(value): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       firebase.auth().createUserWithEmailAndPassword(value.email, value.password)
         .then(res => {
@@ -24,7 +24,7 @@ export class AuthService {
     })
   }
 
-  doUpdateDisplayName(profName){
+  doUpdateDisplayName(profName): Promise<any>{
     return new Promise<any>((resolve, reject) => {
       firebase.auth().currentUser.updateProfile({displayName : profName}).
       then(res => {
@@ -33,7 +33,7 @@ export class AuthService {
     })
   }
 
-  doUpdateProfilePhotoURL(profPhoto){
+  doUpdateProfilePhotoURL(profPhoto): Promise<any>{
     return new Promise<any>((resolve, reject) => {
       firebase.auth().currentUser.updateProfile({photoURL : profPhoto}).
       then(res => {
@@ -42,7 +42,7 @@ export class AuthService {
     })
   }
 
-  doLogin(value) {
+  doLogin(value): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       firebase.auth().signInWithEmailAndPassword(value.email, value.password)
         .then(res => {
@@ -51,7 +51,7 @@ export class AuthService {
     })
   }
 
-  doPasswordReset(value) {
+  doPasswordReset(value): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       firebase.auth().sendPasswordResetEmail(value.email)
         .then(res => {
@@ -60,7 +60,7 @@ export class AuthService {
     })
   }
 
-  doLogout() {
+  doLogout(): Promise<any> {
     //quick hack to kill references to database
     //window.location.reload();
     return new Promise((resolve, reject) => {

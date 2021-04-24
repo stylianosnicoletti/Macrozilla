@@ -6,7 +6,7 @@ import { ToastService } from '../services/toast.service';
 import { Food, ServingUnit } from '../types';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MyMacrosConstants } from '../my-macros-constants'
-import { IonInput } from '@ionic/angular';
+import { PopoverController , IonInput } from '@ionic/angular';
 
 @Component({
   selector: 'app-add-food',
@@ -16,6 +16,7 @@ import { IonInput } from '@ionic/angular';
 export class AddFoodPage {
 
   @ViewChild('nameInput') nameInput: IonInput;
+  @ViewChild('servingUnitSelect') servingUnitSelect: PopoverController ;
 
   food: Food;
   addForm: FormGroup;
@@ -29,12 +30,14 @@ export class AddFoodPage {
     private _formBuilder: FormBuilder,
     private _foodService: FoodService,
     private _toastService: ToastService,
+    private _popController: PopoverController
   ) {
     this.initialiseItems();
     this.servingAmountDefaultValue = MyMacrosConstants.SERVING_AMOUNT_DEFAULT_VALUE;
   }
 
   ionViewWillEnter() {
+    console.log("entering add food page");
     this.setFocus();
   }
 
@@ -44,6 +47,28 @@ export class AddFoodPage {
         this.servingUnits = res;
       }));
     this.addFoodData();
+  }
+
+  async ionViewWillLeave() {
+    console.log("Leaving add food page");
+    await this.closePopItems();
+    this.unsubscribeData();
+  }
+
+
+  // Closing pop items (E.g. Service Unit Select)
+  async closePopItems() {
+     console.log("Close pop items.");
+     const popover = await this._popController.getTop();
+     if (popover)
+         await popover.dismiss(null);   
+    }
+
+  unsubscribeData() {
+    this.subscriptionsList.forEach(item => {
+      if (!item.closed) item.unsubscribe();
+    })
+    this.subscriptionsList = [];
   }
 
   // Set focus on quantity input

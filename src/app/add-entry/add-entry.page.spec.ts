@@ -10,7 +10,7 @@ describe('AddEntryPage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ AddEntryPage ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddEntryPage);

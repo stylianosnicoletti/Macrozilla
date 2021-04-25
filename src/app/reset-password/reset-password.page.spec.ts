@@ -10,7 +10,7 @@ describe('ResetPasswordPage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ ResetPasswordPage ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ResetPasswordPage);

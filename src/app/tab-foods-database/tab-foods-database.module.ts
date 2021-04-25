@@ -17,7 +17,6 @@ const routes: Routes = [
     IonicModule,
     CommonModule,
     FormsModule,
-    //RouterModule.forRoot(routes, {onSameUrlNavigation: 'reload'}),
     RouterModule.forChild([{ 
       path: '',
        component: TabFoodsDatabasePage

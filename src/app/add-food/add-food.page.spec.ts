@@ -10,7 +10,7 @@ describe('AddFoodPage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ AddFoodPage ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddFoodPage);

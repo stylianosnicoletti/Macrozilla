@@ -9,7 +9,7 @@ describe('TabAccountPage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [TabAccountPage],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TabAccountPage);

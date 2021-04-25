@@ -22,7 +22,6 @@ export class AppComponent {
     private _angularFireDatabase: AngularFireDatabase) {
     this.initializeApp();
     this.initializePauseResumeSubscriptions();
-
   }
 
   initializeApp() {

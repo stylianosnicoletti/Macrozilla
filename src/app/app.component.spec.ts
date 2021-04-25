@@ -5,8 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AngularFireDatabase } from '@angular/fire/database';
-import { Observable, Subject } from 'rxjs';
-import { Mock } from 'protractor/built/driverProviders';
+import {  Subject } from 'rxjs';
 
 describe('AppComponent', () => {
 

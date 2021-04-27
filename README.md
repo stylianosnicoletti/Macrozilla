@@ -12,13 +12,23 @@ When adding a new package
 --------------------------
 * npm install XYZ --save-prod (to put it in the package.json and avoid future rebuilt issues)
 
-To Run Andoid Version
+To Run Andoid Version OLD
 ---------------------
 * npx cap init (select names,etc)
 * npx cap android
 * make sure that capacitor.config.json has the correct path for android studio
 * ionic cap sync
 * sudo npx cap open android
+
+To Run Andoid Version NEW
+---------------------
+* Link: https://ionicframework.com/docs/developing/android
+* ionic capacitor add android
+* make sure that capacitor.config.json has the correct path for android studio, names, etc
+* gitgnore will be configured to skip asset files automatically commit it to skip always 
+* ionic capacitor copy android
+* ionic capacitor run android (might need sudo if Android Studio in root folders)
+* run app in Android Studio
 
 Development Environment in Windows
 ------------------------

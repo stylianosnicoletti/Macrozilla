@@ -27,7 +27,7 @@ To Run Andoid Version NEW
 * make sure that capacitor.config.json has the correct path for android studio, names, etc
 * gitgnore will be configured to skip asset files automatically commit it to skip always 
 * ionic capacitor copy android
-* ionic capacitor run android 
+* ionic capacitor run android (might need sudo if Android Studio in root folders)
 * run app in Android Studio
 
 Development Environment in Windows

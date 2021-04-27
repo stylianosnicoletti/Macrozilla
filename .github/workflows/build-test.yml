@@ -5,9 +5,9 @@ name: Build & Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ android ]
   pull_request:
-    branches: [ main ]
+    branches: [ android ]
 
 jobs:
   build:

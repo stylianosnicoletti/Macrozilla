@@ -37,22 +37,22 @@ export class TabDailyEntryPage {
     private _network: Network) {
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     console.log("entering daily entries page");
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(() => {
+    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
       this.unsubscribeData();
-      this.presentNetworkAlert();
+      await this.presentNetworkAlert();
       console.log('network was disconnected :-(');
       if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
     });
 
-    this.connectSubscription = this._network.onConnect().subscribe(() => {
+    this.connectSubscription = this._network.onConnect().subscribe(async() => {
       this.unsubscribeData();
-      this.initialiseItems();
+      await this.initialiseItems();
       console.log('network connected!');
     });
 
-    this.initialiseItems();
+    await this.initialiseItems();
   }
 
   ionViewWillLeave() {
@@ -73,12 +73,12 @@ export class TabDailyEntryPage {
     this.subscriptionsList = [];
   }
 
-  initialiseItems() {
-    this.transformDate(Date.now());
+  async initialiseItems() {
+    await this.transformDate(Date.now());
   }
 
-  doRefresh(event) {
-    this.initialiseItems();
+  async doRefresh(event) {
+    await this.initialiseItems();
     setTimeout(() => {
       event.target.complete();
     }, 1000);
@@ -95,17 +95,16 @@ export class TabDailyEntryPage {
   }
 
   // Transforms a the date to a specifed format and observe summary for that date
-  transformDate(myDate) {
+  async transformDate(myDate) {
     this.date = this._datePipe.transform(myDate, 'yyyy-MM-dd');
-    this.subscriptionsList.push(this._foodEntryService.getAllFoodEntriesByDate(this.date).subscribe(x => this.dailyEntriesList = x));
-    this.subscriptionsList.push(this._summaryService.getSummaryObservable(this.date).subscribe(x => this.summaryDay = x));
+    this.subscriptionsList.push((await this._foodEntryService.getAllFoodEntriesByDate(this.date)).subscribe(x => this.dailyEntriesList = x));
+    this.subscriptionsList.push((await this._summaryService.getSummaryObservable(this.date)).subscribe(x => this.summaryDay = x));
   }
 
   // Parse selected date
-  parseDate() {
-    this.transformDate(this.date);
+  async parseDate() {
+    await this.transformDate(this.date);
   }
-
 
   // Delete Confirmation
   async presentAlertConfirm(entryArg: DailyEntryFood, slidingItem: any) {
@@ -125,18 +124,18 @@ export class TabDailyEntryPage {
           }
         }, {
           text: 'Yes',
-          handler: () => {
+          handler: async () => {
             if (this.numberOfEntriesByDate > 1) {
-              this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
+              await this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
               // Decrement summary on entry deletion 
               this._summaryService.decrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
             } else {
               // Remove summary on last entry deletion 
-              this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
-              this._summaryService.removeSummary(this.date);
+              await this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
+              await this._summaryService.removeSummary(this.date);
             }
             slidingItem.close();
-            this._loadingService.presentLoading('Deleting..', 500);
+            await this._loadingService.presentLoading('Deleting..', 500);
           }
         }
 
@@ -159,7 +158,7 @@ export class TabDailyEntryPage {
 
   // Add New Entry
   async addNewEntry() {
-    this._router.navigate(["/add_entry/" + this.date]);
+    await this._router.navigate(["/add_entry/" + this.date]);
   }
 
 }

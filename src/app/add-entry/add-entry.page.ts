@@ -49,25 +49,25 @@ export class AddEntryPage {
     private _alertController: AlertController) {
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     console.log("entering add entry page");
 
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(() => {
+    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
       this.unsubscribeData();
       this.searchTerm = "";
       // Don't alert becuase daily entry tabs page will do that
       console.log('network was disconnected :-(');
-      this.goToDailyEntryTab();
+      await this.goToDailyEntryTab();
     });
 
-    this.connectSubscription = this._network.onConnect().subscribe(() => {
+    this.connectSubscription = this._network.onConnect().subscribe(async () => {
       this.unsubscribeData();
-      this.initialiseItems();
+      await this.initialiseItems();
       this.searchTerm = "";
       console.log('network connected!');
     });
 
-    this.initialiseItems();
+    await this.initialiseItems();
   }
 
   ionViewWillLeave() {
@@ -88,18 +88,18 @@ export class AddEntryPage {
     this.subscriptionsList = [];
   }
 
-  initialiseItems() {
+  async initialiseItems() {
     this.enterGuard();
     this.addEntryData();
     this.subscriptionsList.push(
-      this._foodService.getAllFoods().subscribe(res => {
+      (await this._foodService.getAllFoods()).subscribe(res => {
         this.filteredFoodList = res;
       }));
   }
 
-  doRefresh(event) {
+  async doRefresh(event) {
     this.unsubscribeData();
-    this.initialiseItems();
+    await this.initialiseItems();
     this.searchTerm = "";
     setTimeout(() => {
       event.target.complete();
@@ -124,16 +124,16 @@ export class AddEntryPage {
   }
 
   // Route back to foods_databse tab
-  goToDailyEntryTab() {
-    this._router.navigate(["/tabs/daily_entry"]);
+  async goToDailyEntryTab() {
+    await this._router.navigate(["/tabs/daily_entry"]);
   }
 
   // Update filteredFoodList using search term parsed
-  filterFoods() {
+  async filterFoods() {
     this.hideForm();
     this.unhidetList();
     this.subscriptionsList.push(
-      this._foodService.getAllFoods().subscribe(res => {
+      (await this._foodService.getAllFoods()).subscribe(res => {
         this.filteredFoodList = res.filter((item) => {
           return (item.name.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1);
         })
@@ -167,8 +167,8 @@ export class AddEntryPage {
 
   // Set focus on quantity input
   setFocus() {
-    setTimeout(() => {
-      this.qtyInput.setFocus();
+    setTimeout(async () => {
+      await this.qtyInput.setFocus();
     });
   }
 
@@ -184,24 +184,24 @@ export class AddEntryPage {
   async submitForm() {
     this.isSubmitted = true;
     if (!this.addEntryForm.valid) {
-      this._toastService.presentToast('Please provide all the required values!');
+      await this._toastService.presentToast('Please provide all the required values!');
       return false;
     } else {
       this.entry = this.createEntry(this.food, this.addEntryForm.value.qty);
       this.entrySummary = this.createEntrySummary(this.entry);
-      this._foodEntryService.addFoodEntry(this.entry, this.date);
+      await this._foodEntryService.addFoodEntry(this.entry, this.date);
       this.existingSummary = await this._summaryService.getSummary(this.date);
       if (this.existingSummary != null) {
         // Increment summary if already exists
         this._summaryService.incrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
       } else {
         // Set summary if it does not exists
-        this._summaryService.setSummary(this.entrySummary, this.date);
+        await this._summaryService.setSummary(this.entrySummary, this.date);
       }
-      this._router.navigate(["/tabs/daily_entry"]);
+      await this._router.navigate(["/tabs/daily_entry"]);
       this.hideForm();
       this.unhidetList();
-      this._toastService.presentToast('Entry Successfully Added!');
+      await this._toastService.presentToast('Entry Successfully Added!');
     }
   }
 

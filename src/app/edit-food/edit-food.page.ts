@@ -32,7 +32,7 @@ export class EditFoodPage {
     private _alertController: AlertController) {
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     console.log("entering edit food page");
     this.disconnectSubscription = this._network.onDisconnect().subscribe(() => {
       this.unsubscribeData();
@@ -41,14 +41,14 @@ export class EditFoodPage {
       this.goToFoodsDatabaseTab()
     });
 
-    this.connectSubscription = this._network.onConnect().subscribe(() => {
+    this.connectSubscription = this._network.onConnect().subscribe(async () => {
       this.isFormReadyToBuild = false;
       this.unsubscribeData();
-      this.initialiseItems();
+      await this.initialiseItems();
       console.log('network connected!');
     });
 
-    this.initialiseItems();
+    await this.initialiseItems();
   }
 
   ionViewWillLeave() {
@@ -71,16 +71,20 @@ export class EditFoodPage {
   }
 
   // Initialise items
-  initialiseItems() {
-    this.foodExistGuard();
+  async initialiseItems() {
+    await this.foodExistGuard();
     this.updateFoodData();
-    this.subscriptionsList.push(this._foodService.getFood(this.foodKey).subscribe(res => { this.editForm.setValue(res, res.key = this._activatedRoute.snapshot.params['food_key']); }));
+    this.subscriptionsList.push(
+      (await this._foodService.getFood(this.foodKey)).subscribe(res => {
+        this.editForm.setValue(res, res.key = this._activatedRoute.snapshot.params['food_key']);
+      }
+      ));
   }
 
   // Check if the route param food key exist
-  foodExistGuard() {
+  async foodExistGuard() {
     this.foodKey = this._activatedRoute.snapshot.params['food_key'];
-    if (this._foodService.doesFoodKeyExist(this.foodKey) <= 0) {
+    if ((await this._foodService.doesFoodKeyExist(this.foodKey)) <= 0) {
       this._router.navigate(["/tabs/foods_database"]);
     } else {
       this.isFormReadyToBuild = true;
@@ -116,20 +120,20 @@ export class EditFoodPage {
   }
 
   // Route back to foods_databse tab
-  goToFoodsDatabaseTab() {
-    this._router.navigate(["/tabs/foods_database"]);
+  async goToFoodsDatabaseTab() {
+    await this._router.navigate(["/tabs/foods_database"]);
   }
 
   // Submit changes
-  submitForm() {
+  async submitForm() {
     this.isSubmitted = true;
     if (!this.editForm.valid) {
-      this._toastService.presentToast('Please provide all the required values!')
+      await this._toastService.presentToast('Please provide all the required values!')
       return false;
     } else {
-      this._foodService.updateFood(this.editForm.value);
-      this._router.navigate(["/tabs/foods_database"]);
-      this._toastService.presentToast('Food Successfully Edited!')
+      await this._foodService.updateFood(this.editForm.value);
+      await this._router.navigate(["/tabs/foods_database"]);
+      await this._toastService.presentToast('Food Successfully Edited!')
     }
   }
 }

@@ -49,9 +49,9 @@ export class AddFoodPage {
   /**
   * Do before leave page.
   */
-  ionViewWillLeave() {
+  async ionViewWillLeave() {
     console.log("Leaving add food page");
-    this.closePopItems();
+    await this.closePopItems();
     this.subscriptionsList = this._unsubscribeService.unsubscribeData(this.subscriptionsList);
   }
 
@@ -80,8 +80,8 @@ export class AddFoodPage {
   * Sets focus on name input.
   */
   setFocus() {
-    setTimeout(() => {
-      this.nameInput.setFocus();
+    setTimeout(async () => {
+      await this.nameInput.setFocus();
     });
   }
 
@@ -105,8 +105,8 @@ export class AddFoodPage {
   /** 
   * Routes back to "foods_database" tab.
   */
-  goToFoodsDatabaseTab() {
-    this._router.navigate(["/tabs/foods_database"]);
+  async goToFoodsDatabaseTab() {
+    await this._router.navigate(["/tabs/foods_database"]);
   }
 
   /** 
@@ -116,17 +116,17 @@ export class AddFoodPage {
   async submitForm() {
     this.isSubmitted = true;
     if (!this.addForm.valid) {
-      this._toastService.presentToast('Please provide all the required values!');
+      await this._toastService.presentToast('Please provide all the required values!');
       return false;
     } else {
       this.food = this.fillFood(this.addForm.value);
       if (await this.foodNameExistGuard(this.food)) {
-        this._toastService.presentToast('Food with that name already exists!');
+        await this._toastService.presentToast('Food with that name already exists!');
         return false;
       } else {
-        this._foodService.addFood(this.food);
-        this._router.navigate(["/tabs/foods_database"]);
-        this._toastService.presentToast('Food Successfully Added');
+        await this._foodService.addFood(this.food);
+        await this._router.navigate(["/tabs/foods_database"]);
+        await this._toastService.presentToast('Food Successfully Added');
       }
     }
   }
@@ -137,7 +137,7 @@ export class AddFoodPage {
   * @return {Promise<boolean>} True if it exists. False when it doesn't.
   */
   async foodNameExistGuard(food: Food): Promise<boolean> {
-    return (await this._foodService.doesFoodNameExist(food) != 0);
+    return ((await this._foodService.doesFoodNameExist(food)) != 0);
   }
 
   /** 

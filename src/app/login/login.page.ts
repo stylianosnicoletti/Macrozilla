@@ -26,14 +26,14 @@ export class LoginPage implements OnInit {
   };
 
   constructor(
-    private toastService: ToastService,
-    private authService: AuthService,
-    private formBuilder: FormBuilder,
-    private router: Router
+    private _toastService: ToastService,
+    private _authService: AuthService,
+    private _formBuilder: FormBuilder,
+    private _router: Router
   ) { }
 
   ngOnInit() {
-    this.validations_form = this.formBuilder.group({
+    this.validations_form = this._formBuilder.group({
       email: new FormControl('', Validators.compose([
         Validators.required,
         Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')
@@ -45,11 +45,11 @@ export class LoginPage implements OnInit {
     });
   }
 
-  tryLogin(value) {
-    this.authService.doLogin(value)
-      .then(res => {
-        if (this.authService.afAuth.auth.currentUser.emailVerified) {
-          this.router.navigate(["/tabs"]);
+  async tryLogin(value) {
+    await this._authService.doLogin(value)
+      .then(async () => {
+        if((await this._authService.afAuth.currentUser.then(u => u.emailVerified))) {
+          this._router.navigate(["/tabs"]);
         }
         else {
           this.errorMessage = "Email not verified";
@@ -59,15 +59,15 @@ export class LoginPage implements OnInit {
       })
   }
 
-  goRegisterPage() {
-    this.router.navigate(["/register"]);
+  async goRegisterPage() {
+    await this._router.navigate(["/register"]);
   }
 
-  goResetPasswordPage() {
-    this.router.navigate(["/reset_password"]);
+  async goResetPasswordPage() {
+    await this._router.navigate(["/reset_password"]);
   }
 
-  presentToast(value) {
-    this.toastService.presentToast(value);
+  async presentToast(value) {
+    await this._toastService.presentToast(value);
   }
 }

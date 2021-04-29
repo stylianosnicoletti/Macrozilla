@@ -15,7 +15,7 @@ export class ToastService {
       message: value,
       duration: 2000
     });
-    toast.present();
+    await toast.present();
   }
 
   async presentToastWithOptions(message: string) {
@@ -40,6 +40,6 @@ export class ToastService {
         }
       ]
     });
-    toast.present();
+    await toast.present();
   }
 }

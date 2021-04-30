@@ -27,6 +27,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: sudo apt install chromium-browser
 
+    - name: Running npm install
+      run: npm install
+
     - name: Install dependencies
       run: npm ci
 

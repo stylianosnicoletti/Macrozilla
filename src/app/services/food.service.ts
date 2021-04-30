@@ -24,8 +24,9 @@ export class FoodService {
   }
 
   // Get all foods from database ordered by name for the current user
-  getAllFoods(): Observable<Food[]> {
-    this.foodsFire = this._angularFireDatabase.list('/foods/' + this._authService.afAuth.auth.currentUser.uid + '/', ref => ref.orderByChild('name'));
+  async getAllFoods(): Promise<Observable<Food[]>> {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    this.foodsFire = this._angularFireDatabase.list('/foods/' + currentUserUid + '/', ref => ref.orderByChild('name'));
     this.foods = this.foodsFire.snapshotChanges().pipe(
       map(changes =>
         changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
@@ -35,39 +36,45 @@ export class FoodService {
   }
 
   // Delete food from database for the current user
-  deleteFood(key) {
-    this._angularFireDatabase.object('/foods/' + this._authService.afAuth.auth.currentUser.uid + '/' + key).remove();
+  async deleteFood(key) {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    this._angularFireDatabase.object('/foods/' + currentUserUid + '/' + key).remove();
   }
 
   // Update food on database for the current user
-  updateFood(food) {
-    this._angularFireDatabase.object('/foods/' + this._authService.afAuth.auth.currentUser.uid + '/' + food.key).update(food);
+  async updateFood(food) {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    this._angularFireDatabase.object('/foods/' + currentUserUid + '/' + food.key).update(food);
   }
 
   // Add food on database for the current user
-  addFood(food) {
-    this._angularFireDatabase.list('/foods/' + this._authService.afAuth.auth.currentUser.uid + '/').push(food);
+  async addFood(food) {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    this._angularFireDatabase.list('/foods/' + currentUserUid + '/').push(food);
   }
 
   // Get food from databade for the current user
-  getFood(key): Observable<Food> {
-    this.foodFire = this._angularFireDatabase.object('/foods/' + this._authService.afAuth.auth.currentUser.uid + '/' + key + '/');
+  async getFood(key): Promise<Observable<Food>> {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    this.foodFire = this._angularFireDatabase.object('/foods/' + currentUserUid + '/' + key + '/');
     this.food = this.foodFire.valueChanges();
     return this.food;
   }
 
   // Check to see if the food with that name already exist for that user and returns count 
   async doesFoodNameExist(food: Food): Promise<Number> {
-    const foodAlreadyExistsFireRef = this._angularFireDatabase.database.ref('/foods/' + this._authService.afAuth.auth.currentUser.uid + '/');
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const foodAlreadyExistsFireRef = this._angularFireDatabase.database.ref('/foods/' + currentUserUid + '/');
     return foodAlreadyExistsFireRef.orderByChild('name').equalTo(food.name).once("value").then(function (snapshot) {
       return snapshot.numChildren();
     });
   }
 
   // Check to see if the food with that id already exist for that user and returns count 
-  doesFoodKeyExist(key: any): Number {
+  async doesFoodKeyExist(key: any): Promise<Number> {
     let timesFoodExist = 0;
-    const foodAlreadyExistsFireRef = this._angularFireDatabase.database.ref('/foods/' + this._authService.afAuth.auth.currentUser.uid + '/');
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const foodAlreadyExistsFireRef = this._angularFireDatabase.database.ref('/foods/' + currentUserUid + '/');
     foodAlreadyExistsFireRef.orderByKey().equalTo(key).on("value", function (snapshot) {
       timesFoodExist = snapshot.numChildren();
     });
@@ -76,13 +83,13 @@ export class FoodService {
 
   // Get all serving units
   getAllServingUnits(): Observable<ServingUnit[]> {
-      this.servingUnitsFire = this._angularFireDatabase.list('/servingUnits/');
-      this.servingUnits = this.servingUnitsFire.snapshotChanges().pipe(
-        map(changes =>
-          changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
-        )
-      );
-      return this.servingUnits;
+    this.servingUnitsFire = this._angularFireDatabase.list('/servingUnits/');
+    this.servingUnits = this.servingUnitsFire.snapshotChanges().pipe(
+      map(changes =>
+        changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
+      )
+    );
+    return this.servingUnits;
   }
 
 }

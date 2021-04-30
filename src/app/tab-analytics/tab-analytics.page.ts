@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { AlertController } from '@ionic/angular';
 import { Network } from '@ionic-native/network/ngx';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
-import * as Chart from 'chart.js';
+import { Chart } from 'chart.js';
 
 @Component({
   selector: 'app-tab-analytics',
@@ -12,7 +12,7 @@ import * as Chart from 'chart.js';
   styleUrls: ['./tab-analytics.page.scss'],
 })
 export class TabAnalyticsPage {
-  
+
   @ViewChild('lineChartCaloriesAllTime') lineChartCaloriesAllTime;
   @ViewChild('pieChartMacrosAllTime') pieChartMacrosAllTime;
 
@@ -37,11 +37,11 @@ export class TabAnalyticsPage {
     private _screenOrientation: ScreenOrientation) {
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     console.log("entering analytics page");
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(() => {
+    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
       this.unsubscribeData();
-      this.presentNetworkAlert();
+      await this.presentNetworkAlert();
       console.log('network was disconnected :-(');
     });
 
@@ -58,7 +58,7 @@ export class TabAnalyticsPage {
       //now am enabling portrain onluy from android manifest
       //location.reload();
     });
-    this.initialiseItems();
+    await this.initialiseItems();
   }
 
   ionViewWillLeave() {
@@ -84,8 +84,8 @@ export class TabAnalyticsPage {
     this.subscriptionsList = [];
   }
 
-  initialiseItems() {
-    this.prepareAllTimeCharts();
+  async initialiseItems() {
+    await this.prepareAllTimeCharts();
   }
 
   // No network alert
@@ -98,21 +98,20 @@ export class TabAnalyticsPage {
     await alert.present();
   }
 
-  averageOfArray(array: number[]) : number {
-    return this.sumOfArray(array)/array.length;
+  averageOfArray(array: number[]): number {
+    return this.sumOfArray(array) / array.length;
   }
 
-  sumOfArray(array: number[]) : number{
+  sumOfArray(array: number[]): number {
     return array.reduce((previous, current) => current += previous);
-
   }
 
   precise_round(num, decimals) {
     return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
   }
 
-  prepareAllTimeCharts() {
-    this.subscriptionsList.push(this._summaryService.getAllSummaries().subscribe(r => {
+  async prepareAllTimeCharts() {
+    this.subscriptionsList.push((await this._summaryService.getAllSummaries()).subscribe(r => {
       this.allTimeDates = [];
       this.allTimeCalories = [];
       this.allTimeProteinCalories = 0;
@@ -129,7 +128,7 @@ export class TabAnalyticsPage {
         this.allTimeSaturatedCalories += a.totalGramsSaturated * 9;
         this.allTimeUnsaturatedCalories += ((a.totalGramsFats * 9) - (a.totalGramsSaturated * 9));
       })
-      this.allTimeAverageCalories = this.precise_round(this.averageOfArray(this.allTimeCalories),0);
+      this.allTimeAverageCalories = this.precise_round(this.averageOfArray(this.allTimeCalories), 0);
       this.createAllTimeCharts();
     }));
   }
@@ -151,7 +150,7 @@ export class TabAnalyticsPage {
       options: {
         legend: null,
         scales: {
-          yAxes: [{
+          yaxes: [{
             ticks: {
               beginAtZero: null
             }
@@ -199,14 +198,13 @@ export class TabAnalyticsPage {
             },
             ticks: {
               display: false
-            }
+            },
           }]
 
         }
       }
     }));
   }
-
 }
 
 

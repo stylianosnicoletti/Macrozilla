@@ -29,23 +29,23 @@ export class TabFoodsDatabasePage {
       private _network: Network) {
   }
 
-  ionViewWillEnter() {
+ async ionViewWillEnter() {
     console.log("entering foods dbs page");
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(() => {
+    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
       this.unsubscribeData();
       this.searchTerm = "";
-      this.presentNetworkAlert();
+      await this.presentNetworkAlert();
       console.log('network was disconnected :-(');
     });
 
-    this.connectSubscription = this._network.onConnect().subscribe(() => {
+    this.connectSubscription = this._network.onConnect().subscribe(async () => {
       this.unsubscribeData();
-      this.initialiseItems();
+      await this.initialiseItems();
       this.searchTerm = "";
       console.log('network connected!');
     });
 
-    this.initialiseItems();
+    await this.initialiseItems();
   }
 
   ionViewWillLeave() {
@@ -67,16 +67,16 @@ export class TabFoodsDatabasePage {
     this.subscriptionsList = [];
   }
 
-  initialiseItems() {
+  async initialiseItems() {
     this.subscriptionsList.push(
-      this._foodService.getAllFoods().subscribe(res => {
+      (await this._foodService.getAllFoods()).subscribe(res => {
         this.filteredFoodList = res;
       }));
   }
 
-  doRefresh(event) {
+  async doRefresh(event) {
     this.unsubscribeData();
-    this.initialiseItems();
+    await this.initialiseItems();
     this.searchTerm = "";
     setTimeout(() => {
       event.target.complete();
@@ -94,9 +94,9 @@ export class TabFoodsDatabasePage {
   }
 
   // Update filteredFoodList using search term parsed
-  filterFoods() {
+  async filterFoods() {
     this.subscriptionsList.push(
-      this._foodService.getAllFoods().subscribe(res => {
+      (await this._foodService.getAllFoods()).subscribe(res => {
         this.filteredFoodList = res.filter((item) => {
           return (item.name.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1);
         })
@@ -131,12 +131,12 @@ export class TabFoodsDatabasePage {
 
   // Add 
   async addFood() {
-    this._router.navigate(["/add_food/"]);
+    await this._router.navigate(["/add_food/"]);
   }
 
   // Edit Food
   async editFood(food: Food, slidingItem: any) {
-    this._router.navigate(["/edit_food/" + food.key]);
+    await this._router.navigate(["/edit_food/" + food.key]);
     slidingItem.close();
   }
 

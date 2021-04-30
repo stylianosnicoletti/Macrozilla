@@ -37,24 +37,24 @@ export class ResetPasswordPage implements OnInit {
     });
   }
 
-  tryPasswordReset(value) {
-    this.authService.doPasswordReset(value)
-      .then(res => {
+  async tryPasswordReset(value) {
+    await this.authService.doPasswordReset(value)
+      .then(async res => {
         this.errorMessage = "";
         this.successMessage = "Reset password link sent to email address";
-        this.goToLoginPage();
+        await this.goToLoginPage();
       }, err => {
         this.errorMessage = err.message;
         this.successMessage = "";
       })
   }
 
-  goToLoginPage() {
-    this.router.navigate(["/login"]);
+  async goToLoginPage() {
+    await this.router.navigate(["/login"]);
   }
 
-  presentToast(value) {
-    this.toastService.presentToast(value);
+  async presentToast(value) {
+    await this.toastService.presentToast(value);
   }
 
 

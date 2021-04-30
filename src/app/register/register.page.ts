@@ -57,8 +57,8 @@ export class RegisterPage implements OnInit {
     });
   }
 
-  tryRegister(value) {
-    this.authService.doRegister(value)
+  async tryRegister(value) {
+    await this.authService.doRegister(value)
       .then(res => {
         this.errorMessage = "";
         this.successMessage = "Account created. Please verify your email to login.";
@@ -68,8 +68,8 @@ export class RegisterPage implements OnInit {
       })
   }
 
-  goToLoginPage() {
-    this.router.navigate(["/login"]);
+  async goToLoginPage() {
+    await this.router.navigate(["/login"]);
   }
 
 }

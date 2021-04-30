@@ -1,66 +1,41 @@
-<ion-content padding>
-  <ion-grid>
-    <ion-row>
-      <ion-col col-12 col-md-6 col-lg-4 col-xl-3>
-        <ion-card style="text-align: center;">
-           <ion-card-header>
-        <ion-card-title>All Time Average Calories</ion-card-title>
-        <ion-card-title><strong>🔋{{allTimeAverageCalories}} kcal</strong></ion-card-title>
-      </ion-card-header>
-        </ion-card>
-      </ion-col>
-      <ion-col col-12 col-md-6 col-lg-4 col-xl-3>
-        <ion-card style="text-align: center;">
-           <ion-card-header>
-        <ion-card-title>All Time Calories</ion-card-title>
-      </ion-card-header>
-          <ion-card-content>
-            <canvas #lineChartCaloriesAllTime></canvas>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col col-12 col-md-6 col-lg-4 col-xl-3>
-        <ion-card style="text-align: center;">
-           <ion-card-header>
-        <ion-card-title>All Time Average Macro Ratio</ion-card-title>
-      </ion-card-header>
-          <ion-card-content>
-            <canvas #pieChartMacrosAllTime></canvas>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</ion-content>
-<!--future development
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Ranged Time Calories</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <canvas #barChartCaloriesSelectedTme></canvas>
-      </ion-card-content>
-      <ion-item>
-        <ion-range id="dual-range" dual-knobs pin color="dark">
-          <ion-icon slot="start" size="small" name="calendar-outline"></ion-icon>
-          <ion-icon slot="end" name="calendar-outline"></ion-icon>
-        </ion-range>
-      </ion-item>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Ranged Time Calories</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <canvas #pieChartMacrosSelectedTime></canvas>
-        <ion-item>
-          <ion-range id="dual-range" mindual-knobs pin color="dark">
-            <ion-icon slot="start" size="small" name="calendar-outline"></ion-icon>
-            <ion-icon slot="end" name="calendar-outline"></ion-icon>
-          </ion-range>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-
-  -->
+<ion-app>
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>Analytics</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content fullscreen>
+    <ion-grid>
+      <ion-row>
+        <ion-col col-12 col-md-6 col-lg-4 col-xl-3>
+          <ion-card style="text-align: center;">
+            <ion-card-header>
+              <ion-card-title>All Time Average Calories</ion-card-title>
+              <ion-card-title><strong>🔋{{allTimeAverageCalories}} kcal</strong></ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+        <ion-col col-12 col-md-6 col-lg-4 col-xl-3>
+          <ion-card style="text-align: center;">
+            <ion-card-header>
+              <ion-card-title>All Time Calories</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <canvas #lineChartCaloriesAllTime></canvas>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col col-12 col-md-6 col-lg-4 col-xl-3>
+          <ion-card style="text-align: center;">
+            <ion-card-header>
+              <ion-card-title>All Time Average Macro Ratio</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <canvas #pieChartMacrosAllTime></canvas>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-content>
+</ion-app>

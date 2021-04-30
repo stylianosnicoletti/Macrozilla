@@ -1,37 +1,72 @@
-  <!--<ion-toolbar>
-  <ion-buttons slot="primary">
-  <ion-button (click)="presentPopover($event)">
-      <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
-    </ion-button>
-  </ion-buttons>
-</ion-toolbar>
--->
-<ion-content padding>
-  <ion-grid>
-    <ion-row>
-      <ion-col col-3></ion-col>
-      <ion-col col-6 style="text-align: center;">
-        <img style="text-align: center;" expand="block" src="assets/avatar.png" button>
-      </ion-col>
-      <ion-col col-3></ion-col>
-    </ion-row>
-  </ion-grid>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-subtitle>Name</ion-card-subtitle>
-      <ion-card-title>
-        <ion-row>
-          <ion-col>
-            {{userName}}
-          </ion-col>
-          <ion-col style="text-align: end;">
-            <ion-icon name="create-outline" button></ion-icon>
-          </ion-col>
-        </ion-row>
-      </ion-card-title>
-      <ion-card-subtitle>Email</ion-card-subtitle>
-      <ion-card-title>{{emailAddress}}</ion-card-title>
-    </ion-card-header>
-  </ion-card>
-  <ion-button class="button" color="danger" expand="block" (click)="logout()">Log out</ion-button>
-</ion-content>
+<ion-app>
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>Details</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content fullscreen>
+    <ion-card>
+      <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-list>
+            <ion-item>
+              <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+              <ion-label>{{userName}}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon slot="start" name="mail-outline"></ion-icon>
+              <ion-label>{{userEmailAddress}}</ion-label>
+            </ion-item>
+
+          </ion-list>
+          <ion-button class="button" color="danger" expand="block"(click)="logout()">Log out</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    </ion-card>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+    <ion-toolbar>
+      <ion-title>Settings</ion-title>
+    </ion-toolbar>
+    <ion-card>
+      <ion-list>
+        <ion-radio-group value="grape">
+          <ion-list-header>
+            <ion-card-subtitle>Theme</ion-card-subtitle>
+          </ion-list-header>
+          <ion-item>
+            <ion-label>Light</ion-label>
+            <ion-radio slot="end" value="apple"></ion-radio>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Dark</ion-label>
+            <ion-radio slot="end" value="grape"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+    </ion-card>
+    <ion-card>
+      <ion-list>
+        <ion-radio-group value="grape">
+          <ion-list-header>
+            <ion-card-subtitle>Food Database</ion-card-subtitle>
+          </ion-list-header>
+          <ion-item>
+            <ion-label>Personal</ion-label>
+            <ion-radio slot="end" value="apple"></ion-radio>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Personal & Public</ion-label>
+            <ion-radio slot="end" value="grape"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+    </ion-card>
+
+  </ion-content>
+</ion-app>

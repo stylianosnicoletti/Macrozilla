@@ -1,40 +1,53 @@
-<ion-item>
-  <ion-label> Select Date</ion-label>
-  <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date" (ionChange)="parseDate()" value={{date}}>
-  </ion-datetime>
-</ion-item>
+<ion-app>
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>Daily Entry</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content fullscreen>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <strong>🔋{{ summaryDay?.totalCalories | number:'1.0-0' }} kcal</strong>
+        </ion-card-title>
+      </ion-card-header>
 
-<ion-card>
-  <ion-card-header>
-    <ion-card-title>
-      <strong>🔋{{ summaryDay?.totalCalories  | number:'1.0-0' }} kcal</strong></ion-card-title>
-  </ion-card-header>
+      <ion-card-content>
+        <strong>
+          🥩
+          {{ summaryDay?.totalGramsProtein *4 / (summaryDay?.totalGramsProtein*4 + summaryDay?.totalGramsCarbohydrates*4
+          +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
+          🍞
+          {{ summaryDay?.totalGramsCarbohydrates *4 / (summaryDay?.totalGramsProtein *4 +
+          summaryDay?.totalGramsCarbohydrates*4 +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
+          🐖
+          {{ summaryDay?.totalGramsFats *9 / (summaryDay?.totalGramsProtein *4 + summaryDay?.totalGramsCarbohydrates*4
+          +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
+          :
+          (
+          ✔️
+          {{ (summaryDay?.totalGramsFats-summaryDay?.totalGramsSaturated ) * 9 / (summaryDay?.totalGramsProtein *4 +
+          summaryDay?.totalGramsCarbohydrates*4 +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
+          ❌
+          {{ summaryDay?.totalGramsSaturated *9 / (summaryDay?.totalGramsProtein *4 +
+          summaryDay?.totalGramsCarbohydrates*4 +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
+          )
+        </strong>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-item>
+        <ion-label> Select Date</ion-label>
+        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date" (ionChange)="parseDate()" value={{date}}>
+        </ion-datetime>
+      </ion-item>
 
-  <ion-card-content>
-    <strong>
-      🥩
-      {{ summaryDay?.totalGramsProtein *4 / (summaryDay?.totalGramsProtein*4 + summaryDay?.totalGramsCarbohydrates*4 +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
-      🍞
-      {{ summaryDay?.totalGramsCarbohydrates *4 / (summaryDay?.totalGramsProtein *4 + summaryDay?.totalGramsCarbohydrates*4 +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
-      🐖
-      {{ summaryDay?.totalGramsFats *9 / (summaryDay?.totalGramsProtein *4 + summaryDay?.totalGramsCarbohydrates*4 +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
-      :
-      (
-      ✔️
-      {{ (summaryDay?.totalGramsFats-summaryDay?.totalGramsSaturated ) * 9 / (summaryDay?.totalGramsProtein *4 + summaryDay?.totalGramsCarbohydrates*4 +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
-      ❌
-      {{ summaryDay?.totalGramsSaturated *9 / (summaryDay?.totalGramsProtein *4 + summaryDay?.totalGramsCarbohydrates*4 +summaryDay?.totalGramsFats*9) * 100 | number:'1.0-0'}}%
-      )
-    </strong>
-  </ion-card-content>
-</ion-card>
+    </ion-card>
 
-<ion-content>
-  
-  <!-- Default Refresher -->
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
+    <!-- Default Refresher -->
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
 
     <ion-list>
       <ion-item-sliding *ngFor="let entry of dailyEntriesList" #slidingItem>
@@ -59,12 +72,14 @@
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>
-  
-  <!-- Fab placed to the bottom end -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="addNewEntry()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-  
-</ion-content>
+
+    <!-- Fab placed to the bottom end -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button (click)="addNewEntry()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+
+
+  </ion-content>
+</ion-app>

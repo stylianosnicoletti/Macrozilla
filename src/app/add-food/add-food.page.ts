@@ -22,7 +22,6 @@ export class AddFoodPage {
   food: Food;
   addForm: FormGroup;
   isSubmitted = false;
-  servingAmountDefaultValue: Number;
   servingUnits: ServingUnit[];
   subscriptionsList: Subscription[] = [];
 
@@ -35,7 +34,6 @@ export class AddFoodPage {
     private _popController: PopoverController
   ) {
     this.initialiseItems();
-    this.servingAmountDefaultValue = MyMacrosConstants.SERVING_AMOUNT_DEFAULT_VALUE;
   }
 
   /**
@@ -92,7 +90,7 @@ export class AddFoodPage {
     this.addForm = this._formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(5)]],
       servingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
-      servingUnit: [],
+      servingUnit: ['', [Validators.required]],
       comment: ['', [Validators.maxLength(15)]],
       protein: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
       carbohydrates: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],

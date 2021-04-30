@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { PopoverController } from '@ionic/angular';
-//import { SettingsUserComponent } from './settings-user/settings-user.component';
-
 
 @Component({
   selector: 'app-tab-account',
@@ -12,9 +10,8 @@ import { PopoverController } from '@ionic/angular';
 export class TabAccountPage {
 
   currentPopover: any = null;
-  emailAddress: string;
+  userEmailAddress: string;
   userName: string;
-  //profilePhoto: string;
 
   constructor(
     public popoverController: PopoverController,
@@ -23,7 +20,6 @@ export class TabAccountPage {
   async ionViewWillEnter() {
     console.log("entering acount page");
     await this.initialiseItems();
-    // this.authService.doUpdateDisplayName("Stelios");
   }
 
   ionViewWillLeave() {
@@ -31,8 +27,7 @@ export class TabAccountPage {
   }
 
   async initialiseItems() {
-    this.emailAddress = await this._authService.afAuth.currentUser.then(u => u.email);
-    //this.profilePhoto = this.authService.afAuth.auth.currentUser.photoURL;
+    this.userEmailAddress = await this._authService.afAuth.currentUser.then(u => u.email);
     this.userName = await this._authService.afAuth.currentUser.then(u => u.displayName);
   }
 

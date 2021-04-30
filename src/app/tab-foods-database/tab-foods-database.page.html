@@ -4,12 +4,12 @@
       <ion-title>Food Database</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-content fullscreen>
+  
 
     <!-- Searchbar with cancel button shown on focus -->
     <ion-searchbar debounce="380" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
     </ion-searchbar>
-
+    <ion-content>
     <!-- Default Refresher -->
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
       <ion-refresher-content></ion-refresher-content>

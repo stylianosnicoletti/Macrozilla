@@ -21,8 +21,9 @@ export class SummaryService {
 
 
   //Get all summaries for that user 
-  getAllSummaries(): Observable<Summary[]> {
-    this.allSummariesFire = this._angularFireDatabase.list('/summary/' + this._authService.afAuth.auth.currentUser.uid + '/', ref => ref.orderByKey());
+  async getAllSummaries(): Promise<Observable<Summary[]>> {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    this.allSummariesFire = this._angularFireDatabase.list('/summary/' + currentUserUid + '/', ref => ref.orderByKey());
     this.allSummaries = this.allSummariesFire.snapshotChanges().pipe(
       map(changes =>
         changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
@@ -33,30 +34,34 @@ export class SummaryService {
 
   // Get summary for that date for that user, if it does not exist, it returns null
   async getSummary(selected_date): Promise<Summary> {
-    const getSummaryFireRef = this._angularFireDatabase.database.ref('/summary/' + this._authService.afAuth.auth.currentUser.uid + '/').child(selected_date);
-    return getSummaryFireRef.once("value").then(function (snapshot) {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const getSummaryFireRef = this._angularFireDatabase.database.ref('/summary/' + currentUserUid + '/').child(selected_date);
+    return await getSummaryFireRef.once("value").then(function (snapshot) {
       return snapshot.val();
     });
   }
 
   // Get summary observable for that date for that user
-  getSummaryObservable(selected_date): Observable<Summary> {
-    this.dailySummaryFireObject = this._angularFireDatabase.object('/summary/' + this._authService.afAuth.auth.currentUser.uid + '/' + selected_date + '/');
+  async getSummaryObservable(selected_date): Promise<Observable<Summary>> {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    this.dailySummaryFireObject = this._angularFireDatabase.object('/summary/' + currentUserUid + '/' + selected_date + '/');
     this.dailySummary = this.dailySummaryFireObject.valueChanges();
     return this.dailySummary;
   }
 
 
   // Add or Edit summary under that date of that user
-  setSummary(summary, selected_date) {
+  async setSummary(summary, selected_date) {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
     this._angularFireDatabase.object('/summary/' +
-      this._authService.afAuth.auth.currentUser.uid + '/' + selected_date + '/').set(summary);
+    currentUserUid + '/' + selected_date + '/').set(summary);
   }
 
   // Remove summary for that date of that user
-  removeSummary(selected_date) {
+  async removeSummary(selected_date) {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
     this._angularFireDatabase.object('/summary/' +
-      this._authService.afAuth.auth.currentUser.uid + '/' + selected_date + '/').remove();
+    currentUserUid + '/' + selected_date + '/').remove();
   }
 
   // Increment summary when new entry added for that date for that user

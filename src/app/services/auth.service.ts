@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import * as firebase from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable({
@@ -12,60 +11,63 @@ export class AuthService {
     public afAuth: AngularFireAuth) {
   }
 
-  doRegister(value): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      firebase.auth().createUserWithEmailAndPassword(value.email, value.password)
-        .then(res => {
-          let user = firebase.auth().currentUser;
-          this.doUpdateDisplayName(value.userName);
-          user.sendEmailVerification();
+  async doRegister(value): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      await this.afAuth.createUserWithEmailAndPassword(value.email, value.password)
+        .then(async res => {
+          await this.doUpdateDisplayName(value.userName);
+          await this.afAuth.currentUser.then(async u => await u.sendEmailVerification);
           resolve(res);
         }, err => reject(err))
     })
   }
 
-  doUpdateDisplayName(profName): Promise<any>{
-    return new Promise<any>((resolve, reject) => {
-      firebase.auth().currentUser.updateProfile({displayName : profName}).
-      then(res => {
-        resolve(res);
-      }, err => reject(err))
+  async doUpdateDisplayName(profName): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      await this.afAuth.currentUser
+        .then(async u => await u.updateProfile({ displayName: profName })
+          .then(res => {
+            resolve(res);
+          }, err => reject(err))
+        )
     })
   }
 
-  doUpdateProfilePhotoURL(profPhoto): Promise<any>{
-    return new Promise<any>((resolve, reject) => {
-      firebase.auth().currentUser.updateProfile({photoURL : profPhoto}).
-      then(res => {
-        resolve(res);
-      }, err => reject(err))
+  async doUpdateProfilePhotoURL(profPhoto): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      await this.afAuth.currentUser
+        .then(async u => await u.updateProfile({ photoURL: profPhoto })
+          .then(res => {
+            resolve(res);
+          }, err => reject(err))
+        )
     })
   }
 
-  doLogin(value): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      firebase.auth().signInWithEmailAndPassword(value.email, value.password)
-        .then(res => {
-          resolve(res);
-        }, err => reject(err))
-    })
-  }
-
-  doPasswordReset(value): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      firebase.auth().sendPasswordResetEmail(value.email)
+  async doLogin(value): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      await this.afAuth.signInWithEmailAndPassword(value.email, value.password)
         .then(res => {
           resolve(res);
         }, err => reject(err))
     })
   }
 
-  doLogout(): Promise<any> {
+  async doPasswordReset(value): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      await this.afAuth.sendPasswordResetEmail(value.email)
+        .then(res => {
+          resolve(res);
+        }, err => reject(err))
+    })
+  }
+
+  async doLogout(): Promise<any> {
     //quick hack to kill references to database
     //window.location.reload();
-    return new Promise((resolve, reject) => {
-      if (firebase.auth().currentUser) {
-        this.afAuth.auth.signOut().then(() => {
+    return new Promise(async (resolve, reject) => {
+      if (await this.afAuth.currentUser) {
+        await this.afAuth.signOut().then(() => {
           window.localStorage.clear();
           window.sessionStorage.clear();
           window.location.reload();

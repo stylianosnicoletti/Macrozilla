@@ -20,9 +20,9 @@ export class TabAccountPage {
     public popoverController: PopoverController,
     private _authService: AuthService) {
   }
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     console.log("entering acount page");
-    this.initialiseItems();
+    await this.initialiseItems();
     // this.authService.doUpdateDisplayName("Stelios");
   }
 
@@ -30,14 +30,14 @@ export class TabAccountPage {
     console.log("leaving acount page");
   }
 
-  initialiseItems() {
-    this.emailAddress = this._authService.afAuth.auth.currentUser.email;
+  async initialiseItems() {
+    this.emailAddress = await this._authService.afAuth.currentUser.then(u => u.email);
     //this.profilePhoto = this.authService.afAuth.auth.currentUser.photoURL;
-    this.userName = this._authService.afAuth.auth.currentUser.displayName;
+    this.userName = await this._authService.afAuth.currentUser.then(u => u.displayName);
   }
 
-  logout() {
-    this._authService.doLogout();
+  async logout() {
+    await this._authService.doLogout();
     this.clearCookies();
   }
 
@@ -50,15 +50,4 @@ export class TabAccountPage {
       document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
   }
-
-/*  async presentPopover(ev: any) {
-    const popover = await this.popoverController.create({
-      component: SettingsUserComponent,
-      event: ev,
-      translucent: true
-    });
-    this.currentPopover = popover;
-    return await popover.present();
-  }
-*/
 }

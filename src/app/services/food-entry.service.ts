@@ -21,12 +21,13 @@ export class FoodEntryService {
   }
 
   //Get all foods from database ordered by name for the current user on that date
-  getAllFoodEntriesByDate(selected_date): Observable<DailyEntryFood[]> {
-    this.foodEntriesFire = this._angularFireDatabase.list('/entries/' + this._authService.afAuth.auth.currentUser.uid + '/' +
+  async getAllFoodEntriesByDate(selected_date): Promise<Observable<DailyEntryFood[]>> {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    this.foodEntriesFire = this._angularFireDatabase.list('/entries/' + currentUserUid + '/' +
       selected_date + '/', ref => ref.orderByKey());
 
     this.foodEntries = this.foodEntriesFire.snapshotChanges().pipe(
-      map(changes => 
+      map(changes =>
         changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
       )
     );
@@ -34,24 +35,26 @@ export class FoodEntryService {
   }
 
   // Delete food entry from entries for the current user on that date
-  deleteFoodEntry(key_negative_timestamp, selected_date) {
+  async deleteFoodEntry(key_negative_timestamp, selected_date) {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
     this._angularFireDatabase.object('/entries/' +
-      this._authService.afAuth.auth.currentUser.uid + '/' +
+    currentUserUid + '/' +
       selected_date + '/' + key_negative_timestamp).remove();
   }
 
   // Add a new food entry on entries for the current user on that date
-  addFoodEntry(food_entry, selected_date) {
-
+  async addFoodEntry(food_entry, selected_date) {
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
     this._angularFireDatabase.object('/entries/' +
-      this._authService.afAuth.auth.currentUser.uid + '/' +
+    currentUserUid + '/' +
       selected_date + '/' + this.getAnEntryKey() + '/').set(food_entry);
   }
 
 
   // Get number of entries under that date for that user 
   async getNumberOfFoodEntriesByDate(selected_date): Promise<Number> {
-    const getNumberOfEntriesRef = this._angularFireDatabase.database.ref('/entries/' + this._authService.afAuth.auth.currentUser.uid + '/').child(selected_date);
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const getNumberOfEntriesRef = this._angularFireDatabase.database.ref('/entries/' + currentUserUid + '/').child(selected_date);
     return getNumberOfEntriesRef.once("value").then(function (snapshot) {
       return snapshot.numChildren()
     });

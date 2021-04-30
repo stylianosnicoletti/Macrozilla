@@ -27,15 +27,18 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: sudo apt install chromium-browser
 
+    - name: Run npm install
+      run: npm install
+
     - name: Install dependencies
       run: npm ci
 
     - name: Run Build if present 
       run: npm run build --if-present
 
-    - name: NPM Test
-      run: |
-        export CHROME_BIN=/usr/bin/chromium-browser
-        CI=true npm run test-headless
-      env:
-        CI: true
+#    - name: NPM Test
+#      run: |
+#        export CHROME_BIN=/usr/bin/chromium-browser
+#        CI=true npm run test-headless
+#      env:
+#        CI: true

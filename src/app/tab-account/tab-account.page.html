@@ -7,70 +7,88 @@
   <ion-content fullscreen>
     <ion-card>
       <ion-grid>
-      <ion-row>
-        <ion-col>
-          <ion-list>
-            <ion-item>
-              <ion-icon slot="start" name="person-circle-outline"></ion-icon>
-              <ion-label>{{userName}}</ion-label>
-            </ion-item>
-            <ion-item>
-              <ion-icon slot="start" name="mail-outline"></ion-icon>
-              <ion-label>{{userEmailAddress}}</ion-label>
-            </ion-item>
+        <ion-row>
+          <ion-col>
+            <ion-list>
+              <ion-item>
+                <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+                <ion-label>{{userName}}</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon slot="start" name="mail-outline"></ion-icon>
+                <ion-label>{{userEmailAddress}}</ion-label>
+              </ion-item>
 
-          </ion-list>
-          <ion-button class="button" color="danger" expand="block"(click)="logout()">Log out</ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+            </ion-list>
+            <ion-button class="button" color="danger" expand="block" (click)="logout()">Log out</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
 
     </ion-card>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;
 
     <ion-toolbar>
       <ion-title>Settings</ion-title>
     </ion-toolbar>
     <ion-card>
       <ion-list>
-        <ion-radio-group value="grape">
-          <ion-list-header>
-            <ion-card-subtitle>Theme</ion-card-subtitle>
-          </ion-list-header>
-          <ion-item>
-            <ion-icon slot="start" name="sunny-outline"></ion-icon>
-            <ion-label> Light</ion-label>
-            <ion-radio slot="end" value="apple"></ion-radio>
-          </ion-item>
-
-          <ion-item>
-            <ion-label>Dark</ion-label>
-            <ion-icon slot="start" name="moon-outline"></ion-icon>
-            <ion-radio slot="end" value="grape"></ion-radio>
-          </ion-item>
-        </ion-radio-group>
+        <ion-list-header>
+          <ion-card-subtitle>Theme</ion-card-subtitle>
+        </ion-list-header>
+        <ion-item>
+          <ion-label>Dark Mode</ion-label>
+          <ion-icon *ngIf="darkMode;" slot="start" name="moon-outline"></ion-icon>
+          <ion-icon *ngIf="!darkMode;" slot="start" name="sunny-outline"></ion-icon>
+          <ion-toggle
+           [(ngModel)]="darkMode"
+           (ionChange)="updateUserOptions()">Dark Mode</ion-toggle>
+        </ion-item>
       </ion-list>
     </ion-card>
     <ion-card>
       <ion-list>
-        <ion-radio-group value="grape">
+        <ion-radio-group allowEmptySelection=false
+        [(ngModel)]="useOnlyPersonalDb"
+          (ionChange)="updateUserOptions()">
           <ion-list-header>
             <ion-card-subtitle>Food Database</ion-card-subtitle>
           </ion-list-header>
           <ion-item>
             <ion-icon slot="start" name="create-outline"></ion-icon>
             <ion-label>Personal</ion-label>
-            <ion-radio slot="end" value="apple"></ion-radio>
+            <ion-radio slot="end" value="1"></ion-radio>
           </ion-item>
 
           <ion-item>
             <ion-icon slot="start" name="earth-outline"></ion-icon>
             <ion-label>Personal & Public</ion-label>
-            <ion-radio slot="end" value="grape"></ion-radio>
+            <ion-radio slot="end" value="0"></ion-radio>
           </ion-item>
         </ion-radio-group>
       </ion-list>
     </ion-card>
+
+    <ion-card>
+      <ion-list>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-button class="button" color="warning" expand="block" (click)="erasePersonalDb()">Erase Personal Food Database
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-button class="button" color="warning" expand="block" (click)="eraseDailyTrackingRecords()">Erase Daily Tracking Records
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+      </ion-list>
+    </ion-card>
+
 
   </ion-content>
 </ion-app>

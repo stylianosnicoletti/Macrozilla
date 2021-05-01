@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Network } from '@ionic-native/network/ngx'
 import { AlertController } from '@ionic/angular';
+import { MyMacrosConstants } from '../my-macros-constants';
 
 @Component({
   selector: 'app-edit-food',
@@ -58,20 +59,28 @@ export class EditFoodPage {
     this.unsubscribeNetwork();
   }
 
-  unsubscribeNetwork() {
+  /**
+   * Unsubscribe network.
+   */
+  unsubscribeNetwork(): void {
     if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
     if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
   }
 
-  unsubscribeData() {
+  /**
+   * Unsubscribe all unclosed subscriptions.
+   */
+  unsubscribeData(): void {
     this.subscriptionsList.forEach(item => {
       if (!item.closed) item.unsubscribe();
     })
     this.subscriptionsList = [];
   }
 
-  // Initialise items
-  async initialiseItems() {
+  /**
+   * Initialise items.
+   */  
+  async initialiseItems(): Promise<void> {
     await this.foodExistGuard();
     this.updateFoodData();
     this.subscriptionsList.push(
@@ -81,8 +90,10 @@ export class EditFoodPage {
       ));
   }
 
-  // Check if the route param food key exist
-  async foodExistGuard() {
+  /**
+   * Checks if the route param food key exist.
+   */  
+  async foodExistGuard(): Promise<void> {
     this.foodKey = this._activatedRoute.snapshot.params['food_key'];
     if ((await this._foodService.doesFoodKeyExist(this.foodKey)) <= 0) {
       this._router.navigate(["/tabs/foods_database"]);
@@ -91,8 +102,10 @@ export class EditFoodPage {
     }
   }
 
-  // No network alert
-  async presentNetworkAlert() {
+  /**
+   * No network alert.
+   */ 
+  async presentNetworkAlert(): Promise<void> {
     const alert = await this._alertController.create({
       header: 'No Data Connection',
       message: 'Consider turning on mobile data or Wi-Fi.',
@@ -101,39 +114,50 @@ export class EditFoodPage {
     await alert.present();
   }
 
-  // Contains Reactive Form logic
-  updateFoodData() {
-    // Validator pattern don't work with input type number
-    // Use type ="text" inputmode="numeric" as quick fix
-    const decimalRegexPattern = /^(\d*\.)?\d+$/;
-    const integerRegexPattern = /^[0-9]+$/;
-
+  /** 
+   * Contains Reactive Form logic.
+   */
+  updateFoodData(): void {
     this.editForm = this._formBuilder.group({
       name: [{ value: '', disabled: true, }, Validators.required],
-      protein: ['', [Validators.required, Validators.pattern(decimalRegexPattern), Validators.maxLength(6)]],
-      carbohydrates: ['', [Validators.required, Validators.pattern(decimalRegexPattern), Validators.maxLength(6)]],
-      fats: ['', [Validators.required, Validators.pattern(decimalRegexPattern), Validators.maxLength(6)]],
-      saturated: ['', [Validators.required, Validators.pattern(decimalRegexPattern), Validators.maxLength(6)]],
-      calories: ['', [Validators.required, Validators.minLength(1), Validators.pattern(integerRegexPattern), Validators.maxLength(6)]],
+      protein: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      carbohydrates: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      fats: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      saturated: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      calories: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
       key: ['']
     })
   }
 
-  // Route back to foods_databse tab
-  async goToFoodsDatabaseTab() {
+  /**
+   * Route back to foods_database tab.
+   */
+  async goToFoodsDatabaseTab(): Promise<void> {
     await this._router.navigate(["/tabs/foods_database"]);
   }
 
-  // Submit changes
-  async submitForm() {
+  /**
+   * Submit changes when validations pass.
+   * @returns True when submission was successful.
+   */
+  async submitForm(): Promise<boolean> {
     this.isSubmitted = true;
+
+    // Validation
     if (!this.editForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!')
       return false;
-    } else {
-      await this._foodService.updateFood(this.editForm.value);
-      await this._router.navigate(["/tabs/foods_database"]);
-      await this._toastService.presentToast('Food Successfully Edited!')
     }
+
+    // Saturated Fats Check
+    if (this.editForm.value.saturated > this.editForm.value.fats) {
+      await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
+      return false;
+    }
+
+    await this._foodService.updateFood(this.editForm.value);
+    await this._router.navigate(["/tabs/foods_database"]);
+    await this._toastService.presentToast('Food Successfully Edited!')
+
   }
 }

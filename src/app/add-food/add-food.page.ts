@@ -56,7 +56,7 @@ export class AddFoodPage {
   /**
   * Initialises Items. (E.g. Serving Units)
   */
-  initialiseItems() {
+  initialiseItems(): void {
     this.subscriptionsList.push(
       this._foodService.getAllServingUnits().subscribe(res => {
         this.servingUnits = res;
@@ -67,7 +67,7 @@ export class AddFoodPage {
   /**
   * Closing pop items (E.g. Service Unit Select).
   */
-  async closePopItems() {
+  async closePopItems(): Promise<void> {
     console.log("Close pop items.");
     const popover = await this._popController.getTop();
     if (popover)
@@ -77,7 +77,7 @@ export class AddFoodPage {
   /** 
   * Sets focus on name input.
   */
-  setFocus() {
+  setFocus(): void {
     setTimeout(async () => {
       await this.nameInput.setFocus();
     });
@@ -86,12 +86,12 @@ export class AddFoodPage {
   /** 
   * Contains Reactive Form logic.
   */
-  addFoodData() {
+  addFoodData(): void {
     this.addForm = this._formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(5)]],
+      name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]],
       servingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
       servingUnit: ['', [Validators.required]],
-      comment: ['', [Validators.maxLength(15)]],
+      comment: ['', [Validators.maxLength(50)]],
       protein: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
       carbohydrates: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
       fats: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
@@ -100,33 +100,45 @@ export class AddFoodPage {
     })
   }
 
-  /** 
-  * Routes back to "foods_database" tab.
-  */
-  async goToFoodsDatabaseTab() {
+  /**
+   * Routes back to "foods_database" tab.
+   */
+  async goToFoodsDatabaseTab(): Promise<void> {
     await this._router.navigate(["/tabs/foods_database"]);
   }
 
-  /** 
-  * Submits food form.
-  * Checks that all required values are entered and that food doesn't not already exist.
-  */
+  /**
+   * Submit changes when validations pass.
+   * @returns True when submission was successful.
+   */
   async submitForm() {
     this.isSubmitted = true;
+
+    // Validation Check
     if (!this.addForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!');
       return false;
-    } else {
-      this.food = this.fillFood(this.addForm.value);
-      if (await this.foodNameExistGuard(this.food)) {
-        await this._toastService.presentToast('Food with that name already exists!');
-        return false;
-      } else {
-        await this._foodService.addFood(this.food);
-        await this._router.navigate(["/tabs/foods_database"]);
-        await this._toastService.presentToast('Food Successfully Added');
-      }
     }
+
+    this.food = this.fillFood(this.addForm.value);
+
+    // Food Name Exists Check
+    if (await this.foodNameExistGuard(this.food)) {
+      await this._toastService.presentToast('Food with that name already exists!');
+      return false;
+    }
+
+    // Saturated Fats Check
+    if (this.food.saturated > this.food.fats) {
+      await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
+      return false;
+    }
+
+    // Submit food.
+    await this._foodService.addFood(this.food);
+    await this._router.navigate(["/tabs/foods_database"]);
+    await this._toastService.presentToast('Food Successfully Added');
+
   }
 
   /** 

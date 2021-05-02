@@ -6,6 +6,7 @@ import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { LoadingService } from '../services/loading.service';
 import { Network } from '@ionic-native/network/ngx';
+import { FoodDatabaseService } from '../services/food-db.service';
 
 @Component({
   selector: 'app-tab-foods-database',
@@ -23,6 +24,7 @@ export class TabFoodsDatabasePage {
   constructor
     (
       private _foodService: FoodService,
+      private _foodDatabaseService: FoodDatabaseService,
       private _loadingService: LoadingService,
       private _router: Router,
       private _alertController: AlertController,
@@ -95,6 +97,8 @@ export class TabFoodsDatabasePage {
 
   // Update filteredFoodList using search term parsed
   async filterFoods() {
+    //this.subscriptionsList.push(await (await this._foodDatabaseService.getGlobalFoodsFromDb(false,true,this.searchTerm.toLowerCase(),false,)).subscribe(res => {console.log(res);}));
+   // this.subscriptionsList.push(await (await this._foodDatabaseService.getFoodsFromDb(false,this.searchTerm.toLowerCase(),false,)).subscribe(res => {console.log(res);}));
     this.subscriptionsList.push(
       (await this._foodService.getAllFoods()).subscribe(res => {
         this.filteredFoodList = res.filter((item) => {

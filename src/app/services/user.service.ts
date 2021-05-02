@@ -19,7 +19,6 @@ export class UserService {
    */
   async getUserFields(): Promise<Observable<User>> {
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-    console.log(currentUserUid);
     return this._angularFireStore.doc<User>("/TheMacroDiet/Testing/Users/" + currentUserUid).valueChanges();
   }
 
@@ -30,7 +29,6 @@ export class UserService {
    */
   async updateUserFields(user: User): Promise<void> {
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-    console.log(currentUserUid);
     this._angularFireStore.doc<User>("/TheMacroDiet/Testing/Users/" + currentUserUid).set(user);
   }
 

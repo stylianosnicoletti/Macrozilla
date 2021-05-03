@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { AngularFirestore, AngularFirestoreCollection, DocumentReference } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { Food } from '../models/food.model';
 import { map } from 'rxjs/operators';
 
@@ -16,58 +16,132 @@ export class FoodDatabaseService {
 
 
   /**
-   * Get List of Food docs.
-   * @param onlyPesronalDb When true, food will be fetched only from personal Db.
-   * @param filter Filter query by Food Name using searchable Indexes stored for each food in database (Order: Most matches first).
-   * @param useLimit When true, limit in the number of returned Foods will be used.
-   * @param limitVal Limit in the number of returned Foods (Default = 20).
-   * @returns Observable of list of Foods.
-   */
-  async getFoodsFromDb(onlyPesronalDb: boolean, filter: string, useLimit: boolean, limitVal: number = 20): Promise<Observable<Food[]>> {
+ * Get List of all Food docs from Personal Food DB in order.
+ * @param orderField Field to be used for the ordering..
+ * @param inDescending If true, descending order will be used for ordering (Default: False -> Ascending order)
+ * @returns Observable of list of Foods.
+ */
+  async getFoodsFromDb(orderField: string, inDescending: boolean = false): Promise<Observable<Food[]>> {
+
+    // Current user id
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+
     return this._angularFireStore.collection<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase", ref => ref
-      .orderBy(`searchableFoodNameIndex.${filter}`)
-      .limit(limitVal))
+      .orderBy(orderField, inDescending ? "desc" : "asc"))
       .snapshotChanges().pipe(map(changes =>
         // Maps doc data to Food
-        changes.map(c => ({
-           DocumentId: c.payload.doc.id,
-           Name: c.payload.doc.data().Name,
-           Calories: c.payload.doc.data().Calories,
-           Carbohydrates: c.payload.doc.data().Carbohydrates,
-           Fats: c.payload.doc.data().Fats,
-           Protein: c.payload.doc.data().Protein,
-           Saturated: c.payload.doc.data().Saturated,
-           ServingAmount: c.payload.doc.data().ServingAmount,
-           ServingUnit: c.payload.doc.data().ServingUnit,
-           ServingUnitShortCode: c.payload.doc.data().ServingUnitShortCode,
-           // ...c.payload.val()  To fill the rest
-          }))
+        changes.map(c => ({ 
+          DocumentId: c.payload.doc.id,
+          Name: c.payload.doc.data().Name,
+          Calories: c.payload.doc.data().Calories,
+          Carbohydrates: c.payload.doc.data().Carbohydrates,
+          Fats: c.payload.doc.data().Fats,
+          Protein: c.payload.doc.data().Protein,
+          Saturated: c.payload.doc.data().Saturated,
+          ServingAmount: c.payload.doc.data().ServingAmount,
+          ServingUnit: c.payload.doc.data().ServingUnit,
+          ServingUnitShortCode: c.payload.doc.data().ServingUnitShortCode,
+          IsFromPersonalDb: true,
+          // ...c.payload.val()  To fill the rest
+        }))
       ));
   }
 
-  async getGlobalFoodsFromDb(onlyPesronalDb: boolean, orderByName: boolean, filter: string, useLimit: boolean, limitVal: number = 20): Promise<Observable<Food[]>> {
-    //const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-    return this._angularFireStore.collection<Food>("/TheMacroDiet/Production/GlobalFoodDatabase", ref => ref
-      .orderBy(`searchableFoodNameIndex.${filter}`)
-      .limit(limitVal))
-      .snapshotChanges().pipe(map(changes =>
-        // Maps doc data to Food
-        changes.map(c => ({
-           DocumentId: c.payload.doc.id,
-           Name: c.payload.doc.data().Name,
-           Calories: c.payload.doc.data().Calories,
-           Carbohydrates: c.payload.doc.data().Carbohydrates,
-           Fats: c.payload.doc.data().Fats,
-           Protein: c.payload.doc.data().Protein,
-           Saturated: c.payload.doc.data().Saturated,
-           ServingAmount: c.payload.doc.data().ServingAmount,
-           ServingUnit: c.payload.doc.data().ServingUnit,
-           ServingUnitShortCode: c.payload.doc.data().ServingUnitShortCode,
-           // ...c.payload.val()  To fill the rest
-          }))
-      ));
+  /**
+   * Get List of Food docs from Personal Food DB with filter.
+   * @param filter Filter query by Food Name using searchable Indexes stored for each food in database (Order: Most matches first).
+   * @param useLimit When true, limit in the number of returned Foods will be used (Default = true).
+   * @param limitVal Limit in the number of returned Foods (Default = 20).
+   * @returns Observable of list of Foods.
+   */
+  async getFoodsFromDbWithFilter(filter: string, useLimit: boolean, limitVal: number = 20): Promise<Observable<Food[]>> {
+
+    // Current user id
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+
+    let foodCollection: AngularFirestoreCollection<Food>;
+
+    // Use limit
+    if (useLimit) {
+      foodCollection = this._angularFireStore.collection<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase", ref => ref
+        .orderBy(`searchableFoodNameIndex.${filter}`)
+        .limit(limitVal));
+    }
+
+
+    // No limit
+    if (!useLimit) {
+      foodCollection = this._angularFireStore.collection<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase", ref => ref
+        .orderBy(`searchableFoodNameIndex.${filter}`));
+    }
+
+    return foodCollection.snapshotChanges().pipe(map(changes =>
+      // Maps doc data to Food
+      changes.map(c => ({
+        DocumentId: c.payload.doc.id,
+        Name: c.payload.doc.data().Name,
+        Calories: c.payload.doc.data().Calories,
+        Carbohydrates: c.payload.doc.data().Carbohydrates,
+        Fats: c.payload.doc.data().Fats,
+        Protein: c.payload.doc.data().Protein,
+        Saturated: c.payload.doc.data().Saturated,
+        ServingAmount: c.payload.doc.data().ServingAmount,
+        ServingUnit: c.payload.doc.data().ServingUnit,
+        ServingUnitShortCode: c.payload.doc.data().ServingUnitShortCode,
+        IsFromPersonalDb: true,
+        // ...c.payload.val()  To fill the rest
+      }))
+    ));
   }
+
+  /**
+     * Get List of Food docs from Global Food DB with filter.
+     * @param filter Filter query by Food Name using searchable Indexes stored for each food in database (Order: Most matches first).
+     * @param useLimit When true, limit in the number of returned Foods will be used (Default = true).
+     * @param limitVal Limit in the number of returned Foods (Default = 20).
+     * @returns Observable of list of Foods.
+     */
+  async getGlobalFoodsFromDbWithFilter(filter: string, useLimit: boolean = true, limitVal: number = 20): Promise<Observable<Food[]>> {
+
+    let foodCollection: AngularFirestoreCollection<Food>;
+
+    // Use limit
+    if (useLimit) {
+      foodCollection = this._angularFireStore.collection<Food>("/TheMacroDiet/Production/GlobalFoodDatabase", ref => ref
+        .orderBy(`searchableFoodNameIndex.${filter}`)
+        .limit(limitVal));
+    }
+
+    // No limit
+    if (!useLimit) {
+      foodCollection = this._angularFireStore.collection<Food>("/TheMacroDiet/Production/GlobalFoodDatabase", ref => ref
+        .orderBy(`searchableFoodNameIndex.${filter}`));
+    }
+
+    return foodCollection.snapshotChanges().pipe(map(changes =>
+      // Maps doc data to Food
+      changes.map(c => ({
+        DocumentId: c.payload.doc.id,
+        Name: c.payload.doc.data().Name,
+        Calories: c.payload.doc.data().Calories,
+        Carbohydrates: c.payload.doc.data().Carbohydrates,
+        Fats: c.payload.doc.data().Fats,
+        Protein: c.payload.doc.data().Protein,
+        Saturated: c.payload.doc.data().Saturated,
+        ServingAmount: c.payload.doc.data().ServingAmount,
+        ServingUnit: c.payload.doc.data().ServingUnit,
+        ServingUnitShortCode: c.payload.doc.data().ServingUnitShortCode,
+        IsFromPersonalDb: false,
+        // ...c.payload.val()  To fill the rest
+      }))
+    ));
+  }
+
+ //async getCombinedFoodLists(a:Observable<Food[]>, b: Observable<Food[]>): Promise<Observable<any>>{
+ //  return combineLatest([a,b]);
+ //}
+
+  //* @param onlyPesronalDb When true, food will be fetched only from personal Db.
   /* this.foodsFire = this._angularFireDatabase.list('/foods/' + currentUserUid + '/', ref => ref.orderByChild('name'));
    this.foods = this.foodsFire.snapshotChanges().pipe(
      map(changes =>

@@ -4,7 +4,7 @@
 export interface Food {
     DocumentId: string;
 
-    Name: String;
+    Name: string;
 
     Calories: Number;
     
@@ -18,8 +18,10 @@ export interface Food {
 
     ServingAmount: Number;
 
-    ServingUnit: String;
+    ServingUnit: string;
 
-    ServingUnitShortCode: String;
+    ServingUnitShortCode: string;
+
+    IsFromPersonalDb: Boolean;
 
 }

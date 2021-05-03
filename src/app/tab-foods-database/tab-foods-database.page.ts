@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { combineLatest, Subscription } from 'rxjs';
 import { Food } from '../models/food.model';
-import { FoodService } from '../services/food.service';
 import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { LoadingService } from '../services/loading.service';
@@ -32,7 +31,6 @@ export class TabFoodsDatabasePage {
 
   constructor
     (
-      private _foodService: FoodService,
       private _foodDatabaseService: FoodDatabaseService,
       private _loadingService: LoadingService,
       private _router: Router,
@@ -202,7 +200,7 @@ export class TabFoodsDatabasePage {
         }, {
           text: 'Yes',
           handler: () => {
-            this._foodService.deleteFood(food.DocumentId);
+            this._foodDatabaseService.deleteFood(food.DocumentId);
             slidingItem.close();
             this._loadingService.presentLoading('Deleting..', 500);
           }
@@ -232,7 +230,11 @@ export class TabFoodsDatabasePage {
    * @param slidingItem Sliding item.
    */
   async editFood(food: Food, slidingItem: any) {
-    await this._router.navigate(["/edit_food/" + food.DocumentId]);
+    (await this._foodDatabaseService.getFood(food.DocumentId)).subscribe(res =>{
+      //console.log(res);
+    })
+
+    //await this._router.navigate(["/edit_food/" + food.DocumentId]);
     slidingItem.close();
   }
 

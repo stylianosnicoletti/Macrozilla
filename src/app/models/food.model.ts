@@ -2,8 +2,7 @@
  * Food Model (For Food Database).
  */
 export interface Food {
-    DocumentId: string;
-
+    
     Name: string;
 
     Calories: Number;
@@ -22,6 +21,14 @@ export interface Food {
 
     ServingUnitShortCode: string;
 
+    /**
+     * Not in firestore fields.
+     */
+    DocumentId: string;
+
+    /**
+     * Not in firestore fields.
+     */
     IsFromPersonalDb: Boolean;
 
 }

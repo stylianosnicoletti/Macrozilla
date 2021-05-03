@@ -86,7 +86,7 @@
       <ng-container
         *ngIf="searchTerm.length > 0 && !loadingFlag && noPersonalFoodsFoundAfterQuery && noGlobalFoodsFoundAfterQuery && !personalDbSearchExecutionInProcess && !globalDbSearchExecutionInProcess; then nothingFound">
       </ng-container>
-      <ion-item-sliding *ngFor="let food of filteredFoodMap | keyvalue: asIsOrder">
+      <ion-item-sliding *ngFor="let food of filteredFoodMap | keyvalue: asIsOrder" #slidingItem>
         <ion-item>
           <ion-label class="ion-text-wrap">
             <h2><strong>{{food.value.Name}} ({{food.value.ServingAmount}}{{food.value.ServingUnitShortCode}})</strong>
@@ -108,17 +108,26 @@
           </ion-avatar>
         </ion-item>
 
-
-        <ion-item-options side="end">
-          <ion-item-option color="warning" (click)="editFood(food,slidingItem)">
+        <!-- Enable sliding on personal foods -->
+        <ion-item-options *ngIf="food.value.IsFromPersonalDb" side="end">
+          <ion-item-option color="warning" (click)="editFood(food.value,slidingItem)">
             <ion-icon name="create"></ion-icon>
             Edit
           </ion-item-option>
-          <ion-item-option color="danger" (click)="presentAlertConfirmDelete(food,slidingItem)">
+          <ion-item-option color="danger" (click)="presentAlertConfirmDelete(food.value,slidingItem)">
             <ion-icon name="trash"></ion-icon>
             Delete
           </ion-item-option>
         </ion-item-options>
+
+        <!-- Lock sliding on public foods -->
+        <ion-item-options *ngIf="!food.value.IsFromPersonalDb" side="end">
+          <ion-item-option color="light" disabled>
+            🔒
+          </ion-item-option>
+        </ion-item-options>
+
+
       </ion-item-sliding>
     </ng-template>
 

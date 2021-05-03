@@ -4,47 +4,43 @@
       <ion-title>Food Database</ion-title>
     </ion-toolbar>
   </ion-header>
-  
 
-    <!-- Searchbar with cancel button shown on focus -->
-    <ion-searchbar debounce="380" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
-    </ion-searchbar>
-    <ion-content>
+
+  <!-- Searchbar with cancel button shown on focus -->
+  <ion-searchbar debounce="370" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
+  </ion-searchbar>
+  <ion-content>
     <!-- Default Refresher -->
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
       <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
 
     <!-- Normal screen -->
-    <ion-list *ngIf="filteredFoodList.length > 0; else loading">
-      <!-- Removed virtaul scroll there was an issue with the keyboard when forwar back-->
-      <!--    <ion-virtual-scroll [items]="filteredFoodList">
-      <ion-item-sliding *virtualItem="let food" #slidingItem>
-      -->
-      <ion-item-sliding *ngFor="let food of filteredFoodList" #slidingItem>
-        <ion-item>
-          <ion-label class="ion-text-wrap">
-            <h2><strong>{{food.name}}</strong></h2>
-            <h3>🔋 {{food.calories}} kcal</h3>
-            <p>🥩 {{food.protein | number:'.1'}}g 🍞 {{food.carbohydrates | number:'.1'}}g 🐖
-              {{food.fats | number:'.1'}}g :
-              (✔️ {{+food.fats - +food.saturated | number:'.1'}}g ❌ {{food.saturated | number:'.1'}}g) </p>
-          </ion-label>
-        </ion-item>
-        <ion-item-options side="end">
-          <ion-item-option color="warning" (click)="editFood(food,slidingItem)">
-            <ion-icon name="create"></ion-icon>
-            Edit
-          </ion-item-option>
-          <ion-item-option color="danger" (click)="presentAlertConfirm(food,slidingItem)">
-            <ion-icon name="trash"></ion-icon>
-            Delete
-          </ion-item-option>
-        </ion-item-options>
-      </ion-item-sliding>
+    <ion-list
+      *ngIf="searchTerm.length == 0; then viewIntroMessage else beginSearch">
+      <!-- Skeleton in here-->
     </ion-list>
 
-    <!-- Skeleton dummy screen -->
+    <!-- Skeleton: view personal db message screen -->
+    <ng-template #viewIntroMessage>
+      <ion-card>
+        <ion-item class="ion-text-center">
+          <ion-label class="ion-text-center" color="tertiary"><strong>Search by Food Name</strong></ion-label>
+        </ion-item>
+      
+        <ion-card-content class="ion-text-center">
+          Start typing the name of food you want to find.
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
+
+    <!-- Skeleton: Begin Search -->
+    <ng-template #beginSearch>
+      <ng-container *ngIf="loadingFlag; then loading else filteredItems">
+      </ng-container>
+    </ng-template>
+
+    <!-- Skeleton: Loading screen -->
     <ng-template #loading>
       <ion-list>
         <ion-item>
@@ -83,6 +79,56 @@
           </ion-label>
         </ion-item>
       </ion-list>
+    </ng-template>
+
+    <!-- Skeleton: List filtered items -->
+    <ng-template #filteredItems>
+      <ng-container
+        *ngIf="searchTerm.length > 0 && !loadingFlag && noPersonalFoodsFoundAfterQuery && noGlobalFoodsFoundAfterQuery && !personalDbSearchExecutionInProcess && !globalDbSearchExecutionInProcess; then nothingFound">
+      </ng-container>
+      <ion-item-sliding *ngFor="let food of filteredFoodMap | keyvalue: asIsOrder">
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <h2><strong>{{food.value.Name}} ({{food.value.ServingAmount}}{{food.value.ServingUnitShortCode}})</strong>
+            </h2>
+
+            <h3>🔋 {{food.value.Calories}} kcal</h3>
+            <p>🥩 {{food.value.Protein | number:'.1'}}g 🍞 {{food.value.Carbohydrates | number:'.1'}}g 🐖
+              {{food.value.Fats | number:'.1'}}g :
+              (✔️ {{+food.value.Fats - +food.value.Saturated | number:'.1'}}g ❌ {{food.value.Saturated |
+              number:'.1'}}g)
+            </p>
+
+          </ion-label>
+          <ion-avatar *ngIf="food.value.IsFromPersonalDb" slot="end" color="primary">
+            <h3>📝</h3>
+          </ion-avatar>
+          <ion-avatar *ngIf="!food.value.IsFromPersonalDb" slot="end" color="primary">
+            <h3>🌎</h3>
+          </ion-avatar>
+        </ion-item>
+
+
+        <ion-item-options side="end">
+          <ion-item-option color="warning" (click)="editFood(food,slidingItem)">
+            <ion-icon name="create"></ion-icon>
+            Edit
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="presentAlertConfirmDelete(food,slidingItem)">
+            <ion-icon name="trash"></ion-icon>
+            Delete
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ng-template>
+
+    <!-- Skeleton: Nothing found -->
+    <ng-template #nothingFound>
+      <ion-card>
+        <ion-card-content>
+          Sorry, we couldn't find anything. 😞
+        </ion-card-content>
+      </ion-card>
     </ng-template>
 
     <!-- Fab placed to the bottom end -->

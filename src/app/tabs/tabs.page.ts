@@ -18,7 +18,9 @@ export class TabsPage {
    */
   async ngOnInit() {
     console.log("Initialise Tabs Common page.");
-    await (await this._userService.getUserFields()).subscribe(x => this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode)));
+    await (await this._userService.getUserFields()).subscribe(async x => {
+      this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
+    });
   }
 
   /**

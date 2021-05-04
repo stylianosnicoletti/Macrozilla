@@ -8,6 +8,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MyMacrosConstants } from '../my-macros-constants'
 import { PopoverController, IonInput } from '@ionic/angular';
 import { UnsubscribeService } from '../services/unsubscribe.service';
+import { GlobalVariablesService } from '../services/global-variables.service';
 
 @Component({
   selector: 'app-add-food',
@@ -31,7 +32,8 @@ export class AddFoodPage {
     private _foodService: FoodService,
     private _toastService: ToastService,
     private _unsubscribeService: UnsubscribeService,
-    private _popController: PopoverController
+    private _popController: PopoverController,
+    private _globalVariableService: GlobalVariablesService
   ) {
     this.initialiseItems();
   }
@@ -56,12 +58,16 @@ export class AddFoodPage {
   /**
   * Initialises Items. (E.g. Serving Units)
   */
-  initialiseItems(): void {
+  async initialiseItems(): Promise<void> {
     this.subscriptionsList.push(
       this._foodService.getAllServingUnits().subscribe(res => {
         this.servingUnits = res;
       }));
     this.addFoodData();
+   // this.subscriptionsList.push(
+   // await (await this._globalVariableService.getServingUnits()).subscribe(res => {
+//console.log(res);
+  //  }));
   }
 
   /**

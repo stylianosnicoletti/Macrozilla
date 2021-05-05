@@ -7,11 +7,6 @@ export interface ServingUnit {
 
     ShortCode: string;
 
-    SHortCodePlural: string;
+    ShortCodePlural: string;
 
-}
-
-export interface ServingUnitsDoc {
-
-    data: ServingUnit[];
 }

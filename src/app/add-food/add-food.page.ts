@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FoodService } from '../services/food.service';
 import { ToastService } from '../services/toast.service';
-import { Food, ServingUnit } from '../types';
+import { Food } from '../types';
+import { ServingUnit } from '../models/servingUnit.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MyMacrosConstants } from '../my-macros-constants'
 import { PopoverController, IonInput } from '@ionic/angular';
@@ -58,16 +59,13 @@ export class AddFoodPage {
   /**
   * Initialises Items. (E.g. Serving Units)
   */
-  async initialiseItems(): Promise<void> {
+  initialiseItems(): void {
     this.subscriptionsList.push(
-      this._foodService.getAllServingUnits().subscribe(res => {
-        this.servingUnits = res;
+       this._globalVariableService.getServingUnits().subscribe(res => {
+        console.log(res);
+        this.servingUnits = res.ServingUnits;
       }));
-    this.addFoodData();
-   // this.subscriptionsList.push(
-   // await (await this._globalVariableService.getServingUnits()).subscribe(res => {
-//console.log(res);
-  //  }));
+      this.addFoodData();
   }
 
   /**

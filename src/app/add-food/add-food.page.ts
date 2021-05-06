@@ -1,9 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { FoodService } from '../services/food.service';
+import { FoodDatabaseService } from '../services/food-db.service';
 import { ToastService } from '../services/toast.service';
-import { Food } from '../types';
+import { Food } from '../models/food.model';
 import { ServingUnit } from '../models/servingUnit.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MyMacrosConstants } from '../my-macros-constants'
@@ -30,7 +30,7 @@ export class AddFoodPage {
   constructor(
     private _router: Router,
     private _formBuilder: FormBuilder,
-    private _foodService: FoodService,
+    private _foodDbService: FoodDatabaseService,
     private _toastService: ToastService,
     private _unsubscribeService: UnsubscribeService,
     private _popController: PopoverController,
@@ -61,11 +61,11 @@ export class AddFoodPage {
   */
   initialiseItems(): void {
     this.subscriptionsList.push(
-       this._globalVariableService.getServingUnits().subscribe(res => {
+      this._globalVariableService.getServingUnits().subscribe(res => {
         console.log(res);
         this.servingUnits = res.ServingUnits;
       }));
-      this.addFoodData();
+    this.addFoodData();
   }
 
   /**
@@ -95,7 +95,6 @@ export class AddFoodPage {
       name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]],
       servingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
       servingUnit: ['', [Validators.required]],
-      comment: ['', [Validators.maxLength(50)]],
       protein: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
       carbohydrates: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
       fats: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
@@ -125,33 +124,21 @@ export class AddFoodPage {
     }
 
     this.food = this.fillFood(this.addForm.value);
-
-    // Food Name Exists Check
-    if (await this.foodNameExistGuard(this.food)) {
-      await this._toastService.presentToast('Food with that name already exists!');
-      return false;
-    }
+    console.log(this.food);
 
     // Saturated Fats Check
-    if (this.food.saturated > this.food.fats) {
+    if (this.food.Saturated > this.food.Fats) {
       await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
       return false;
     }
 
     // Submit food.
-    await this._foodService.addFood(this.food);
-    await this._router.navigate(["/tabs/foods_database"]);
-    await this._toastService.presentToast('Food Successfully Added');
-
-  }
-
-  /** 
-  * Checks if food name exist under that user.
-  * @param {Food} food Food.
-  * @return {Promise<boolean>} True if it exists. False when it doesn't.
-  */
-  async foodNameExistGuard(food: Food): Promise<boolean> {
-    return ((await this._foodService.doesFoodNameExist(food)) != 0);
+    if (await this._foodDbService.addFood(this.food)) {
+      await this._router.navigate(["/tabs/foods_database"]);
+      await this._toastService.presentToast('Food Successfully Added');
+    } else {
+      await this._toastService.presentToast('FTHERE IS AN ISSUE WITH SERVER');
+    }
   }
 
   /** 
@@ -161,32 +148,18 @@ export class AddFoodPage {
   */
   fillFood(formValue: any): Food {
     return {
-      name: this.prepareName(formValue.name, formValue.servingAmount, formValue.servingUnit, formValue.comment),
-      protein: formValue.protein,
-      carbohydrates: formValue.carbohydrates,
-      fats: formValue.fats,
-      saturated: formValue.saturated,
-      calories: formValue.calories,
-      key: null
+      Name: formValue.name,
+      Protein: formValue.protein,
+      Carbohydrates: formValue.carbohydrates,
+      Fats: formValue.fats,
+      Saturated: formValue.saturated,
+      Calories: formValue.calories,
+      ServingAmount: formValue.servingAmount,
+      ServingUnit: formValue.servingUnit.Name,
+      ServingUnitShortCode: this.mapServingUnitToShortCode(formValue.servingAmount, formValue.servingUnit)
     };
   }
 
-  /** 
-  * Prepares the food name.
-  * @param {string} name Name of food (E.g. Chocolate).
-  * @param {string} servingAmount Serving amount (E.g. 100).
-  * @param {ServingUnit} servingUnit Serving Unit (E.g Grams).
-  * @param {string} comment Serving Unit (E.g bar).
-  * @return {string} The full name (E.g. Chocolate (100g - bar)).
-  */
-  prepareName(name: String, servingAmount: string, servingUnit: ServingUnit, comment: string) {
-    if (comment.length > 0) {
-      return name + " (" + servingAmount + this.mapServingUnitToShortCode(servingAmount, servingUnit) + " - " + comment + ")";
-    }
-    else {
-      return name + " (" + servingAmount + this.mapServingUnitToShortCode(servingAmount, servingUnit) + ")";
-    }
-  }
 
   /** 
   * Decides which serving unit shortcode should be used based on the amount.

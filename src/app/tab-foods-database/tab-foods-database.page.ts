@@ -199,10 +199,17 @@ export class TabFoodsDatabasePage {
           }
         }, {
           text: 'Yes',
-          handler: () => {
-            this._foodDatabaseService.deleteFood(food.DocumentId);
-            slidingItem.close();
-            this._loadingService.presentLoading('Deleting..', 500);
+          handler: async () => {
+            if (await this._foodDatabaseService.deleteFood(food.DocumentId)){
+              slidingItem.close();
+              await this._loadingService.presentLoading('Deleting..', 500);
+              await this.filterFoods();
+            }
+            else {
+              slidingItem.close();
+              //ADD A TOAST!!!!!!!!!!!!!!!
+              console.log("add a toast");
+            }
           }
         }
       ]
@@ -230,7 +237,7 @@ export class TabFoodsDatabasePage {
    * @param slidingItem Sliding item.
    */
   async editFood(food: Food, slidingItem: any) {
-    (await this._foodDatabaseService.getFood(food.DocumentId)).subscribe(res =>{
+    (await this._foodDatabaseService.getFood(food.DocumentId)).subscribe(res => {
       //console.log(res);
     })
 

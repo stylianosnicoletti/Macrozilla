@@ -15,6 +15,9 @@ export interface Food {
 
     Saturated: Number;
 
+    /**
+     * The name of serving unit object.
+     */
     ServingAmount: Number;
 
     ServingUnit: string;
@@ -24,11 +27,11 @@ export interface Food {
     /**
      * Not in firestore fields.
      */
-    DocumentId: string;
+    DocumentId?: string;
 
     /**
      * Not in firestore fields.
      */
-    IsFromPersonalDb: Boolean;
+    IsFromPersonalDb?: Boolean;
 
 }

@@ -1,12 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FoodService } from '../services/food.service';
+import { FoodDatabaseService } from '../services/food-db.service';
 import { ToastService } from '../services/toast.service';
 import { Subscription } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Network } from '@ionic-native/network/ngx'
-import { AlertController } from '@ionic/angular';
+import { AlertController, PopoverController } from '@ionic/angular';
 import { MyMacrosConstants } from '../my-macros-constants';
+import { Food } from '../models/food.model';
+import { ServingUnit } from '../models/servingUnit.model';
+import { GlobalVariablesService } from '../services/global-variables.service';
+import { UnsubscribeService } from '../services/unsubscribe.service';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-edit-food',
@@ -15,7 +21,10 @@ import { MyMacrosConstants } from '../my-macros-constants';
 })
 export class EditFoodPage {
 
-  foodKey: any;
+  foodDocId: string;
+  food: Food;
+  preselectedServingUnit: ServingUnit;
+  servingUnitsMap = new Map<String, ServingUnit>();
   editForm: FormGroup;
   isSubmitted = false;
   subscriptionsList: Subscription[] = [];
@@ -27,16 +36,31 @@ export class EditFoodPage {
     private _router: Router,
     private _formBuilder: FormBuilder,
     private _activatedRoute: ActivatedRoute,
-    private _foodService: FoodService,
-    private _toastService: ToastService,
+    private _foodDatabaseService: FoodDatabaseService,
+    private _globalVariableService: GlobalVariablesService,
+    private _userService: UserService,
+    private _renderer: Renderer2,
     private _network: Network,
-    private _alertController: AlertController) {
+    private _unsubscribeService: UnsubscribeService,
+    private _alertController: AlertController,
+    private _toastService: ToastService,
+    private _popController: PopoverController) {
+  }
+
+  /**
+   * Will not be triggered, if you come back to a page after putting it into a stack.
+   */
+  async ngOnInit() {
+    console.log("ngOnInit EditFood Tab.");
+    await (await this._userService.getUserFields()).subscribe(async x => {
+      this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
+    });
   }
 
   async ionViewWillEnter() {
     console.log("entering edit food page");
     this.disconnectSubscription = this._network.onDisconnect().subscribe(() => {
-      this.unsubscribeData();
+      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
       //don't alert cz inherits from mother page
       console.log('network was disconnected :-(');
       this.goToFoodsDatabaseTab()
@@ -44,7 +68,7 @@ export class EditFoodPage {
 
     this.connectSubscription = this._network.onConnect().subscribe(async () => {
       this.isFormReadyToBuild = false;
-      this.unsubscribeData();
+      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
       await this.initialiseItems();
       console.log('network connected!');
     });
@@ -55,7 +79,7 @@ export class EditFoodPage {
   ionViewWillLeave() {
     console.log("leaving edit food page");
     this.isFormReadyToBuild = false;
-    this.unsubscribeData();
+    this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     this.unsubscribeNetwork();
   }
 
@@ -68,43 +92,41 @@ export class EditFoodPage {
   }
 
   /**
-   * Unsubscribe all unclosed subscriptions.
-   */
-  unsubscribeData(): void {
-    this.subscriptionsList.forEach(item => {
-      if (!item.closed) item.unsubscribe();
-    })
-    this.subscriptionsList = [];
-  }
-
-  /**
    * Initialise items.
-   */  
+   */
   async initialiseItems(): Promise<void> {
     await this.foodExistGuard();
     this.updateFoodData();
-    this.subscriptionsList.push(
-      (await this._foodService.getFood(this.foodKey)).subscribe(res => {
-        this.editForm.setValue(res, res.key = this._activatedRoute.snapshot.params['food_key']);
-      }
-      ));
+
+    this.subscriptionsList.push((await this._globalVariableService.getServingUnits()).subscribe(res => {
+      res.ServingUnits.forEach(servingUnit => {
+        this.servingUnitsMap.set(servingUnit.Name, servingUnit);
+      });
+    }));
+
+    this.subscriptionsList.push((await this._foodDatabaseService.getFood(this.foodDocId)).subscribe(res => {
+      this.editForm.setValue(res);
+      this.preselectedServingUnit = this.servingUnitsMap.get(res.ServingUnit);
+    }));
+
   }
 
   /**
    * Checks if the route param food key exist.
-   */  
+   */
   async foodExistGuard(): Promise<void> {
-    this.foodKey = this._activatedRoute.snapshot.params['food_key'];
-    if ((await this._foodService.doesFoodKeyExist(this.foodKey)) <= 0) {
-      this._router.navigate(["/tabs/foods_database"]);
-    } else {
+    this.foodDocId = this._activatedRoute.snapshot.params['food_doc_id'];
+    if ((await this._foodDatabaseService.doesFoodDocExists(this.foodDocId))) {
       this.isFormReadyToBuild = true;
+    } else {
+      this._router.navigate(["/tabs/foods_database"]);
+
     }
   }
 
   /**
    * No network alert.
-   */ 
+   */
   async presentNetworkAlert(): Promise<void> {
     const alert = await this._alertController.create({
       header: 'No Data Connection',
@@ -114,18 +136,31 @@ export class EditFoodPage {
     await alert.present();
   }
 
+  /**
+    * Closing pop items (E.g. Service Unit Select).
+    */
+  async closePopItems(): Promise<void> {
+    const popover = await this._popController.getTop();
+    if (popover)
+      await popover.dismiss(null);
+  }
+
   /** 
    * Contains Reactive Form logic.
    */
   updateFoodData(): void {
     this.editForm = this._formBuilder.group({
-      name: [{ value: '', disabled: true, }, Validators.required],
-      protein: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
-      carbohydrates: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
-      fats: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
-      saturated: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
-      calories: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
-      key: ['']
+      DocumentId: '',
+      ServingUnitShortCode: '',
+      IsFromPersonalDb: '',
+      Name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]],
+      ServingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
+      ServingUnit: ['', [Validators.required]],
+      Protein: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      Carbohydrates: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      Fats: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      Saturated: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      Calories: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]]
     })
   }
 
@@ -134,6 +169,39 @@ export class EditFoodPage {
    */
   async goToFoodsDatabaseTab(): Promise<void> {
     await this._router.navigate(["/tabs/foods_database"]);
+  }
+
+  /** 
+   * Prepares Food with form values provided.
+   * @param {any} formValue Form value.
+   * @return {Food} Filled Food.
+   */
+  fillFood(formValue: any): Food {
+    return {
+      DocumentId: this.foodDocId,
+      Name: formValue.Name,
+      Protein: formValue.Protein,
+      Carbohydrates: formValue.Carbohydrates,
+      Fats: formValue.Fats,
+      Saturated: formValue.Saturated,
+      Calories: formValue.Calories,
+      ServingAmount: formValue.ServingAmount,
+      ServingUnit: formValue.ServingUnit.Name,
+      ServingUnitShortCode: this.mapServingUnitToShortCode(formValue.ServingAmount, formValue.ServingUnit)
+    };
+  }
+
+  /** 
+   * Decides which serving unit shortcode should be used based on the amount.
+   * @param {string} servingAmount Serving amount (E.g. 100)
+   * @param {ServingUnit} servingUnit Serving Unit (E.g Grams)
+   * @return {string} The shortcode or plural short code of the serving unit to be appended in the name (E.g gram or grams)
+   */
+  mapServingUnitToShortCode(servingAmount: string, servingUnit: ServingUnit): string {
+    if (Number.parseInt(servingAmount) > 1 && servingUnit.ShortCodePlural != null) {
+      return servingUnit.ShortCodePlural;
+    }
+    return servingUnit.ShortCode;
   }
 
   /**
@@ -149,15 +217,64 @@ export class EditFoodPage {
       return false;
     }
 
+    this.food = this.fillFood(this.editForm.value);
+
     // Saturated Fats Check
-    if (this.editForm.value.saturated > this.editForm.value.fats) {
+    if (this.food.Saturated > this.food.Fats) {
       await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
       return false;
     }
 
-    await this._foodService.updateFood(this.editForm.value);
-    await this._router.navigate(["/tabs/foods_database"]);
-    await this._toastService.presentToast('Food Successfully Edited!')
+    await this.presentAlertConfirmEdit(this.food);
 
+  }
+
+  /**
+   * Delete Confirmation Alert
+   * @param food Food.
+   * @param slidingItem Sliding item.
+   */
+  async presentAlertConfirmEdit(food: Food): Promise<void> {
+    const alert = await this._alertController.create({
+      header:  'Proceeding will not affect any existing tracking!',
+      message: 'Do you wish to continue?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+           return false;
+          }
+        }, {
+          text: 'Yes',
+          handler: async () => {
+            await this._foodDatabaseService.updateFood(this.food);
+            await this._router.navigate(["/tabs/foods_database"]);
+            await this._toastService.presentToast('Food Successfully Edited!')
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  /**
+   *  Maintain insertion order in Map when using keyvalue pipe.
+   */
+  asIsOrder(a, b) {
+    return 1;
+  }
+
+  /**
+   * Maps darkMode boolean to body name.
+   * @param darkMode User prefered theme option.
+   * @returns Body name.
+   */
+  mapThemeModeToBodyName(darkMode: boolean): string {
+    if (darkMode) {
+      return 'dark';
+    }
+    return 'light';
   }
 }

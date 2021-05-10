@@ -82,7 +82,7 @@ export class TabFoodsDatabasePage {
    */
   async initialiseItems(): Promise<void> {
     this.searchTerm = "";
-    await (await this._userService.getUserFields()).subscribe(async x => {
+    await (await this._userService.getUserFields()).subscribe(x => {
       this.useOnlyPersonalDb = x.Options.UseOnlyPersonalDb;
     });
   }
@@ -200,16 +200,10 @@ export class TabFoodsDatabasePage {
         }, {
           text: 'Yes',
           handler: async () => {
-            if (await this._foodDatabaseService.deleteFood(food.DocumentId)){
-              slidingItem.close();
-              await this._loadingService.presentLoading('Deleting..', 500);
-              await this.filterFoods();
-            }
-            else {
-              slidingItem.close();
-              //ADD A TOAST!!!!!!!!!!!!!!!
-              console.log("add a toast");
-            }
+            await this._foodDatabaseService.deleteFood(food.DocumentId)
+            slidingItem.close();
+            await this._loadingService.presentLoading('Deleting..', 500);
+            await this.filterFoods();
           }
         }
       ]
@@ -237,11 +231,7 @@ export class TabFoodsDatabasePage {
    * @param slidingItem Sliding item.
    */
   async editFood(food: Food, slidingItem: any) {
-    (await this._foodDatabaseService.getFood(food.DocumentId)).subscribe(res => {
-      //console.log(res);
-    })
-
-    //await this._router.navigate(["/edit_food/" + food.DocumentId]);
+    await this._router.navigate(["/edit_food/" + food.DocumentId]);
     slidingItem.close();
   }
 

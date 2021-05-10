@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Renderer2, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FoodDatabaseService } from '../services/food-db.service';
@@ -7,9 +7,10 @@ import { Food } from '../models/food.model';
 import { ServingUnit } from '../models/servingUnit.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MyMacrosConstants } from '../my-macros-constants'
-import { PopoverController, IonInput } from '@ionic/angular';
+import { PopoverController, IonInput, AlertController } from '@ionic/angular';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { GlobalVariablesService } from '../services/global-variables.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-add-food',
@@ -30,13 +31,26 @@ export class AddFoodPage {
   constructor(
     private _router: Router,
     private _formBuilder: FormBuilder,
-    private _foodDbService: FoodDatabaseService,
+    private _popController: PopoverController,
+    private _alertController: AlertController,
     private _toastService: ToastService,
     private _unsubscribeService: UnsubscribeService,
-    private _popController: PopoverController,
-    private _globalVariableService: GlobalVariablesService
+    private _foodDbService: FoodDatabaseService,
+    private _globalVariableService: GlobalVariablesService,
+    private _renderer: Renderer2,
+    private _userService: UserService
   ) {
     this.initialiseItems();
+  }
+
+  /**
+   * Will not be triggered, if you come back to a page after putting it into a stack.
+   */
+  async ngOnInit() {
+    console.log("ngOnInit AddFood Tab.");
+    await (await this._userService.getUserFields()).subscribe(async x => {
+      this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
+    });
   }
 
   /**
@@ -133,13 +147,24 @@ export class AddFoodPage {
     }
 
     // Submit food.
-    if (await this._foodDbService.addFood(this.food)) {
-      await this._router.navigate(["/tabs/foods_database"]);
-      await this._toastService.presentToast('Food Successfully Added');
-    } else {
-      await this._toastService.presentToast('FTHERE IS AN ISSUE WITH SERVER');
-    }
+    await this._foodDbService.addFood(this.food);
+    await this._router.navigate(["/tabs/foods_database"]);
+    await this._toastService.presentToast('Food Successfully Added');
   }
+
+
+  /**
+   * No network alert
+   */
+  async presentIssueWithServerAlert(): Promise<void> {
+    const alert = await this._alertController.create({
+      header: 'There is an issue with server. ',
+      message: 'Please try again later.',
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+
 
   /** 
   * Prepares Food with form values provided.
@@ -160,7 +185,6 @@ export class AddFoodPage {
     };
   }
 
-
   /** 
   * Decides which serving unit shortcode should be used based on the amount.
   * @param {string} servingAmount Serving amount (E.g. 100)
@@ -172,6 +196,18 @@ export class AddFoodPage {
       return servingUnit.ShortCodePlural;
     }
     return servingUnit.ShortCode;
+  }
+
+  /**
+   * Maps darkMode boolean to body name.
+   * @param darkMode User prefered theme option.
+   * @returns Body name.
+   */
+  mapThemeModeToBodyName(darkMode: boolean): string {
+    if (darkMode) {
+      return 'dark';
+    }
+    return 'light';
   }
 }
 

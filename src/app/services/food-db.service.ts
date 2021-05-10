@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Food } from '../models/food.model';
 import { map } from 'rxjs/operators';
@@ -140,34 +140,26 @@ export class FoodDatabaseService {
   /**
    * Delete food document from Personal database for the current user.
    * @param docId Food Doc Id.
-   * @returns True when food sucesfully deleted.
    */
-  async deleteFood(docId: string): Promise<boolean> {
+  async deleteFood(docId: string): Promise<void> {
     // Current user id
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
 
     // Delete food doc 
-    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).delete()
-    .then(function() {
-      return true;
-    })
-    .catch(function() {
-      return false;
-    });
+    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).delete();
   }
 
 
   /**
    * Update food document on personal database for the current user
    * @param food Food.
-   * @returns True when food sucesfully updated.
    */
-  async updateFood(food: Food): Promise<boolean> {
+  async updateFood(food: Food): Promise<void> {
     // Current user id
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
 
     // Update food doc 
-    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + food.DocumentId).update({
+    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + food.DocumentId).set({
       Name: food.Name, // Investigate if the cloud function gets executed if the name remains the same
       Calories: food.Calories,
       Carbohydrates: food.Carbohydrates,
@@ -177,22 +169,15 @@ export class FoodDatabaseService {
       ServingAmount: food.ServingAmount,
       ServingUnit: food.ServingUnit,
       ServingUnitShortCode: food.ServingUnitShortCode
-    })
-      .then(function() {
-        return true;
-      })
-      .catch(function() {
-        return false;
-      });
+    });
   }
 
 
   /**
    * Add food document on personl database for the current user.
    * @param food Food.
-   * @returns True when food sucesfully added.
    */
-  async addFood(food: Food): Promise<boolean> {
+  async addFood(food: Food): Promise<any> {
     // Current user id
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
 
@@ -208,13 +193,7 @@ export class FoodDatabaseService {
       ServingUnit: food.ServingUnit,
       ServingUnitShortCode: food.ServingUnitShortCode
     })
-      .then(function() {
-        return true;
-      })
-      .catch(function() {
-        return false;
-      });
-    }
+  }
 
 
   /**
@@ -222,13 +201,13 @@ export class FoodDatabaseService {
    * @param docId Food Doc Id.
    * @returns Observable of Food doc.
    */
-   async getFood(docId: any): Promise<Observable<Food>>{
+  async getFood(docId: any): Promise<Observable<Food>> {
     // Current user id
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-    
+
     // Get food doc 
     return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).get()
-    .pipe(map(c => ({
+      .pipe(map(c => ({
         DocumentId: c.id,
         Name: c.data().Name,
         Calories: c.data().Calories,
@@ -242,41 +221,32 @@ export class FoodDatabaseService {
         IsFromPersonalDb: true,
         // ...c.payload.val()  To fill the rest
       }))
-    );
+      );
   }
-    /*
-      // Check to see if the food with that name already exist for that user and returns count 
-      async doesFoodNameExist(food: Food): Promise<Number> {
-        const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-        const foodAlreadyExistsFireRef = this._angularFireDatabase.database.ref('/foods/' + currentUserUid + '/');
-        return foodAlreadyExistsFireRef.orderByChild('name').equalTo(food.name).once("value").then(function (snapshot) {
-          return snapshot.numChildren();
-        });
-      }
-    
-      // Check to see if the food with that id already exist for that user and returns count 
-      async doesFoodKeyExist(key: any): Promise<Number> {
-        let timesFoodExist = 0;
-        const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-        const foodAlreadyExistsFireRef = this._angularFireDatabase.database.ref('/foods/' + currentUserUid + '/');
-        foodAlreadyExistsFireRef.orderByKey().equalTo(key).on("value", function (snapshot) {
-          timesFoodExist = snapshot.numChildren();
-        });
-        return timesFoodExist;
-      }
-    
-      // Get all serving units
-      getAllServingUnits(): Observable<ServingUnit[]> {
-        this.servingUnitsFire = this._angularFireDatabase.list('/servingUnits/');
-        this.servingUnits = this.servingUnitsFire.snapshotChanges().pipe(
-          map(changes =>
-            changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
-          )
-        );
-        return this.servingUnits;
-      }*/
 
+  /**
+   * Check to see if the food with that DocId already exist for that user
+   * @param docId Document Id
+   * @returns True if food document exists. False if food document does not exists.
+   */
+  async doesFoodDocExists(docId: any): Promise<Boolean> {
+    // Current user id
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+
+    // Get food doc 
+    return await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).get().toPromise()
+      .then(docSnapshot => {
+        if (docSnapshot.exists) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      });
+  }
+  
 }
+
 
 
 

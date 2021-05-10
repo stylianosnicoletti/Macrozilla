@@ -17,7 +17,7 @@ export class TabsPage {
    * Will not be triggered, if you come back to a page after putting it into a stack.
    */
   async ngOnInit() {
-    console.log("Initialise Tabs Common page.");
+    console.log("ngOnInit Tabs Common.");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });

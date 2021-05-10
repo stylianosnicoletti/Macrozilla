@@ -16,7 +16,7 @@ export class GlobalVariablesService {
    */
   getServingUnits(): Observable<GlobalVariables> {
 
-    // Get food doc 
+    // Get globalVariables doc 
     return this._angularFireStore.doc<GlobalVariables>("/TheMacroDiet/Production/Configuration/GlobalVariables").valueChanges();
     
     }

@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { DailyEntryFood, Summary } from '../types';
-import { FoodEntryService } from '../services/food-entry.service';
-import { SummaryService } from '../services/summary.service';
+
 import { Subscription } from 'rxjs';
 import { AlertController } from '@ionic/angular';
 import { LoadingService } from '../services/loading.service';
@@ -30,8 +29,6 @@ export class TabDailyEntryPage {
   constructor(
     private _router: Router,
     private _datePipe: DatePipe,
-    private _foodEntryService: FoodEntryService,
-    private _summaryService: SummaryService,
     private _loadingService: LoadingService,
     private _alertController: AlertController,
     private _network: Network) {
@@ -97,8 +94,8 @@ export class TabDailyEntryPage {
   // Transforms a the date to a specifed format and observe summary for that date
   async transformDate(myDate) {
     this.date = this._datePipe.transform(myDate, 'yyyy-MM-dd');
-    this.subscriptionsList.push((await this._foodEntryService.getAllFoodEntriesByDate(this.date)).subscribe(x => this.dailyEntriesList = x));
-    this.subscriptionsList.push((await this._summaryService.getSummaryObservable(this.date)).subscribe(x => this.summaryDay = x));
+    //this.subscriptionsList.push((await this._foodEntryService.getAllFoodEntriesByDate(this.date)).subscribe(x => this.dailyEntriesList = x));
+    //this.subscriptionsList.push((await this._summaryService.getSummaryObservable(this.date)).subscribe(x => this.summaryDay = x));
   }
 
   // Parse selected date
@@ -108,9 +105,9 @@ export class TabDailyEntryPage {
 
   // Delete Confirmation
   async presentAlertConfirm(entryArg: DailyEntryFood, slidingItem: any) {
-    this.numberOfEntriesByDate = await this._foodEntryService.getNumberOfFoodEntriesByDate(this.date);
+    //this.numberOfEntriesByDate = await this._foodEntryService.getNumberOfFoodEntriesByDate(this.date);
     this.entrySummary = this.createEntrySummary(entryArg);
-    this.existingSummary = await this._summaryService.getSummary(this.date);
+    //this.existingSummary = await this._summaryService.getSummary(this.date);
     const alert = await this._alertController.create({
       header: 'Do you want to proceed deleting?',
       message: entryArg.food.name + ' Qty: ' + entryArg.qty,
@@ -126,13 +123,13 @@ export class TabDailyEntryPage {
           text: 'Yes',
           handler: async () => {
             if (this.numberOfEntriesByDate > 1) {
-              await this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
+              //await this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
               // Decrement summary on entry deletion 
-              this._summaryService.decrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
+              //this._summaryService.decrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
             } else {
               // Remove summary on last entry deletion 
-              await this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
-              await this._summaryService.removeSummary(this.date);
+              //await this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
+              //await this._summaryService.removeSummary(this.date);
             }
             slidingItem.close();
             await this._loadingService.presentLoading('Deleting..', 500);

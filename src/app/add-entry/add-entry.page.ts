@@ -1,14 +1,15 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Renderer2, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FoodService } from '../services/food.service';
 import { ToastService } from '../services/toast.service';
-import { Food, DailyEntryFood, Summary } from '../types';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { SummaryService } from '../services/summary.service';
-import { FoodEntryService } from '../services/food-entry.service';
+import { combineLatest, Subscription } from 'rxjs';
 import { Network } from '@ionic-native/network/ngx'
 import { AlertController, IonInput } from '@ionic/angular';
+import { Food } from '../models/food.model';
+import { FoodDatabaseService } from '../services/food-db.service';
+import { UserService } from '../services/user.service';
+import { UnsubscribeService } from '../services/unsubscribe.service';
+import { Entry, DailyEntry } from '../models/dailyEntry';
 
 
 @Component({
@@ -24,16 +25,23 @@ export class AddEntryPage {
 
   date: string;
   food: Food;
-  entry: DailyEntryFood;
-  entrySummary: Summary;
-  existingSummary: Summary;
+  entry: Entry;
+  //entrySummary: Summary;
+  //existingSummary: Summary;
   addEntryForm: FormGroup;
   isSubmitted = false;
   searchTerm: string = "";
-  filteredFoodList: Food[] = [];
-  isListHidden = false;
-  isFormHidden = true;
-  subscriptionsList: Subscription[] = [];
+  filteredFoodMap = new Map<string, Food>(); // To avoid duplication and maintain insertion order (for ES6+)
+  foodDbSubscriptionsList: Subscription[] = []; // Storing subscriptions calling the food databases
+  generalSubscriptionsList: Subscription[] = [];
+  useOnlyPersonalDb: boolean = false;
+  noPersonalFoodsFoundAfterQuery: boolean = true;
+  noGlobalFoodsFoundAfterQuery: boolean = true;
+  personalDbSearchExecutionInProcess: boolean = false;
+  globalDbSearchExecutionInProcess: boolean = false;
+  loadingFlag: boolean = false;
+  isListHidden: boolean = false;
+  isFormHidden: boolean = true;
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
 
@@ -41,19 +49,28 @@ export class AddEntryPage {
     private _router: Router,
     private _formbBuilder: FormBuilder,
     private _activatedRoute: ActivatedRoute,
-    private _foodService: FoodService,
-    private _foodEntryService: FoodEntryService,
-    private _summaryService: SummaryService,
+    private _foodDatabaseService: FoodDatabaseService,
+    private _unSubscribeService: UnsubscribeService,
+    private _userService: UserService,
     private _toastService: ToastService,
     private _network: Network,
-    private _alertController: AlertController) {
+    private _alertController: AlertController,
+    private _renderer: Renderer2) {
+  }
+
+  async ngOnInit() {
+    console.log("ngOnInit Add New Daily Entry");
+    await (await this._userService.getUserFields()).subscribe(async x => {
+      this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
+    });
   }
 
   async ionViewWillEnter() {
     console.log("entering add entry page");
 
     this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this.unsubscribeData();
+      this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+      this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
       this.searchTerm = "";
       // Don't alert becuase daily entry tabs page will do that
       console.log('network was disconnected :-(');
@@ -61,7 +78,8 @@ export class AddEntryPage {
     });
 
     this.connectSubscription = this._network.onConnect().subscribe(async () => {
-      this.unsubscribeData();
+      this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+      this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
       await this.initialiseItems();
       this.searchTerm = "";
       console.log('network connected!');
@@ -72,7 +90,8 @@ export class AddEntryPage {
 
   ionViewWillLeave() {
     console.log("leaving add entry page");
-    this.unsubscribeData();
+    this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+    this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
     this.unsubscribeNetwork();
   }
 
@@ -81,24 +100,20 @@ export class AddEntryPage {
     if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
   }
 
-  unsubscribeData() {
-    this.subscriptionsList.forEach(item => {
-      if (!item.closed) item.unsubscribe();
-    })
-    this.subscriptionsList = [];
-  }
-
-  async initialiseItems() {
+  /**
+   * Initialises items.
+   */
+  async initialiseItems(): Promise<void> {
     this.enterGuard();
     this.addEntryData();
-    this.subscriptionsList.push(
-      (await this._foodService.getAllFoods()).subscribe(res => {
-        this.filteredFoodList = res;
-      }));
+    this.searchTerm = "";
+    await (await this._userService.getUserFields()).subscribe(x => {
+      this.useOnlyPersonalDb = x.Options.UseOnlyPersonalDb;
+    });
   }
 
   async doRefresh(event) {
-    this.unsubscribeData();
+    this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
     await this.initialiseItems();
     this.searchTerm = "";
     setTimeout(() => {
@@ -128,15 +143,73 @@ export class AddEntryPage {
     await this._router.navigate(["/tabs/daily_entry"]);
   }
 
-  // Update filteredFoodList using search term parsed
-  async filterFoods() {
+  /**
+   * Update filteredFoodList using search term parsed.
+   * Query first personal Db.
+   * If public Db is also enabled query after getting results of Personal.
+   * Put everything in a map (insertion order, no duplicates) to be displayed.
+   * Manipulates flags for the templates to be showned.
+   */
+   async filterFoods(): Promise<void> {
     this.hideForm();
     this.unhidetList();
-    this.subscriptionsList.push(
-      (await this._foodService.getAllFoods()).subscribe(res => {
-        this.filteredFoodList = res.filter((item) => {
-          return (item.name.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1);
-        })
+    this.loadingFlag = true;
+    this.noPersonalFoodsFoundAfterQuery = true;
+    this.noGlobalFoodsFoundAfterQuery = true;
+    this.filteredFoodMap.clear();
+    this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
+
+    if (this.searchTerm.length > 0) {
+      this.personalDbSearchExecutionInProcess = true;
+      if (this.useOnlyPersonalDb) {
+        this.globalDbSearchExecutionInProcess = false;
+        this.onlyPersonalQuery();
+      } else {
+        this.globalDbSearchExecutionInProcess = true;
+        this.bothPersonalAndGlobalDbQuery();
+      }
+    }
+  }
+
+  /**
+   * Subscribes only to Personal Db for querying.
+   */
+  async onlyPersonalQuery(): Promise<void> {
+    this.foodDbSubscriptionsList.push(await (await this._foodDatabaseService.getFoodsFromDbWithFilter(this.searchTerm.toLowerCase(), true, 15))
+      .subscribe(res => {
+        // Personal Db Query
+        if (res.length > 0) { this.noPersonalFoodsFoundAfterQuery = false; }
+        res.forEach(element => {
+          this.filteredFoodMap.set(element.DocumentId, element);
+        });
+        this.personalDbSearchExecutionInProcess = false;
+        this.globalDbSearchExecutionInProcess = false;
+        this.loadingFlag = false;
+      }));
+  }
+
+  /**
+   * Subscribes to both Global and Personal Db for querying.
+   */
+  async bothPersonalAndGlobalDbQuery(): Promise<void> {
+    this.foodDbSubscriptionsList.push(await combineLatest([
+      await this._foodDatabaseService.getFoodsFromDbWithFilter(this.searchTerm.toLowerCase(), true, 15),
+      await this._foodDatabaseService.getGlobalFoodsFromDbWithFilter(this.searchTerm.toLowerCase(), true, 15)])
+      .subscribe(res => {
+        // Personal Db Query
+        if (res[0].length > 0) { this.noPersonalFoodsFoundAfterQuery = false; }
+        res[0].forEach(element => {
+          this.filteredFoodMap.set(element.DocumentId, element);
+        });
+        this.personalDbSearchExecutionInProcess = false;
+        
+        // Global Db Query
+        if (res[1].length > 0) { this.noGlobalFoodsFoundAfterQuery = false; }
+        res[1].forEach(element => {
+          this.filteredFoodMap.set(element.DocumentId, element);
+        });
+        this.globalDbSearchExecutionInProcess = false;
+        this.loadingFlag = false;
       }));
   }
 
@@ -188,16 +261,16 @@ export class AddEntryPage {
       return false;
     } else {
       this.entry = this.createEntry(this.food, this.addEntryForm.value.qty);
-      this.entrySummary = this.createEntrySummary(this.entry);
-      await this._foodEntryService.addFoodEntry(this.entry, this.date);
-      this.existingSummary = await this._summaryService.getSummary(this.date);
-      if (this.existingSummary != null) {
+    //  this.entrySummary = this.createEntrySummary(this.entry);
+     // await this._foodEntryService.addFoodEntry(this.entry, this.date);
+      //this.existingSummary = await this._summaryService.getSummary(this.date);
+   //   if (this.existingSummary != null) {
         // Increment summary if already exists
-        this._summaryService.incrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
-      } else {
+      //  this._summaryService.incrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
+     // } else {
         // Set summary if it does not exists
-        await this._summaryService.setSummary(this.entrySummary, this.date);
-      }
+      //  await this._summaryService.setSummary(this.entrySummary, this.date);
+    //  }
       await this._router.navigate(["/tabs/daily_entry"]);
       this.hideForm();
       this.unhidetList();
@@ -206,16 +279,21 @@ export class AddEntryPage {
   }
 
   // Prepare entry
-  createEntry(foodArg: Food, qtyArg: number): DailyEntryFood {
-    return {
-      qty: qtyArg,
-      food: foodArg,
-      key: null
+  createEntry(food: Food, qtyArg: number): Entry {
+    return {//do the magic calculations here!
+      DocumentId: '',
+
+      CreatedAt: '10-33-93',
+  
+      Food: food
+      //qty: qtyArg,
+      //food: foodArg,
+      //key: null
     };
   }
 
   // Prepare entry's summary
-  createEntrySummary(foodEntryArg): Summary {
+ /* createEntrySummary(foodEntryArg): Summary {
     return {
       key: null,
       totalGramsProtein: foodEntryArg.food.protein * foodEntryArg.qty,
@@ -224,6 +302,25 @@ export class AddEntryPage {
       totalGramsCarbohydrates: foodEntryArg.food.carbohydrates * foodEntryArg.qty,
       totalCalories: foodEntryArg.food.calories * foodEntryArg.qty,
     };
+  }*/
+
+  /**
+ * Maps darkMode boolean to body name.
+ * @param darkMode User prefered theme option.
+ * @returns Body name.
+ */
+  mapThemeModeToBodyName(darkMode: boolean): string {
+    if (darkMode) {
+      return 'dark';
+    }
+    return 'light';
+  }
+
+  /**
+   *  Maintain insertion order in Map when using keyvalue pipe.
+   */
+   asIsOrder(a, b) {
+    return 1;
   }
 
 }

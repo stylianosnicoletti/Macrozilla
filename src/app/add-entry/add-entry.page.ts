@@ -138,9 +138,20 @@ export class AddEntryPage {
     await alert.present();
   }
 
-  // Route back to foods_databse tab
-  async goToDailyEntryTab() {
+  /**
+   *  Navigate back to daily entrries tab
+   */
+  async goToDailyEntryTab(): Promise<void> {
     await this._router.navigate(["/tabs/daily_entry"]);
+  }
+
+  /**
+   *  Navigates back to search list (in same view).
+   */
+  async goToSearchList(): Promise<void> {
+    this.hideForm();
+    this.unhidetList();
+    await this._router.navigate(["/add_entry/" + this.date]);
   }
 
   /**
@@ -150,7 +161,7 @@ export class AddEntryPage {
    * Put everything in a map (insertion order, no duplicates) to be displayed.
    * Manipulates flags for the templates to be showned.
    */
-   async filterFoods(): Promise<void> {
+  async filterFoods(): Promise<void> {
     this.hideForm();
     this.unhidetList();
     this.loadingFlag = true;
@@ -202,7 +213,7 @@ export class AddEntryPage {
           this.filteredFoodMap.set(element.DocumentId, element);
         });
         this.personalDbSearchExecutionInProcess = false;
-        
+
         // Global Db Query
         if (res[1].length > 0) { this.noGlobalFoodsFoundAfterQuery = false; }
         res[1].forEach(element => {
@@ -214,7 +225,8 @@ export class AddEntryPage {
   }
 
   // When food is selected
-  foodSelected(food) {
+  foodSelected(food: Food): void {
+    console.log(food);
     this.hideList();
     this.unhideForm();
     this.food = food;
@@ -261,16 +273,16 @@ export class AddEntryPage {
       return false;
     } else {
       this.entry = this.createEntry(this.food, this.addEntryForm.value.qty);
-    //  this.entrySummary = this.createEntrySummary(this.entry);
-     // await this._foodEntryService.addFoodEntry(this.entry, this.date);
+      //  this.entrySummary = this.createEntrySummary(this.entry);
+      // await this._foodEntryService.addFoodEntry(this.entry, this.date);
       //this.existingSummary = await this._summaryService.getSummary(this.date);
-   //   if (this.existingSummary != null) {
-        // Increment summary if already exists
+      //   if (this.existingSummary != null) {
+      // Increment summary if already exists
       //  this._summaryService.incrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
-     // } else {
-        // Set summary if it does not exists
+      // } else {
+      // Set summary if it does not exists
       //  await this._summaryService.setSummary(this.entrySummary, this.date);
-    //  }
+      //  }
       await this._router.navigate(["/tabs/daily_entry"]);
       this.hideForm();
       this.unhidetList();
@@ -279,12 +291,12 @@ export class AddEntryPage {
   }
 
   // Prepare entry
-  createEntry(food: Food, qtyArg: number): Entry {
+  createEntry(food: Food, qty: number): Entry {
     return {//do the magic calculations here!
       DocumentId: '',
 
       CreatedAt: '10-33-93',
-  
+
       Food: food
       //qty: qtyArg,
       //food: foodArg,
@@ -293,16 +305,16 @@ export class AddEntryPage {
   }
 
   // Prepare entry's summary
- /* createEntrySummary(foodEntryArg): Summary {
-    return {
-      key: null,
-      totalGramsProtein: foodEntryArg.food.protein * foodEntryArg.qty,
-      totalGramsFats: foodEntryArg.food.fats * foodEntryArg.qty,
-      totalGramsSaturated: foodEntryArg.food.saturated * foodEntryArg.qty,
-      totalGramsCarbohydrates: foodEntryArg.food.carbohydrates * foodEntryArg.qty,
-      totalCalories: foodEntryArg.food.calories * foodEntryArg.qty,
-    };
-  }*/
+  /* createEntrySummary(foodEntryArg): Summary {
+     return {
+       key: null,
+       totalGramsProtein: foodEntryArg.food.protein * foodEntryArg.qty,
+       totalGramsFats: foodEntryArg.food.fats * foodEntryArg.qty,
+       totalGramsSaturated: foodEntryArg.food.saturated * foodEntryArg.qty,
+       totalGramsCarbohydrates: foodEntryArg.food.carbohydrates * foodEntryArg.qty,
+       totalCalories: foodEntryArg.food.calories * foodEntryArg.qty,
+     };
+   }*/
 
   /**
  * Maps darkMode boolean to body name.
@@ -319,7 +331,7 @@ export class AddEntryPage {
   /**
    *  Maintain insertion order in Map when using keyvalue pipe.
    */
-   asIsOrder(a, b) {
+  asIsOrder(a, b) {
     return 1;
   }
 

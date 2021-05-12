@@ -6,9 +6,9 @@ import { Food } from "./food.model";
  */
 export interface DailyEntry {
     
-    DocumentId: string;
+    DocumentId?: string;
 
-    Entries: Entry[];
+    Entries?: Entry[];
 
     TotalCalories: Number;
 
@@ -23,7 +23,7 @@ export interface DailyEntry {
 
 export interface Entry {
 
-    DocumentId: string;
+    DocumentId?: string;
 
     CreatedAt: string;
 

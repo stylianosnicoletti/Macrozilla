@@ -1,14 +1,19 @@
 <ion-header>
-  <ion-toolbar>
 
+  <ion-toolbar *ngIf="!isListHidden">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="home" (click)="goToDailyEntryTab()"></ion-back-button>
+      <ion-back-button (click)="goToDailyEntryTab()"></ion-back-button>
     </ion-buttons>
-
     <ion-title *ngIf="!isListHidden">New Daily Entry</ion-title>
-    <ion-title *ngIf="!isFormHidden">Enter Quantity</ion-title>
-
   </ion-toolbar>
+
+  <ion-toolbar *ngIf="!isFormHidden">
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goToSearchList()"></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="!isFormHidden">Enter Consumed Amount </ion-title>
+  </ion-toolbar>
+
 </ion-header>
 
 <!-- Searchbar with cancel button shown on focus -->
@@ -52,13 +57,13 @@
       <ng-container
         *ngIf="searchTerm.length > 0 && !loadingFlag && noPersonalFoodsFoundAfterQuery && noGlobalFoodsFoundAfterQuery && !personalDbSearchExecutionInProcess && !globalDbSearchExecutionInProcess; then nothingFound">
       </ng-container>
-      <ion-item *ngFor="let food of filteredFoodMap | keyvalue: asIsOrder">
+      <ion-item *ngFor="let food of filteredFoodMap | keyvalue: asIsOrder" (click)="foodSelected(food.value)">
         <ion-label class="ion-text-wrap">
           <h2>
             <strong>{{food.value.Name}}</strong>&nbsp;({{food.value.ServingAmount}}{{food.value.ServingUnitShortCode}})
           </h2>
         </ion-label>
-        
+
         <ion-chip *ngIf="food.value.IsFromPersonalDb" slot="end" color="secondary">
           <strong>🔋 {{food.value.Calories}} kcal</strong>
         </ion-chip>
@@ -66,7 +71,7 @@
         <ion-chip *ngIf="!food.value.IsFromPersonalDb" slot="end" color="medium">
           <strong>🔋 {{food.value.Calories}} kcal</strong>
         </ion-chip>
-      
+
       </ion-item>
     </ng-template>
 
@@ -124,15 +129,55 @@
 
   <div *ngIf="!isFormHidden">
     <form [formGroup]="addEntryForm" (ngSubmit)="submitForm()" novalidate>
+
+      <ion-item-divider>
+        <ion-label>Name</ion-label>
+      </ion-item-divider>
       <ion-card>
-        <ion-card-header>
-          <ion-card-title>
-            <strong>{{food?.name}}</strong>
-          </ion-card-title>
-        </ion-card-header>
+        <ion-item disabled>
+          <ion-label>{{food.Name}}</ion-label>
+        </ion-item>
+      </ion-card>
+
+      <ion-item-divider>
+        <ion-label>Nutritional Information (Per {{food.ServingAmount}}{{food.ServingUnitShortCode}})</ion-label>
+      </ion-item-divider>
+      <ion-card>
+        <ion-list>
+          <ion-item disabled>
+            <ion-label>🔋 {{food.Calories}} kcal</ion-label>
+          </ion-item>
+          <ion-item disabled>
+            <ion-label>🐖 {{food.Fats | number:'.1'}}g (❌ {{food.Saturated | number:'.1'}}g) 🍞 {{food.Carbohydrates |
+              number:'.1'}}g 🥩 {{food.Protein | number:'.1'}}g</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+
+      <ion-item-divider>
+        <ion-label>Nutritional Information (Consumed)</ion-label>
+      </ion-item-divider>
+      <ion-card>
+        <ion-list>
+          <ion-item disabled>
+            <ion-label>🔋 {{food.Calories}} kcal</ion-label>
+          </ion-item>
+          <ion-item disabled>
+            <ion-label>🐖 {{food.Fats | number:'.1'}}g (❌ {{food.Saturated | number:'.1'}}g) 🍞 {{food.Carbohydrates |
+              number:'.1'}}g 🥩 {{food.Protein | number:'.1'}}g</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+
+
+      <ion-item-divider>
+        <ion-label>Consumed Amount</ion-label>
+      </ion-item-divider>
+
+      <ion-card>
         <ion-item>
-          <ion-label position="floating">Qty</ion-label>
-          <ion-input formControlName="qty" type="text" inputmode="numeric" #qtyInput></ion-input>
+          <ion-label position="floating">{{food.ServingUnit}}</ion-label>
+          <ion-input formControlName="qty" type="text" inputmode="numeric" (ionChange)="filterFoods()" #qtyInput></ion-input>
         </ion-item>
       </ion-card>
       <ion-row>
@@ -140,6 +185,8 @@
           <ion-button type="submit" color="danger" expand="block">Submit</ion-button>
         </ion-col>
       </ion-row>
+
+
     </form>
   </div>
 

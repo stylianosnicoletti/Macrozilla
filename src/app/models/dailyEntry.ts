@@ -25,7 +25,7 @@ export interface Entry {
 
     DocumentId?: string;
 
-    CreatedAt: string;
+    CreatedAt: Number;
 
     Food: Food;
 }

@@ -11,7 +11,6 @@ import { Food } from '../models/food.model';
 import { ServingUnit } from '../models/servingUnit.model';
 import { GlobalVariablesService } from '../services/global-variables.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { UserService } from '../services/user.service';
 
 @Component({

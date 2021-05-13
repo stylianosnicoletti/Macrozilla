@@ -10,6 +10,10 @@ import { FoodDatabaseService } from '../services/food-db.service';
 import { UserService } from '../services/user.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { Entry, DailyEntry } from '../models/dailyEntry';
+import { MyMacrosConstants } from '../my-macros-constants';
+import { GlobalVariablesService } from '../services/global-variables.service';
+import { ServingUnit } from '../models/servingUnit.model';
+
 
 
 @Component({
@@ -25,6 +29,8 @@ export class AddEntryPage {
 
   date: string;
   food: Food;
+  consumedFood: Food;
+  servingUnitsMap = new Map<String, ServingUnit>();
   entry: Entry;
   //entrySummary: Summary;
   //existingSummary: Summary;
@@ -50,6 +56,7 @@ export class AddEntryPage {
     private _formbBuilder: FormBuilder,
     private _activatedRoute: ActivatedRoute,
     private _foodDatabaseService: FoodDatabaseService,
+    private _globalVariableService: GlobalVariablesService,
     private _unSubscribeService: UnsubscribeService,
     private _userService: UserService,
     private _toastService: ToastService,
@@ -123,9 +130,8 @@ export class AddEntryPage {
 
   // Check if the route param key matches a date
   enterGuard() {
-    let dateRegEx = /([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/;
     this.date = this._activatedRoute.snapshot.params['date_selected'];
-    if (!dateRegEx.test(this.date)) this._router.navigate(["/tabs/daily_entry"]);
+    if (!MyMacrosConstants.REGEX_DATE.test(this.date)) this._router.navigate(["/tabs/daily_entry"]);
   }
 
   // No network alert
@@ -225,11 +231,30 @@ export class AddEntryPage {
   }
 
   // When food is selected
-  foodSelected(food: Food): void {
+  async foodSelected(food: Food): Promise<void> {
     console.log(food);
     this.hideList();
     this.unhideForm();
+    // Selected food
     this.food = food;
+    // Prepare consumed food based on details of selected food
+    this.consumedFood = {
+      Name: this.food.Name,
+      Calories: 0,
+      Fats: 0,
+      Saturated: 0,
+      Carbohydrates: 0,
+      Protein: 0,
+      ServingAmount: 0,
+      ServingUnit: this.food.ServingUnit,
+      ServingUnitShortCode: this.food.ServingUnitShortCode
+    };
+    // Get map of all serving units
+    this.generalSubscriptionsList.push((await this._globalVariableService.getServingUnits()).subscribe(res => {
+      res.ServingUnits.forEach(servingUnit => {
+        this.servingUnitsMap.set(servingUnit.Name, servingUnit);
+      });
+    }));
   }
 
   // Hiding or unhiding elements
@@ -259,9 +284,8 @@ export class AddEntryPage {
 
   // Contains Reactive Form logic
   addEntryData() {
-    const decimalRegexPattern = /^(\d*\.)?\d+$/;
     this.addEntryForm = this._formbBuilder.group({
-      qty: ['', [Validators.required, Validators.pattern(decimalRegexPattern), Validators.maxLength(6)]]
+      qty: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]]
     })
   }
 
@@ -272,7 +296,7 @@ export class AddEntryPage {
       await this._toastService.presentToast('Please provide all the required values!');
       return false;
     } else {
-      this.entry = this.createEntry(this.food, this.addEntryForm.value.qty);
+      this.entry = this.createEntry(this.food);
       //  this.entrySummary = this.createEntrySummary(this.entry);
       // await this._foodEntryService.addFoodEntry(this.entry, this.date);
       //this.existingSummary = await this._summaryService.getSummary(this.date);
@@ -291,17 +315,35 @@ export class AddEntryPage {
   }
 
   // Prepare entry
-  createEntry(food: Food, qty: number): Entry {
-    return {//do the magic calculations here!
-      DocumentId: '',
-
-      CreatedAt: '10-33-93',
-
-      Food: food
-      //qty: qtyArg,
-      //food: foodArg,
-      //key: null
+  createEntry(food: Food): Entry {
+    return {
+      CreatedAt: Math.floor(Date.now()/1000), //unix timestamp in seconds
+      Food: this.consumedFood
     };
+  }
+
+  /**
+   * When input is decimal change the value of consumed food according to input else reset it.
+   * @param qty Input
+   */
+  prepareConsumedFood(qty: string): void {
+    if (MyMacrosConstants.REGEX_DECIMAL_PATTERN.test(qty)) {
+      this.consumedFood.Calories = Number(this.food.Calories) * Number(qty) / Number(this.food.ServingAmount);
+      this.consumedFood.Fats = Number(this.food.Fats) * Number(qty) / Number(this.food.ServingAmount);
+      this.consumedFood.Saturated = Number(this.food.Saturated) * Number(qty) / Number(this.food.ServingAmount);
+      this.consumedFood.Carbohydrates = Number(this.food.Carbohydrates) * Number(qty) / Number(this.food.ServingAmount);
+      this.consumedFood.Protein = Number(this.food.Protein) * Number(qty) / Number(this.food.ServingAmount);
+      this.consumedFood.ServingAmount = Number(qty);
+      this.consumedFood.ServingUnitShortCode = this.mapServingUnitToShortCode(qty,this.servingUnitsMap.get(this.food.ServingUnit));
+      console.log(this.consumedFood.ServingUnitShortCode);
+    } else {
+      this.consumedFood.Calories = 0;
+      this.consumedFood.Fats = 0;
+      this.consumedFood.Saturated = 0;
+      this.consumedFood.Carbohydrates = 0;
+      this.consumedFood.Protein = 0;
+      this.consumedFood.ServingAmount = 0;
+    }
   }
 
   // Prepare entry's summary
@@ -333,6 +375,19 @@ export class AddEntryPage {
    */
   asIsOrder(a, b) {
     return 1;
+  }
+
+  /** 
+   * Decides which serving unit shortcode should be used based on the amount.
+   * @param {string} servingAmount Serving amount (E.g. 100)
+   * @param {ServingUnit} servingUnit Serving Unit (E.g Grams)
+   * @return {string} The shortcode or plural short code of the serving unit to be appended in the name (E.g gram or grams)
+   */
+  mapServingUnitToShortCode(servingAmount: string, servingUnit: ServingUnit): string {
+    if (Number.parseInt(servingAmount) > 1 && servingUnit.ShortCodePlural != null) {
+      return servingUnit.ShortCodePlural;
+    }
+    return servingUnit.ShortCode;
   }
 
 }

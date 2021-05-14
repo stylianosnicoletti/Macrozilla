@@ -5,20 +5,20 @@ export interface Food {
     
     Name: string;
 
-    Calories: Number;
+    Calories: number;
     
-    Carbohydrates: Number;
+    Carbohydrates: number;
     
-    Fats: Number;
+    Fats: number;
 
-    Protein: Number;
+    Protein: number;
 
-    Saturated: Number;
+    Saturated: number;
 
     /**
      * The name of serving unit object.
      */
-    ServingAmount: Number;
+    ServingAmount: number;
 
     ServingUnit: string;
 
@@ -32,6 +32,6 @@ export interface Food {
     /**
      * Not in firestore fields.
      */
-    IsFromPersonalDb?: Boolean;
+    IsFromPersonalDb?: boolean;
 
 }

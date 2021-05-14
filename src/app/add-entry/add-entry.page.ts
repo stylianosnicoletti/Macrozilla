@@ -13,6 +13,7 @@ import { Entry, DailyEntry } from '../models/dailyEntry';
 import { MyMacrosConstants } from '../my-macros-constants';
 import { GlobalVariablesService } from '../services/global-variables.service';
 import { ServingUnit } from '../models/servingUnit.model';
+import { DailyTrackingService } from '../services/daily-tracking.service';
 
 
 
@@ -34,6 +35,7 @@ export class AddEntryPage {
   entry: Entry;
   //entrySummary: Summary;
   //existingSummary: Summary;
+  existingDailyEntry: DailyEntry;
   addEntryForm: FormGroup;
   isSubmitted = false;
   searchTerm: string = "";
@@ -55,6 +57,7 @@ export class AddEntryPage {
     private _router: Router,
     private _formbBuilder: FormBuilder,
     private _activatedRoute: ActivatedRoute,
+    private _dailyTrackingServince: DailyTrackingService,
     private _foodDatabaseService: FoodDatabaseService,
     private _globalVariableService: GlobalVariablesService,
     private _unSubscribeService: UnsubscribeService,
@@ -230,7 +233,10 @@ export class AddEntryPage {
       }));
   }
 
-  // When food is selected
+  /**
+   * When food is selected from search list.
+   * @param food Selected food.
+   */
   async foodSelected(food: Food): Promise<void> {
     console.log(food);
     this.hideList();
@@ -257,6 +263,151 @@ export class AddEntryPage {
     }));
   }
 
+  /**
+   * Contains Reactive Form logic
+   **/
+  addEntryData(): void {
+    this.addEntryForm = this._formbBuilder.group({
+      qty: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]]
+    })
+  }
+
+  /**
+   * Submit changes.
+   **/
+  async submitForm() {
+    this.isSubmitted = true;
+    if (!this.addEntryForm.valid) {
+      await this._toastService.presentToast('Please provide all the required values!');
+      return false;
+    } else {
+      this.entry = this.createEntry(this.consumedFood);
+      this.existingDailyEntry = await this._dailyTrackingServince.getDailyEntry(this.date);
+      if (this.existingDailyEntry != null) {
+        console.log("1"+ this.existingDailyEntry)
+        this._dailyTrackingServince.updateDailyEntry(this.date, this.prepareUpdatedDailyEntry(this.existingDailyEntry, this.consumedFood))
+      } else {
+        console.log("2"+this.existingDailyEntry)
+        this._dailyTrackingServince.setDailyEntry(this.date, this.prepareUpdatedDailyEntry(null, this.consumedFood))
+      }
+
+      // ADD ENTRY (DB)
+      // GET CURRENT DAILY ENTRY
+      // prepareUpdatedDailyEntry()
+      // UPDATE DAILY ENTRY (DB)
+      // GET ANALYTICS DATA
+      // UPDATE ANALYTICS DATA (DB)
+      //  this.entrySummary = this.createEntrySummary(this.entry);
+      await this._dailyTrackingServince.addEntryToDailyEntries(this.date, this.entry);
+      //this.existingSummary = await this._summaryService.getSummary(this.date);
+      //   if (this.existingSummary != null) {
+      // Increment summary if already exists
+      //  this._summaryService.incrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
+      // } else {
+      // Set summary if it does not exists
+      //  await this._summaryService.setSummary(this.entrySummary, this.date);
+      //  }
+      await this._router.navigate(["/tabs/daily_entry"]);
+      this.hideForm();
+      this.unhidetList();
+      await this._toastService.presentToast('Entry Successfully Added!');
+    }
+  }
+
+  /**
+   * Create new entry with the consumed food.
+   * @param food Consumed Food.
+   * @returns Entry.
+   */
+  createEntry(food: Food): Entry {
+    return {
+      CreatedAt: Math.floor(Date.now() / 1000), //unix timestamp in seconds
+      Food: food
+    };
+  }
+
+  /**
+   * When input is decimal change the value of consumed food according to input else reset it.
+   * @param qty Input
+   */
+  prepareConsumedFood(qty: string): void {
+    if (MyMacrosConstants.REGEX_DECIMAL_PATTERN.test(qty)) {
+      this.consumedFood.Calories = this.food.Calories * Number(qty) / this.food.ServingAmount;
+      this.consumedFood.Fats = this.food.Fats * Number(qty) / this.food.ServingAmount;
+      this.consumedFood.Saturated = this.food.Saturated * Number(qty) / this.food.ServingAmount;
+      this.consumedFood.Carbohydrates = this.food.Carbohydrates * Number(qty) / this.food.ServingAmount;
+      this.consumedFood.Protein = this.food.Protein * Number(qty) / this.food.ServingAmount;
+      this.consumedFood.ServingAmount = Number(qty);
+      this.consumedFood.ServingUnitShortCode = this.mapServingUnitToShortCode(qty, this.servingUnitsMap.get(this.food.ServingUnit));
+      console.log(this.consumedFood.ServingUnitShortCode);
+    } else {
+      this.consumedFood.Calories = 0;
+      this.consumedFood.Fats = 0;
+      this.consumedFood.Saturated = 0;
+      this.consumedFood.Carbohydrates = 0;
+      this.consumedFood.Protein = 0;
+      this.consumedFood.ServingAmount = 0;
+    }
+  }
+
+  /**
+   * Prepare an updated Daily Entry with the changes of the newly consumed food. If no currentDailyEntry is provided then current consumed food will only be used.
+   * @param currentDailyEntry Current daily entry.
+   * @param consumedFood Consumed Food.
+   * @returns Updated Daily Entry.
+   */
+  prepareUpdatedDailyEntry(currentDailyEntry: DailyEntry, consumedFood: Food): DailyEntry {
+    if (currentDailyEntry != null) {
+      return {
+        TotalCalories: currentDailyEntry.TotalCalories + consumedFood.Calories,
+        TotalFatGrams: currentDailyEntry.TotalFatGrams + consumedFood.Fats,
+        TotalSaturatedGrams: currentDailyEntry.TotalSaturatedGrams + consumedFood.Saturated,
+        TotalCarbohydrateGrams: currentDailyEntry.TotalCarbohydrateGrams + consumedFood.Carbohydrates,
+        TotalProteinGrams: currentDailyEntry.TotalProteinGrams + consumedFood.Protein,
+      };
+    } else {
+      return {
+        TotalCalories: consumedFood.Calories,
+        TotalFatGrams: consumedFood.Fats,
+        TotalSaturatedGrams: consumedFood.Saturated,
+        TotalCarbohydrateGrams: consumedFood.Carbohydrates,
+        TotalProteinGrams: consumedFood.Protein,
+      };
+    }
+  }
+
+  /** 
+   * Decides which serving unit shortcode should be used based on the amount.
+   * @param {string} servingAmount Serving amount (E.g. 100)
+   * @param {ServingUnit} servingUnit Serving Unit (E.g Grams)
+   * @return {string} The shortcode or plural short code of the serving unit to be appended in the name (E.g gram or grams)
+   */
+  mapServingUnitToShortCode(servingAmount: string, servingUnit: ServingUnit): string {
+    if (Number.parseInt(servingAmount) > 1 && servingUnit.ShortCodePlural != null) {
+      return servingUnit.ShortCodePlural;
+    }
+    return servingUnit.ShortCode;
+  }
+
+  /**
+ * Maps darkMode boolean to body name.
+ * @param darkMode User prefered theme option.
+ * @returns Body name.
+ */
+  mapThemeModeToBodyName(darkMode: boolean): string {
+    if (darkMode) {
+      return 'dark';
+    }
+    return 'light';
+  }
+
+  /**
+   *  Maintain insertion order in Map when using keyvalue pipe.
+   */
+  asIsOrder(a, b) {
+    return 1;
+  }
+
   // Hiding or unhiding elements
   hideForm() {
     this.isFormHidden = true;
@@ -280,114 +431,6 @@ export class AddEntryPage {
     setTimeout(async () => {
       await this.qtyInput.setFocus();
     });
-  }
-
-  // Contains Reactive Form logic
-  addEntryData() {
-    this.addEntryForm = this._formbBuilder.group({
-      qty: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]]
-    })
-  }
-
-  // Submit changes
-  async submitForm() {
-    this.isSubmitted = true;
-    if (!this.addEntryForm.valid) {
-      await this._toastService.presentToast('Please provide all the required values!');
-      return false;
-    } else {
-      this.entry = this.createEntry(this.food);
-      //  this.entrySummary = this.createEntrySummary(this.entry);
-      // await this._foodEntryService.addFoodEntry(this.entry, this.date);
-      //this.existingSummary = await this._summaryService.getSummary(this.date);
-      //   if (this.existingSummary != null) {
-      // Increment summary if already exists
-      //  this._summaryService.incrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
-      // } else {
-      // Set summary if it does not exists
-      //  await this._summaryService.setSummary(this.entrySummary, this.date);
-      //  }
-      await this._router.navigate(["/tabs/daily_entry"]);
-      this.hideForm();
-      this.unhidetList();
-      await this._toastService.presentToast('Entry Successfully Added!');
-    }
-  }
-
-  // Prepare entry
-  createEntry(food: Food): Entry {
-    return {
-      CreatedAt: Math.floor(Date.now()/1000), //unix timestamp in seconds
-      Food: this.consumedFood
-    };
-  }
-
-  /**
-   * When input is decimal change the value of consumed food according to input else reset it.
-   * @param qty Input
-   */
-  prepareConsumedFood(qty: string): void {
-    if (MyMacrosConstants.REGEX_DECIMAL_PATTERN.test(qty)) {
-      this.consumedFood.Calories = Number(this.food.Calories) * Number(qty) / Number(this.food.ServingAmount);
-      this.consumedFood.Fats = Number(this.food.Fats) * Number(qty) / Number(this.food.ServingAmount);
-      this.consumedFood.Saturated = Number(this.food.Saturated) * Number(qty) / Number(this.food.ServingAmount);
-      this.consumedFood.Carbohydrates = Number(this.food.Carbohydrates) * Number(qty) / Number(this.food.ServingAmount);
-      this.consumedFood.Protein = Number(this.food.Protein) * Number(qty) / Number(this.food.ServingAmount);
-      this.consumedFood.ServingAmount = Number(qty);
-      this.consumedFood.ServingUnitShortCode = this.mapServingUnitToShortCode(qty,this.servingUnitsMap.get(this.food.ServingUnit));
-      console.log(this.consumedFood.ServingUnitShortCode);
-    } else {
-      this.consumedFood.Calories = 0;
-      this.consumedFood.Fats = 0;
-      this.consumedFood.Saturated = 0;
-      this.consumedFood.Carbohydrates = 0;
-      this.consumedFood.Protein = 0;
-      this.consumedFood.ServingAmount = 0;
-    }
-  }
-
-  // Prepare entry's summary
-  /* createEntrySummary(foodEntryArg): Summary {
-     return {
-       key: null,
-       totalGramsProtein: foodEntryArg.food.protein * foodEntryArg.qty,
-       totalGramsFats: foodEntryArg.food.fats * foodEntryArg.qty,
-       totalGramsSaturated: foodEntryArg.food.saturated * foodEntryArg.qty,
-       totalGramsCarbohydrates: foodEntryArg.food.carbohydrates * foodEntryArg.qty,
-       totalCalories: foodEntryArg.food.calories * foodEntryArg.qty,
-     };
-   }*/
-
-  /**
- * Maps darkMode boolean to body name.
- * @param darkMode User prefered theme option.
- * @returns Body name.
- */
-  mapThemeModeToBodyName(darkMode: boolean): string {
-    if (darkMode) {
-      return 'dark';
-    }
-    return 'light';
-  }
-
-  /**
-   *  Maintain insertion order in Map when using keyvalue pipe.
-   */
-  asIsOrder(a, b) {
-    return 1;
-  }
-
-  /** 
-   * Decides which serving unit shortcode should be used based on the amount.
-   * @param {string} servingAmount Serving amount (E.g. 100)
-   * @param {ServingUnit} servingUnit Serving Unit (E.g Grams)
-   * @return {string} The shortcode or plural short code of the serving unit to be appended in the name (E.g gram or grams)
-   */
-  mapServingUnitToShortCode(servingAmount: string, servingUnit: ServingUnit): string {
-    if (Number.parseInt(servingAmount) > 1 && servingUnit.ShortCodePlural != null) {
-      return servingUnit.ShortCodePlural;
-    }
-    return servingUnit.ShortCode;
   }
 
 }

@@ -89,7 +89,7 @@
       <ion-item-sliding *ngFor="let food of filteredFoodMap | keyvalue: asIsOrder" #slidingItem>
         <ion-item>
           <ion-label class="ion-text-wrap">
-            <h2><strong>{{food.value.Name}} </strong>({{food.value.ServingAmount}}{{food.value.ServingUnitShortCode}})
+            <h2><strong>{{food.value.Name}}</strong>&nbsp;({{food.value.ServingAmount}}{{food.value.ServingUnitShortCode}})
             </h2>
 
             <h3>🔋 {{food.value.Calories}} kcal</h3>

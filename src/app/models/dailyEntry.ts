@@ -10,22 +10,22 @@ export interface DailyEntry {
 
     Entries?: Entry[];
 
-    TotalCalories: Number;
+    TotalCalories: number;
 
-    TotalFatGrams: Number;
+    TotalFatGrams: number;
 
-    TotalSaturatedGrams: Number;
+    TotalSaturatedGrams: number;
 
-    TotalCarbohydrateGrams: Number;
+    TotalCarbohydrateGrams: number;
 
-    TotalProteinGrams: Number;
+    TotalProteinGrams: number;
 }
 
 export interface Entry {
 
     DocumentId?: string;
 
-    CreatedAt: Number;
+    CreatedAt: number;
 
     Food: Food;
 }

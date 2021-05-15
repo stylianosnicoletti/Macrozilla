@@ -45,6 +45,7 @@
     "firebase": "^8.4.2",
     "ionic-native": "^2.9.0",
     "rxjs": "~6.5.3",
+    "rxfire": "^4.0.0",
     "tslib": "^2.2.0",
     "zone.js": "~0.11.4"
   },

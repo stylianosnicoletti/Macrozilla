@@ -238,7 +238,6 @@ export class AddEntryPage {
    * @param food Selected food.
    */
   async foodSelected(food: Food): Promise<void> {
-    console.log(food);
     this.hideList();
     this.unhideForm();
     // Selected food
@@ -281,16 +280,8 @@ export class AddEntryPage {
       await this._toastService.presentToast('Please provide all the required values!');
       return false;
     } else {
-      this.entry = this.createEntry(this.consumedFood);
-      this.existingDailyEntry = await this._dailyTrackingServince.getDailyEntry(this.date);
-      if (this.existingDailyEntry != null) {
-        console.log("1"+ this.existingDailyEntry)
-        this._dailyTrackingServince.updateDailyEntry(this.date, this.prepareUpdatedDailyEntry(this.existingDailyEntry, this.consumedFood))
-      } else {
-        console.log("2"+this.existingDailyEntry)
-        this._dailyTrackingServince.setDailyEntry(this.date, this.prepareUpdatedDailyEntry(null, this.consumedFood))
-      }
-
+      // Add entry in sub-collection of Entries on DailyEntry doc
+      await this._dailyTrackingServince.addEntryAndUpdateDailyEntryFields(this.date, this.consumedFood);
       // ADD ENTRY (DB)
       // GET CURRENT DAILY ENTRY
       // prepareUpdatedDailyEntry()
@@ -298,7 +289,7 @@ export class AddEntryPage {
       // GET ANALYTICS DATA
       // UPDATE ANALYTICS DATA (DB)
       //  this.entrySummary = this.createEntrySummary(this.entry);
-      await this._dailyTrackingServince.addEntryToDailyEntries(this.date, this.entry);
+
       //this.existingSummary = await this._summaryService.getSummary(this.date);
       //   if (this.existingSummary != null) {
       // Increment summary if already exists
@@ -314,17 +305,7 @@ export class AddEntryPage {
     }
   }
 
-  /**
-   * Create new entry with the consumed food.
-   * @param food Consumed Food.
-   * @returns Entry.
-   */
-  createEntry(food: Food): Entry {
-    return {
-      CreatedAt: Math.floor(Date.now() / 1000), //unix timestamp in seconds
-      Food: food
-    };
-  }
+
 
   /**
    * When input is decimal change the value of consumed food according to input else reset it.
@@ -339,7 +320,6 @@ export class AddEntryPage {
       this.consumedFood.Protein = this.food.Protein * Number(qty) / this.food.ServingAmount;
       this.consumedFood.ServingAmount = Number(qty);
       this.consumedFood.ServingUnitShortCode = this.mapServingUnitToShortCode(qty, this.servingUnitsMap.get(this.food.ServingUnit));
-      console.log(this.consumedFood.ServingUnitShortCode);
     } else {
       this.consumedFood.Calories = 0;
       this.consumedFood.Fats = 0;
@@ -350,31 +330,7 @@ export class AddEntryPage {
     }
   }
 
-  /**
-   * Prepare an updated Daily Entry with the changes of the newly consumed food. If no currentDailyEntry is provided then current consumed food will only be used.
-   * @param currentDailyEntry Current daily entry.
-   * @param consumedFood Consumed Food.
-   * @returns Updated Daily Entry.
-   */
-  prepareUpdatedDailyEntry(currentDailyEntry: DailyEntry, consumedFood: Food): DailyEntry {
-    if (currentDailyEntry != null) {
-      return {
-        TotalCalories: currentDailyEntry.TotalCalories + consumedFood.Calories,
-        TotalFatGrams: currentDailyEntry.TotalFatGrams + consumedFood.Fats,
-        TotalSaturatedGrams: currentDailyEntry.TotalSaturatedGrams + consumedFood.Saturated,
-        TotalCarbohydrateGrams: currentDailyEntry.TotalCarbohydrateGrams + consumedFood.Carbohydrates,
-        TotalProteinGrams: currentDailyEntry.TotalProteinGrams + consumedFood.Protein,
-      };
-    } else {
-      return {
-        TotalCalories: consumedFood.Calories,
-        TotalFatGrams: consumedFood.Fats,
-        TotalSaturatedGrams: consumedFood.Saturated,
-        TotalCarbohydrateGrams: consumedFood.Carbohydrates,
-        TotalProteinGrams: consumedFood.Protein,
-      };
-    }
-  }
+
 
   /** 
    * Decides which serving unit shortcode should be used based on the amount.
@@ -404,30 +360,30 @@ export class AddEntryPage {
   /**
    *  Maintain insertion order in Map when using keyvalue pipe.
    */
-  asIsOrder(a, b) {
+  asIsOrder(a, b): number {
     return 1;
   }
 
   // Hiding or unhiding elements
-  hideForm() {
+  hideForm(): void {
     this.isFormHidden = true;
   }
 
-  unhideForm() {
+  unhideForm(): void {
     this.isFormHidden = false;
     this.setFocus();
   }
 
-  hideList() {
+  hideList(): void {
     this.isListHidden = true;
   }
 
-  unhidetList() {
+  unhidetList(): void {
     this.isListHidden = false;
   }
 
   // Set focus on quantity input
-  setFocus() {
+  setFocus(): void {
     setTimeout(async () => {
       await this.qtyInput.setFocus();
     });

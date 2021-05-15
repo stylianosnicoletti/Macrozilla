@@ -1,4 +1,4 @@
-import { ServingUnit } from "../types";
+import { ServingUnit } from "../models/servingUnit.model";
 
 /**
  * Global Variables Model.

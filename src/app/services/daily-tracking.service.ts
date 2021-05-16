@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 import { DailyEntry, Entry } from '../models/dailyEntry';
 import { Food } from '../models/food.model';
+import { UserService } from './user.service';
 
 
 @Injectable({
@@ -13,7 +14,8 @@ import { Food } from '../models/food.model';
 export class DailyTrackingService {
   constructor(
     private _angularFireStore: AngularFirestore,
-    private _authService: AuthService) { }
+    private _authService: AuthService,
+    private _userService: UserService) { }
 
 
   /**
@@ -31,18 +33,23 @@ export class DailyTrackingService {
     // Get current Daily Entry Doc if exists
     const existingDailyEntry = await this.getDailyEntry(selectedDate);
 
-    if (existingDailyEntry != null) {
-      // Update Existing Daily Entry
-      await this.updateDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryAdd(existingDailyEntry, consumedFood))
-    } else {
-      // First Daily Entry
-      await this.setDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryAdd(null, consumedFood))
-    }
-
     // Create entry to be added in Entries sub-collection
     const entry = this.createEntry(consumedFood);
 
-    return await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").add(entry);
+    if (existingDailyEntry != null) {
+      // Update Existing Daily Entry
+      await this.updateDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryAdd(existingDailyEntry, consumedFood))
+       // Add Entry
+       await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").add(entry);
+    } else {
+      // First Daily Entry
+      await this.setDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryAdd(null, consumedFood));
+      // Add Entry
+      await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").add(entry);
+      // Increment size of collection
+      await this._userService.DailyEntriesSizeIncrement();
+    }
+
   }
 
   /**
@@ -71,6 +78,8 @@ export class DailyTrackingService {
       await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entry.DocumentId).delete();
       // Remove whole Daily Entry on last Entry deletion 
       await this.deleteDailyEntry(selectedDate);
+      // Decrement size of collection
+      await this._userService.DailyEntriesSizeDecrement();
     }
   }
 

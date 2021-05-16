@@ -99,7 +99,7 @@ export class TabAccountPage {
       Options: this.mapNgModelsToUserOptions(this.darkMode, this.useOnlyPersonalDb)
     }
     console.log("Updating Firestore");
-    await this._userService.updateUserFields(user);
+    await this._userService.updateUserFieldOptions(user.Options);
   }
 
   /**

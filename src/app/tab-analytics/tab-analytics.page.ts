@@ -1,10 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
-import { SummaryService } from '../services/summary.service';
 import { Subscription } from 'rxjs';
 import { AlertController } from '@ionic/angular';
 import { Network } from '@ionic-native/network/ngx';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { Chart } from 'chart.js';
+import { AnalyticsService } from '../services/analytics.service';
+import { UnsubscribeService } from '../services/unsubscribe.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-tab-analytics',
@@ -17,6 +19,9 @@ export class TabAnalyticsPage {
   @ViewChild('pieChartMacrosAllTime') pieChartMacrosAllTime;
 
   bars: Chart[] = [];
+  lastDaysToRetrieve: number;
+  maxDaysThatCanBeRetrieved: number;
+  minDaysThatCanBeRetrieved: number;
   allTimeAverageCalories: number;
   allTimeCalories: number[];
   allTimeDates: string[];
@@ -31,22 +36,24 @@ export class TabAnalyticsPage {
   screenOrientationSubscription: Subscription;
 
   constructor(
-    private _summaryService: SummaryService,
+    private _analyticsService: AnalyticsService,
+    private _userService: UserService,
     private _alertController: AlertController,
     private _network: Network,
-    private _screenOrientation: ScreenOrientation) {
+    private _screenOrientation: ScreenOrientation,
+    private _unsubscribeService: UnsubscribeService) {
   }
 
   async ionViewWillEnter() {
     console.log("entering analytics page");
     this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this.unsubscribeData();
+      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
       await this.presentNetworkAlert();
       console.log('network was disconnected :-(');
     });
 
     this.connectSubscription = this._network.onConnect().subscribe(() => {
-      this.unsubscribeData();
+      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
       this.initialiseItems();
       console.log('network connected!');
     });
@@ -55,7 +62,7 @@ export class TabAnalyticsPage {
       console.log("Orientation Changed");
       this.ionViewWillLeave();
       //need to find a better way
-      //now am enabling portrain onluy from android manifest
+      //now am enabling portrain only from android manifest
       //location.reload();
     });
     await this.initialiseItems();
@@ -63,7 +70,7 @@ export class TabAnalyticsPage {
 
   ionViewWillLeave() {
     console.log("leaving analytics page");
-    this.unsubscribeData();
+    this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     this.unsubscribeNetwork();
     this.unsubscribeOrientation();
   }
@@ -77,15 +84,21 @@ export class TabAnalyticsPage {
     if (!this.screenOrientationSubscription.closed) this.screenOrientationSubscription.unsubscribe();
   }
 
-  unsubscribeData() {
-    this.subscriptionsList.forEach(item => {
-      if (!item.closed) item.unsubscribe();
-    })
-    this.subscriptionsList = [];
-  }
-
   async initialiseItems() {
-    await this.prepareAllTimeCharts();
+    this.allTimeDates = [];
+    this.allTimeCalories = [];
+    this.allTimeProteinCalories = 0;
+    this.allTimeCarbsCalories = 0;
+    this.allTimeSaturatedCalories = 0;
+    this.allTimeUnsaturatedCalories = 0;
+    this.allTimeCaloriesCalculatedFromMacros = 0;
+    this.maxDaysThatCanBeRetrieved = (await this._userService.GetSizes()).DailyEntries;
+    this.minDaysThatCanBeRetrieved = this.maxDaysThatCanBeRetrieved == 0 ? 0 : 1;
+    // Bring at least the last 7 days if the 1/3 of total entries is not a week.
+    this.lastDaysToRetrieve = Math.round(this.maxDaysThatCanBeRetrieved / 3) < 7 ? this.maxDaysThatCanBeRetrieved : Math.round(this.maxDaysThatCanBeRetrieved / 3);
+    if (this.minDaysThatCanBeRetrieved != 0) {
+      await this.prepareAllTimeCharts();
+    }
   }
 
   // No network alert
@@ -110,27 +123,36 @@ export class TabAnalyticsPage {
     return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
   }
 
+  async selectedRange() {
+    this.allTimeDates = [];
+    this.allTimeCalories = [];
+    this.allTimeProteinCalories = 0;
+    this.allTimeCarbsCalories = 0;
+    this.allTimeSaturatedCalories = 0;
+    this.allTimeUnsaturatedCalories = 0;
+    this.allTimeCaloriesCalculatedFromMacros = 0;
+    console.log(this.lastDaysToRetrieve);
+    this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+    if (this.minDaysThatCanBeRetrieved != 0) {
+      await this.prepareAllTimeCharts();
+    }
+  }
+
   async prepareAllTimeCharts() {
-    this.subscriptionsList.push((await this._summaryService.getAllSummaries()).subscribe(r => {
-      this.allTimeDates = [];
-      this.allTimeCalories = [];
-      this.allTimeProteinCalories = 0;
-      this.allTimeCarbsCalories = 0;
-      this.allTimeSaturatedCalories = 0;
-      this.allTimeUnsaturatedCalories = 0;
-      this.allTimeCaloriesCalculatedFromMacros = 0;
-      r.forEach(a => {
-        this.allTimeDates.push(a.key);
-        this.allTimeCalories.push(this.precise_round(a.totalCalories, 0));
-        this.allTimeCaloriesCalculatedFromMacros += (a.totalGramsCarbohydrates * 4 + a.totalGramsFats * 9 + a.totalGramsProtein * 4);
-        this.allTimeProteinCalories += a.totalGramsProtein * 4;
-        this.allTimeCarbsCalories += a.totalGramsCarbohydrates * 4;
-        this.allTimeSaturatedCalories += a.totalGramsSaturated * 9;
-        this.allTimeUnsaturatedCalories += ((a.totalGramsFats * 9) - (a.totalGramsSaturated * 9));
+    this.subscriptionsList.push((await this._analyticsService.getDailyEntries(this.lastDaysToRetrieve)).subscribe(dentries => {
+      dentries.forEach(dentry => {
+        this.allTimeDates.push(dentry.DocumentId);
+        this.allTimeCalories.push(this.precise_round(dentry.TotalCalories, 0));
+        this.allTimeCaloriesCalculatedFromMacros += (dentry.TotalCarbohydrateGrams * 4 + dentry.TotalFatGrams * 9 + dentry.TotalProteinGrams * 4);
+        this.allTimeProteinCalories += dentry.TotalProteinGrams * 4;
+        this.allTimeCarbsCalories += dentry.TotalCarbohydrateGrams * 4;
+        this.allTimeSaturatedCalories += dentry.TotalSaturatedGrams * 9;
+        this.allTimeUnsaturatedCalories += ((dentry.TotalFatGrams * 9) - (dentry.TotalSaturatedGrams * 9));
       })
-      this.allTimeAverageCalories = this.precise_round(this.averageOfArray(this.allTimeCalories), 0);
+      this.allTimeAverageCalories = (this.allTimeCalories.length > 0) ? this.precise_round(this.averageOfArray(this.allTimeCalories), 0) : null;
       this.createAllTimeCharts();
     }));
+    console.log("wowo");
   }
 
   createAllTimeCharts() {

@@ -159,7 +159,7 @@ export class FoodDatabaseService {
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
 
     // Update food doc 
-    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + food.DocumentId).set({
+    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + food.DocumentId).update({
       Name: food.Name, // Investigate if the cloud function gets executed if the name remains the same
       Calories: food.Calories,
       Carbohydrates: food.Carbohydrates,

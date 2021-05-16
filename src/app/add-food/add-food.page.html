@@ -19,11 +19,6 @@
         <ion-label position="floating">Name</ion-label>
         <ion-input formControlName="name" type="text" #nameInput></ion-input>
       </ion-item>
-
-      <ion-item lines="full">
-        <ion-label position="floating">Comment 📝</ion-label>
-        <ion-input formControlName="comment" type="text"></ion-input>
-      </ion-item>
     </ion-card>
 
     <ion-item-divider>
@@ -36,8 +31,7 @@
 
           <ion-col>
             <ion-item lines="full">
-              <ion-input formControlName="servingAmount" [(ngModel)]="servingAmountDefaultValue" type="text"
-                inputmode="numeric">
+              <ion-input formControlName="servingAmount" placeholder="Enter Amount" type="text" inputmode="numeric">
               </ion-input>
             </ion-item>
           </ion-col>

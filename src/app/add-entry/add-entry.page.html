@@ -1,14 +1,19 @@
 <ion-header>
-  <ion-toolbar>
 
+  <ion-toolbar *ngIf="!isListHidden">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="home" (click)="goToDailyEntryTab()"></ion-back-button>
+      <ion-back-button (click)="goToDailyEntryTab()"></ion-back-button>
     </ion-buttons>
-
-    <ion-title *ngIf="!isListHidden">Select Food</ion-title>
-    <ion-title *ngIf="!isFormHidden">Enter Quantity</ion-title>
-
+    <ion-title *ngIf="!isListHidden">New Daily Entry</ion-title>
   </ion-toolbar>
+
+  <ion-toolbar *ngIf="!isFormHidden">
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goToSearchList()"></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="!isFormHidden">{{food.Name}}</ion-title>
+  </ion-toolbar>
+
 </ion-header>
 
 <!-- Searchbar with cancel button shown on focus -->
@@ -23,75 +28,154 @@
   </ion-refresher>
 
   <div *ngIf="!isListHidden">
-    <ion-list *ngIf="filteredFoodList.length > 0; else loading">
-      <ion-item *ngFor="let food of filteredFoodList" (click)="foodSelected(food)">
+    <!-- Normal screen -->
+    <ion-list *ngIf="searchTerm.length == 0; then viewIntroMessage else beginSearch">
+      <!-- Skeleton in here-->
+    </ion-list>
+
+    <!-- Skeleton: view personal db message screen -->
+    <ng-template #viewIntroMessage>
+      <ion-card>
+        <ion-item class="ion-text-center">
+          <ion-label class="ion-text-wrap" color="tertiary"><strong>Search by Food Name</strong></ion-label>
+        </ion-item>
+
+        <ion-card-content class="ion-text-center">
+          Start typing the name of food you want to add in your daily entries.
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
+
+    <!-- Skeleton: Begin Search -->
+    <ng-template #beginSearch>
+      <ng-container *ngIf="loadingFlag; then loading else filteredItems">
+      </ng-container>
+    </ng-template>
+
+    <!-- Skeleton: List filtered items -->
+    <ng-template #filteredItems>
+      <ng-container
+        *ngIf="searchTerm.length > 0 && !loadingFlag && noPersonalFoodsFoundAfterQuery && noGlobalFoodsFoundAfterQuery && !personalDbSearchExecutionInProcess && !globalDbSearchExecutionInProcess; then nothingFound">
+      </ng-container>
+      <ion-item *ngFor="let food of filteredFoodMap | keyvalue: asIsOrder" (click)="foodSelected(food.value)">
         <ion-label class="ion-text-wrap">
-          <h2><strong>{{food?.name}}</strong></h2>
+          <h2>
+            <strong>{{food.value.Name}}</strong>&nbsp;({{food.value.ServingAmount}}{{food.value.ServingUnitShortCode}})
+          </h2>
         </ion-label>
-        <ion-chip slot="end" color="secondary">
-          <strong>🔋 {{food?.calories}} kcal</strong>
+
+        <ion-chip *ngIf="food.value.IsFromPersonalDb" slot="end" color="secondary">
+          <strong>🔋 {{food.value.Calories}} kcal</strong>
         </ion-chip>
+
+        <ion-chip *ngIf="!food.value.IsFromPersonalDb" slot="end" color="medium">
+          <strong>🔋 {{food.value.Calories}} kcal</strong>
+        </ion-chip>
+
       </ion-item>
-    </ion-list>
-      <!-- Skeleton dummy screen -->
-  <ng-template #loading>
-    <ion-list>
-      <ion-item>
-        <ion-label class="ion-text-wrap">
-          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
-        </ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label class="ion-text-wrap">
-          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
-        </ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label class="ion-text-wrap">
-          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
-        </ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label class="ion-text-wrap">
-          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
-        </ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label class="ion-text-wrap">
-          <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </ng-template>
+    </ng-template>
+
+    <!-- Skeleton dummy screen -->
+    <ng-template #loading>
+      <ion-list>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <ion-skeleton-text animated style="width: 90%; height: 21px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 40%; height: 15px"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; height: 14px"></ion-skeleton-text>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+
+    <!-- Skeleton: Nothing found -->
+    <ng-template #nothingFound>
+      <ion-card>
+        <ion-card-content>
+          Sorry, we couldn't find anything. 😞
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
+
   </div>
 
   <div *ngIf="!isFormHidden">
     <form [formGroup]="addEntryForm" (ngSubmit)="submitForm()" novalidate>
+      <ion-item-divider>
+        <ion-label>Nutritional Information (Per {{food.ServingAmount}}{{food.ServingUnitShortCode}})</ion-label>
+      </ion-item-divider>
       <ion-card>
-        <ion-card-header>
-          <ion-card-title>
-            <strong>{{food?.name}}</strong></ion-card-title>
-        </ion-card-header>
+        <ion-list>
+
+          <ion-item disabled>
+            <ion-label>🔋 {{food.Calories}} kcal</ion-label>
+          </ion-item>
+          <ion-item disabled>
+            <ion-label>🐖 {{food.Fats | number:'.1'}}g 🍞 {{food.Carbohydrates |
+              number:'.1'}}g 🥩 {{food.Protein | number:'.1'}}g</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+
+
+      <ion-item-divider>
+        <ion-label>Enter Consumed Amount</ion-label>
+      </ion-item-divider>
+
+      <ion-card>
         <ion-item>
-          <ion-label position="floating">Qty</ion-label>
-          <ion-input formControlName="qty" type="text" inputmode="numeric" #qtyInput></ion-input>
+          <ion-label position="floating">{{food.ServingUnit}}</ion-label>
+          <ion-input formControlName="qty" type="text" inputmode="numeric"
+            (ionChange)="prepareConsumedFood($event.target.value)" #qtyInput></ion-input>
         </ion-item>
+      </ion-card>
+
+      <ion-card>
+        <ion-list>
+          <ion-item disabled>
+            <ion-label>🔋 {{consumedFood.Calories | number:'1.0-0'}} kcal</ion-label>
+          </ion-item>
+          <ion-item disabled>
+            <ion-label>🐖 {{consumedFood.Fats | number:'.1'}}g 🍞 {{consumedFood.Carbohydrates |
+              number:'.1'}}g 🥩 {{consumedFood.Protein | number:'.1'}}g</ion-label>
+          </ion-item>
+        </ion-list>
       </ion-card>
       <ion-row>
         <ion-col>
           <ion-button type="submit" color="danger" expand="block">Submit</ion-button>
         </ion-col>
       </ion-row>
+
+
     </form>
   </div>
 

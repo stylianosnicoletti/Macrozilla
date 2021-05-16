@@ -4,6 +4,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Subscription } from 'rxjs';
 import { AngularFireDatabase } from '@angular/fire/database';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-root',
@@ -26,8 +27,12 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.show();
-      this.splashScreen.hide();
+      console.log("Platform: " +Capacitor.platform);
+      if (Capacitor.isNative) {
+        console.log("Is Native");
+        this.statusBar.show();
+        this.splashScreen.hide();
+      }
     });
   }
 

@@ -23,7 +23,7 @@ const routes: Routes = [
   },
   // If user navigates to edit food page
   {
-    path: 'edit_food/:food_key',
+    path: 'edit_food/:food_doc_id',
     canActivate: [CanEnterTabsPageGuard],
     loadChildren: () => import('./edit-food/edit-food.module').then(m => m.EditFoodPageModule)
   },

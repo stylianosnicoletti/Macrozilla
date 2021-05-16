@@ -131,7 +131,6 @@ export class TabAnalyticsPage {
     this.allTimeSaturatedCalories = 0;
     this.allTimeUnsaturatedCalories = 0;
     this.allTimeCaloriesCalculatedFromMacros = 0;
-    console.log(this.lastDaysToRetrieve);
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     if (this.minDaysThatCanBeRetrieved != 0) {
       await this.prepareAllTimeCharts();
@@ -152,7 +151,6 @@ export class TabAnalyticsPage {
       this.allTimeAverageCalories = (this.allTimeCalories.length > 0) ? this.precise_round(this.averageOfArray(this.allTimeCalories), 0) : null;
       this.createAllTimeCharts();
     }));
-    console.log("wowo");
   }
 
   createAllTimeCharts() {

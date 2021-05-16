@@ -16,6 +16,21 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp();
 
+
+// Creating user fields on user creation (Production)
+exports.createNewUserFields = functions
+    .auth.user().onCreate(user => {
+        return admin.firestore().collection('TheMacroDiet/Production/Users').doc(user.uid).set({
+            Options: {
+                DarkMode: false,
+                UseOnlyPersonalDb: false
+            },
+            Sizes: {
+                DailyEntries: 0
+            }
+        });
+    });
+
 // Creating new food in USER DB (Production)
 exports.createUserFoodNameIndex = functions
     .region('europe-west3').firestore

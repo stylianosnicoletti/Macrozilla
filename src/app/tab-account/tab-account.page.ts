@@ -93,12 +93,9 @@ export class TabAccountPage {
    * Updates User Options in Firestore.
    */
   async updateUserOptions(): Promise<void> {
-    console.log("Use Only Personal Db: " + this.useOnlyPersonalDb);
-    console.log("DarkMode: " + this.darkMode);
     const user = <User>{
       Options: this.mapNgModelsToUserOptions(this.darkMode, this.useOnlyPersonalDb)
     }
-    console.log("Updating Firestore");
     await this._userService.updateUserFieldOptions(user.Options);
   }
 

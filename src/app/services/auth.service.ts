@@ -16,7 +16,7 @@ export class AuthService {
       await this.afAuth.createUserWithEmailAndPassword(value.email, value.password)
         .then(async res => {
           await this.doUpdateDisplayName(value.userName);
-          await this.afAuth.currentUser.then(async u => await u.sendEmailVerification);
+          await this.afAuth.currentUser.then(async u => await u.sendEmailVerification());
           resolve(res);
         }, err => reject(err))
     })

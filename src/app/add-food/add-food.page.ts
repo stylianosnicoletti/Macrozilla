@@ -1,13 +1,16 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Renderer2, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { FoodService } from '../services/food.service';
+import { FoodDatabaseService } from '../services/food-db.service';
 import { ToastService } from '../services/toast.service';
-import { Food, ServingUnit } from '../types';
+import { Food } from '../models/food.model';
+import { ServingUnit } from '../models/servingUnit.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MyMacrosConstants } from '../my-macros-constants'
-import { PopoverController, IonInput } from '@ionic/angular';
+import { PopoverController, IonInput, AlertController } from '@ionic/angular';
 import { UnsubscribeService } from '../services/unsubscribe.service';
+import { GlobalVariablesService } from '../services/global-variables.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-add-food',
@@ -22,20 +25,32 @@ export class AddFoodPage {
   food: Food;
   addForm: FormGroup;
   isSubmitted = false;
-  servingAmountDefaultValue: Number;
   servingUnits: ServingUnit[];
   subscriptionsList: Subscription[] = [];
 
   constructor(
     private _router: Router,
     private _formBuilder: FormBuilder,
-    private _foodService: FoodService,
+    private _popController: PopoverController,
+    private _alertController: AlertController,
     private _toastService: ToastService,
     private _unsubscribeService: UnsubscribeService,
-    private _popController: PopoverController
+    private _foodDbService: FoodDatabaseService,
+    private _globalVariableService: GlobalVariablesService,
+    private _renderer: Renderer2,
+    private _userService: UserService
   ) {
     this.initialiseItems();
-    this.servingAmountDefaultValue = MyMacrosConstants.SERVING_AMOUNT_DEFAULT_VALUE;
+  }
+
+  /**
+   * Will not be triggered, if you come back to a page after putting it into a stack.
+   */
+  async ngOnInit() {
+    console.log("ngOnInit AddFood Tab.");
+    await (await this._userService.getUserFields()).subscribe(async x => {
+      this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
+    });
   }
 
   /**
@@ -58,10 +73,11 @@ export class AddFoodPage {
   /**
   * Initialises Items. (E.g. Serving Units)
   */
-  initialiseItems() {
+  initialiseItems(): void {
     this.subscriptionsList.push(
-      this._foodService.getAllServingUnits().subscribe(res => {
-        this.servingUnits = res;
+      this._globalVariableService.getServingUnits().subscribe(res => {
+        console.log(res);
+        this.servingUnits = res.ServingUnits;
       }));
     this.addFoodData();
   }
@@ -69,7 +85,7 @@ export class AddFoodPage {
   /**
   * Closing pop items (E.g. Service Unit Select).
   */
-  async closePopItems() {
+  async closePopItems(): Promise<void> {
     console.log("Close pop items.");
     const popover = await this._popController.getTop();
     if (popover)
@@ -79,7 +95,7 @@ export class AddFoodPage {
   /** 
   * Sets focus on name input.
   */
-  setFocus() {
+  setFocus(): void {
     setTimeout(async () => {
       await this.nameInput.setFocus();
     });
@@ -88,12 +104,11 @@ export class AddFoodPage {
   /** 
   * Contains Reactive Form logic.
   */
-  addFoodData() {
+  addFoodData(): void {
     this.addForm = this._formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(5)]],
+      name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]],
       servingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
-      servingUnit: [],
-      comment: ['', [Validators.maxLength(15)]],
+      servingUnit: ['', [Validators.required]],
       protein: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
       carbohydrates: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
       fats: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
@@ -102,43 +117,54 @@ export class AddFoodPage {
     })
   }
 
-  /** 
-  * Routes back to "foods_database" tab.
-  */
-  async goToFoodsDatabaseTab() {
+  /**
+   * Routes back to "foods_database" tab.
+   */
+  async goToFoodsDatabaseTab(): Promise<void> {
     await this._router.navigate(["/tabs/foods_database"]);
   }
 
-  /** 
-  * Submits food form.
-  * Checks that all required values are entered and that food doesn't not already exist.
-  */
+  /**
+   * Submit changes when validations pass.
+   * @returns True when submission was successful.
+   */
   async submitForm() {
     this.isSubmitted = true;
+
+    // Validation Check
     if (!this.addForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!');
       return false;
-    } else {
-      this.food = this.fillFood(this.addForm.value);
-      if (await this.foodNameExistGuard(this.food)) {
-        await this._toastService.presentToast('Food with that name already exists!');
-        return false;
-      } else {
-        await this._foodService.addFood(this.food);
-        await this._router.navigate(["/tabs/foods_database"]);
-        await this._toastService.presentToast('Food Successfully Added');
-      }
     }
+
+    this.food = this.fillFood(this.addForm.value);
+    console.log(this.food);
+
+    // Saturated Fats Check
+    if (this.food.Saturated > this.food.Fats) {
+      await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
+      return false;
+    }
+
+    // Submit food.
+    await this._foodDbService.addFood(this.food);
+    await this._router.navigate(["/tabs/foods_database"]);
+    await this._toastService.presentToast('Food Successfully Added');
   }
 
-  /** 
-  * Checks if food name exist under that user.
-  * @param {Food} food Food.
-  * @return {Promise<boolean>} True if it exists. False when it doesn't.
-  */
-  async foodNameExistGuard(food: Food): Promise<boolean> {
-    return ((await this._foodService.doesFoodNameExist(food)) != 0);
+
+  /**
+   * No network alert
+   */
+  async presentIssueWithServerAlert(): Promise<void> {
+    const alert = await this._alertController.create({
+      header: 'There is an issue with server. ',
+      message: 'Please try again later.',
+      buttons: ['OK']
+    });
+    await alert.present();
   }
+
 
   /** 
   * Prepares Food with form values provided.
@@ -147,31 +173,16 @@ export class AddFoodPage {
   */
   fillFood(formValue: any): Food {
     return {
-      name: this.prepareName(formValue.name, formValue.servingAmount, formValue.servingUnit, formValue.comment),
-      protein: formValue.protein,
-      carbohydrates: formValue.carbohydrates,
-      fats: formValue.fats,
-      saturated: formValue.saturated,
-      calories: formValue.calories,
-      key: null
+      Name: formValue.name,
+      Protein: formValue.protein,
+      Carbohydrates: formValue.carbohydrates,
+      Fats: formValue.fats,
+      Saturated: formValue.saturated,
+      Calories: formValue.calories,
+      ServingAmount: formValue.servingAmount,
+      ServingUnit: formValue.servingUnit.Name,
+      ServingUnitShortCode: this.mapServingUnitToShortCode(formValue.servingAmount, formValue.servingUnit)
     };
-  }
-
-  /** 
-  * Prepares the food name.
-  * @param {string} name Name of food (E.g. Chocolate).
-  * @param {string} servingAmount Serving amount (E.g. 100).
-  * @param {ServingUnit} servingUnit Serving Unit (E.g Grams).
-  * @param {string} comment Serving Unit (E.g bar).
-  * @return {string} The full name (E.g. Chocolate (100g - bar)).
-  */
-  prepareName(name: String, servingAmount: string, servingUnit: ServingUnit, comment: string) {
-    if (comment.length > 0) {
-      return name + " (" + servingAmount + this.mapServingUnitToShortCode(servingAmount, servingUnit) + " - " + comment + ")";
-    }
-    else {
-      return name + " (" + servingAmount + this.mapServingUnitToShortCode(servingAmount, servingUnit) + ")";
-    }
   }
 
   /** 
@@ -185,6 +196,18 @@ export class AddFoodPage {
       return servingUnit.ShortCodePlural;
     }
     return servingUnit.ShortCode;
+  }
+
+  /**
+   * Maps darkMode boolean to body name.
+   * @param darkMode User prefered theme option.
+   * @returns Body name.
+   */
+  mapThemeModeToBodyName(darkMode: boolean): string {
+    if (darkMode) {
+      return 'dark';
+    }
+    return 'light';
   }
 }
 

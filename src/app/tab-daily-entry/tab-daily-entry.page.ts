@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { DailyEntryFood, Summary } from '../types';
-import { FoodEntryService } from '../services/food-entry.service';
-import { SummaryService } from '../services/summary.service';
 import { Subscription } from 'rxjs';
 import { AlertController } from '@ionic/angular';
 import { LoadingService } from '../services/loading.service';
 import { Network } from '@ionic-native/network/ngx'
+import { DailyEntry, Entry } from '../models/dailyEntry';
+import { DailyTrackingService } from '../services/daily-tracking.service';
+import { UnsubscribeService } from '../services/unsubscribe.service';
 
 @Component({
   selector: 'app-tab-daily-entry',
@@ -17,12 +17,7 @@ import { Network } from '@ionic-native/network/ngx'
 export class TabDailyEntryPage {
 
   date: string;
-  existingSummary: Summary;
-  entrySummary: Summary;
-  foodEntry: DailyEntryFood;
-  numberOfEntriesByDate: Number;
-  summaryDay: Summary;
-  dailyEntriesList: DailyEntryFood[];
+  dailyEntry: DailyEntry;
   subscriptionsList: Subscription[] = [];
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
@@ -30,24 +25,24 @@ export class TabDailyEntryPage {
   constructor(
     private _router: Router,
     private _datePipe: DatePipe,
-    private _foodEntryService: FoodEntryService,
-    private _summaryService: SummaryService,
     private _loadingService: LoadingService,
+    private _dailyTrackingService: DailyTrackingService,
     private _alertController: AlertController,
-    private _network: Network) {
+    private _network: Network,
+    private _unsubscribeService: UnsubscribeService) {
   }
 
   async ionViewWillEnter() {
     console.log("entering daily entries page");
     this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this.unsubscribeData();
+      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
       await this.presentNetworkAlert();
       console.log('network was disconnected :-(');
       if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
     });
 
-    this.connectSubscription = this._network.onConnect().subscribe(async() => {
-      this.unsubscribeData();
+    this.connectSubscription = this._network.onConnect().subscribe(async () => {
+      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
       await this.initialiseItems();
       console.log('network connected!');
     });
@@ -57,7 +52,7 @@ export class TabDailyEntryPage {
 
   ionViewWillLeave() {
     console.log("leaving daily entries page");
-    this.unsubscribeData();
+    this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     this.unsubscribeNetwork();
   }
 
@@ -66,26 +61,24 @@ export class TabDailyEntryPage {
     if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
   }
 
-  unsubscribeData() {
-    this.subscriptionsList.forEach(item => {
-      if (!item.closed) item.unsubscribe();
-    })
-    this.subscriptionsList = [];
-  }
-
   async initialiseItems() {
-    await this.transformDate(Date.now());
+    await this.transformDateAndReadDailyEntry(Date.now());
   }
 
-  async doRefresh(event) {
+  /**
+   * Refresh action.
+   */
+  async doRefresh(event): Promise<void> {
     await this.initialiseItems();
     setTimeout(() => {
       event.target.complete();
     }, 1000);
   }
 
-  // No network alert
-  async presentNetworkAlert() {
+  /**
+   * No network alert.
+   */
+  async presentNetworkAlert(): Promise<void> {
     const alert = await this._alertController.create({
       header: 'No Data Connection',
       message: 'Consider turning on mobile data or Wi-Fi.',
@@ -94,26 +87,33 @@ export class TabDailyEntryPage {
     await alert.present();
   }
 
-  // Transforms a the date to a specifed format and observe summary for that date
-  async transformDate(myDate) {
-    this.date = this._datePipe.transform(myDate, 'yyyy-MM-dd');
-    this.subscriptionsList.push((await this._foodEntryService.getAllFoodEntriesByDate(this.date)).subscribe(x => this.dailyEntriesList = x));
-    this.subscriptionsList.push((await this._summaryService.getSummaryObservable(this.date)).subscribe(x => this.summaryDay = x));
+  /**
+   * Transforms the date to a specifed format and read daily entry.
+   * @param myDate Date.
+   */
+  async transformDateAndReadDailyEntry(myDate) {
+    this.date = await this._datePipe.transform(myDate, 'yyyy-MM-dd');
+    this.subscriptionsList.push((await this._dailyTrackingService.readDailyEntry(this.date, true)).subscribe(x => {
+      this.dailyEntry = x
+    }));
   }
 
-  // Parse selected date
-  async parseDate() {
-    await this.transformDate(this.date);
+  /**
+   * Parse selected date.
+   */
+  async parseDate(): Promise<void> {
+    await this.transformDateAndReadDailyEntry(this.date);
   }
 
-  // Delete Confirmation
-  async presentAlertConfirm(entryArg: DailyEntryFood, slidingItem: any) {
-    this.numberOfEntriesByDate = await this._foodEntryService.getNumberOfFoodEntriesByDate(this.date);
-    this.entrySummary = this.createEntrySummary(entryArg);
-    this.existingSummary = await this._summaryService.getSummary(this.date);
+  /**
+   * Delete Confirmation.
+   * @param entryArg Selected entry for deletion.
+   * @param slidingItem Sliding item.
+   */
+  async presentAlertConfirm(entryArg: Entry, slidingItem: any): Promise<void> {
     const alert = await this._alertController.create({
       header: 'Do you want to proceed deleting?',
-      message: entryArg.food.name + ' Qty: ' + entryArg.qty,
+      message: entryArg.Food.Name + ' (' + entryArg.Food.ServingAmount + entryArg.Food.ServingUnitShortCode + ')',
       buttons: [
         {
           text: 'No',
@@ -125,39 +125,20 @@ export class TabDailyEntryPage {
         }, {
           text: 'Yes',
           handler: async () => {
-            if (this.numberOfEntriesByDate > 1) {
-              await this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
-              // Decrement summary on entry deletion 
-              this._summaryService.decrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
-            } else {
-              // Remove summary on last entry deletion 
-              await this._foodEntryService.deleteFoodEntry(entryArg.key, this.date);
-              await this._summaryService.removeSummary(this.date);
-            }
+            await this._dailyTrackingService.deleteEntryAndUpdateDailyEntryFields(this.date, entryArg, this.dailyEntry.Entries.length);
             slidingItem.close();
             await this._loadingService.presentLoading('Deleting..', 500);
           }
         }
-
       ]
     });
     await alert.present();
   }
 
-  // Prepare summary of food entry selected 
-  createEntrySummary(foodEntryArg): Summary {
-    return {
-      key:null,
-      totalGramsProtein: foodEntryArg.food.protein * foodEntryArg.qty,
-      totalGramsFats: foodEntryArg.food.fats * foodEntryArg.qty,
-      totalGramsSaturated: foodEntryArg.food.saturated * foodEntryArg.qty,
-      totalGramsCarbohydrates: foodEntryArg.food.carbohydrates * foodEntryArg.qty,
-      totalCalories: foodEntryArg.food.calories * foodEntryArg.qty,
-    };
-  }
-
-  // Add New Entry
-  async addNewEntry() {
+  /**
+   * Add New Entry
+   */
+  async addNewEntry(): Promise<void> {
     await this._router.navigate(["/add_entry/" + this.date]);
   }
 

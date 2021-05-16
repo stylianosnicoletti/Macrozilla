@@ -11,36 +11,75 @@
   <!--(keyup.enter)="submitForm()"-->
   <div *ngIf="isFormReadyToBuild">
     <form [formGroup]="editForm" (ngSubmit)="submitForm()" (keyup.enter)="submitForm()" novalidate>
+     
+      <ion-item-divider>
+        <ion-label>General Information</ion-label>
+      </ion-item-divider>
+      
       <ion-card>
         <ion-item lines="full">
           <ion-label position="floating">Name</ion-label>
-          <ion-input formControlName="name" type="text"></ion-input>
+          <ion-input formControlName="Name" type="text" #nameInput></ion-input>
         </ion-item>
       </ion-card>
+  
+      <ion-item-divider>
+        <ion-label>Serving Size</ion-label>
+      </ion-item-divider>
+  
+      <ion-card>
+        <ion-grid>
+          <ion-row>
+  
+            <ion-col>
+              <ion-item lines="full">
+                <ion-input formControlName="ServingAmount" placeholder="Enter Amount" type="text" inputmode="numeric">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+  
+            <ion-col>
+              <ion-item lines="full">
+                <ion-select interface="popover" formControlName="ServingUnit" placeholder="Choose Unit" [value]="preselectedServingUnit">
+                  <ion-select-option *ngFor="let servingUnit of servingUnitsMap | keyvalue: asIsOrder" [value]="servingUnit.value">{{ servingUnit.value.Name }}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col> 
+  
+          </ion-row>
+        </ion-grid>
+      </ion-card>
+  
+      <ion-item-divider>
+        <ion-label>Nutritional Information</ion-label>
+      </ion-item-divider>
+  
+  
+  
       <ion-card>
         <ion-item lines="full">
           <ion-label position="floating">Calories 🔋</ion-label>
-          <ion-input formControlName="calories" type="text" inputmode="numeric" autofocus></ion-input>
+          <ion-input formControlName="Calories" type="text" inputmode="numeric"></ion-input>
         </ion-item>
-
+  
         <ion-item lines="full">
           <ion-label position="floating">Fats 🐖</ion-label>
-          <ion-input formControlName="fats" type="text" inputmode="numeric"></ion-input>
+          <ion-input formControlName="Fats" type="text" inputmode="numeric"></ion-input>
         </ion-item>
-
+  
         <ion-item lines="full">
           <ion-label position="floating">Saturated Fats ❌</ion-label>
-          <ion-input formControlName="saturated" type="text" inputmode="numeric"></ion-input>
+          <ion-input formControlName="Saturated" type="text" inputmode="numeric"></ion-input>
         </ion-item>
-
+  
         <ion-item lines="full">
           <ion-label position="floating">Carbohydrates 🍞</ion-label>
-          <ion-input formControlName="carbohydrates" type="text" inputmode="numeric"></ion-input>
+          <ion-input formControlName="Carbohydrates" type="text" inputmode="numeric"></ion-input>
         </ion-item>
-
+  
         <ion-item lines="full">
           <ion-label position="floating">Protein 🥩</ion-label>
-          <ion-input formControlName="protein" type="text" inputmode="numeric"></ion-input>
+          <ion-input formControlName="Protein" type="text" inputmode="numeric"></ion-input>
         </ion-item>
       </ion-card>
       <ion-row>
@@ -48,6 +87,7 @@
           <ion-button type="submit" color="danger" expand="block">Submit</ion-button>
         </ion-col>
       </ion-row>
+
     </form>
   </div>
 

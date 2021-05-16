@@ -20,22 +20,4 @@ public class MainActivity extends BridgeActivity {
       // Ex: add(TotallyAwesomePlugin.class);
     }});
   }
-
-  /// Force Dark Mode on App when it is enabled on Android
-  // Android versions >=10 required
-  @RequiresApi(api = Build.VERSION_CODES.Q)
-  @Override
-  public void onResume() {
-    super.onResume();
-    int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-    WebSettings webSettings = this.bridge.getWebView().getSettings();
-
-    if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-        webSettings.setForceDark(WebSettings.FORCE_DARK_ON);
-      }
-    } else {
-      webSettings.setForceDark(WebSettings.FORCE_DARK_OFF);
-    }
-  }
 }

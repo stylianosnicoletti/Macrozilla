@@ -140,7 +140,7 @@ export class TabAnalyticsPage {
   async prepareAllTimeCharts() {
     this.subscriptionsList.push((await this._analyticsService.getDailyEntries(this.lastDaysToRetrieve)).subscribe(dentries => {
       dentries.forEach(dentry => {
-        this.allTimeDates.push(dentry.DocumentId);
+        this.allTimeDates.push(dentry.Date);
         this.allTimeCalories.push(this.precise_round(dentry.TotalCalories, 0));
         this.allTimeCaloriesCalculatedFromMacros += (dentry.TotalCarbohydrateGrams * 4 + dentry.TotalFatGrams * 9 + dentry.TotalProteinGrams * 4);
         this.allTimeProteinCalories += dentry.TotalProteinGrams * 4;

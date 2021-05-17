@@ -28,8 +28,8 @@ export class AnalyticsService {
     // Current user id
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
 
-    const collectionRef = await this._angularFireStore.collection<DailyEntry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/", ref => ref.limit(limit));
-    return await collectionRef.valueChanges({ idField: 'DocumentId' });
+    const collectionRef = await this._angularFireStore.collection<DailyEntry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/", ref => ref.orderBy('Date','desc').limit(limit));
+    return await collectionRef.valueChanges();
   }
 
 }

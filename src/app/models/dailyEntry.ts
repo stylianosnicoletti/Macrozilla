@@ -10,6 +10,8 @@ export interface DailyEntry {
 
     Entries?: Entry[];
 
+    Date: string;
+
     TotalCalories: number;
 
     TotalFatGrams: number;

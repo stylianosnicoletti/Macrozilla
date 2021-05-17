@@ -33,9 +33,6 @@ export class AddEntryPage {
   consumedFood: Food;
   servingUnitsMap = new Map<String, ServingUnit>();
   entry: Entry;
-  //entrySummary: Summary;
-  //existingSummary: Summary;
-  existingDailyEntry: DailyEntry;
   addEntryForm: FormGroup;
   isSubmitted = false;
   searchTerm: string = "";
@@ -282,22 +279,6 @@ export class AddEntryPage {
     } else {
       // Add entry in sub-collection of Entries on DailyEntry doc
       await this._dailyTrackingServince.addEntryAndUpdateDailyEntryFields(this.date, this.consumedFood);
-      // ADD ENTRY (DB)
-      // GET CURRENT DAILY ENTRY
-      // prepareUpdatedDailyEntry()
-      // UPDATE DAILY ENTRY (DB)
-      // GET ANALYTICS DATA
-      // UPDATE ANALYTICS DATA (DB)
-      //  this.entrySummary = this.createEntrySummary(this.entry);
-
-      //this.existingSummary = await this._summaryService.getSummary(this.date);
-      //   if (this.existingSummary != null) {
-      // Increment summary if already exists
-      //  this._summaryService.incrementExisitngSummary(this.existingSummary, this.entrySummary, this.date);
-      // } else {
-      // Set summary if it does not exists
-      //  await this._summaryService.setSummary(this.entrySummary, this.date);
-      //  }
       await this._router.navigate(["/tabs/daily_entry"]);
       this.hideForm();
       this.unhidetList();

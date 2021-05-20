@@ -15,12 +15,12 @@
   </ion-toolbar>
 
 </ion-header>
-
+<ion-content>
 <!-- Searchbar with cancel button shown on focus -->
 <ion-searchbar *ngIf="!isListHidden" debounce="380" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
 </ion-searchbar>
 
-<ion-content>
+
 
   <!-- Default Refresher -->
   <ion-refresher *ngIf="!isListHidden" slot="fixed" (ionRefresh)="doRefresh($event)">

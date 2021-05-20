@@ -7,9 +7,10 @@
 
 
   <!-- Searchbar with cancel button shown on focus -->
+  <ion-content>
   <ion-searchbar debounce="370" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
   </ion-searchbar>
-  <ion-content>
+
     <!-- Default Refresher -->
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
       <ion-refresher-content></ion-refresher-content>

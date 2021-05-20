@@ -3,10 +3,39 @@ import { Subscription } from 'rxjs';
 import { AlertController } from '@ionic/angular';
 import { Network } from '@ionic-native/network/ngx';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
-import { Chart } from 'chart.js';
 import { AnalyticsService } from '../services/analytics.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { UserService } from '../services/user.service';
+import {
+  Chart,
+  ArcElement,
+  LineElement,
+  //BarElement,
+  PointElement,
+  //BarController,
+  //BubbleController,
+  DoughnutController,
+  LineController,
+  //PieController,
+  //PolarAreaController,
+  //RadarController,
+  //ScatterController,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  //RadialLinearScale,
+  //TimeScale,
+  //TimeSeriesScale,
+  Filler,
+  Legend,
+  Title,
+  Tooltip,
+  //ChartConfiguration,
+  //CoreScaleOptions,
+  //Scale,
+  ChartOptions,
+  ChartData
+} from 'chart.js';
 
 @Component({
   selector: 'app-tab-analytics',
@@ -23,8 +52,7 @@ export class TabAnalyticsPage {
   maxDaysThatCanBeRetrieved: number;
   minDaysThatCanBeRetrieved: number;
   allTimeAverageCalories: number;
-  allTimeCalories: number[];
-  allTimeDates: string[];
+  dateCaloriesMap = new Map<string, number>(); // Used map instead of arrays to avoid duplication when adding each element on value changes (may receive same element more than once) 
   allTimeProteinCalories: number;
   allTimeCarbsCalories: number;
   allTimeSaturatedCalories: number;
@@ -42,6 +70,30 @@ export class TabAnalyticsPage {
     private _network: Network,
     private _screenOrientation: ScreenOrientation,
     private _unsubscribeService: UnsubscribeService) {
+    Chart.register(
+      ArcElement,
+      LineElement,
+      //BarElement,
+      PointElement,
+      //BarController,
+      //BubbleController,
+      DoughnutController,
+      LineController,
+      //PieController,
+      //PolarAreaController,
+      //RadarController,
+      //ScatterController,
+      CategoryScale,
+      LinearScale,
+      LogarithmicScale,
+      //RadialLinearScale,
+      //TimeScale,
+      //TimeSeriesScale,
+      Filler,
+      Legend,
+      Title,
+      Tooltip
+    );
   }
 
   async ionViewWillEnter() {
@@ -85,8 +137,7 @@ export class TabAnalyticsPage {
   }
 
   async initialiseItems() {
-    this.allTimeDates = [];
-    this.allTimeCalories = [];
+    this.dateCaloriesMap = new Map<string, number>();
     this.allTimeProteinCalories = 0;
     this.allTimeCarbsCalories = 0;
     this.allTimeSaturatedCalories = 0;
@@ -124,8 +175,7 @@ export class TabAnalyticsPage {
   }
 
   async selectedRange() {
-    this.allTimeDates = [];
-    this.allTimeCalories = [];
+    this.dateCaloriesMap = new Map<string, number>();
     this.allTimeProteinCalories = 0;
     this.allTimeCarbsCalories = 0;
     this.allTimeSaturatedCalories = 0;
@@ -140,89 +190,128 @@ export class TabAnalyticsPage {
   async prepareAllTimeCharts() {
     this.subscriptionsList.push((await this._analyticsService.getDailyEntries(this.lastDaysToRetrieve)).subscribe(dentries => {
       dentries.forEach(dentry => {
-        this.allTimeDates.push(dentry.Date);
-        this.allTimeCalories.push(this.precise_round(dentry.TotalCalories, 0));
+        this.dateCaloriesMap.set(dentry.Date, this.precise_round(dentry.TotalCalories, 0));
         this.allTimeCaloriesCalculatedFromMacros += (dentry.TotalCarbohydrateGrams * 4 + dentry.TotalFatGrams * 9 + dentry.TotalProteinGrams * 4);
         this.allTimeProteinCalories += dentry.TotalProteinGrams * 4;
         this.allTimeCarbsCalories += dentry.TotalCarbohydrateGrams * 4;
         this.allTimeSaturatedCalories += dentry.TotalSaturatedGrams * 9;
         this.allTimeUnsaturatedCalories += ((dentry.TotalFatGrams * 9) - (dentry.TotalSaturatedGrams * 9));
       })
-      this.allTimeAverageCalories = (this.allTimeCalories.length > 0) ? this.precise_round(this.averageOfArray(this.allTimeCalories), 0) : null;
+      this.allTimeAverageCalories = (this.dateCaloriesMap.size > 0) ? this.precise_round(this.averageOfArray(Array.from(this.dateCaloriesMap.values())), 0) : null;
       this.createAllTimeCharts();
     }));
   }
 
   createAllTimeCharts() {
-    this.bars.push(new Chart(this.lineChartCaloriesAllTime.nativeElement, {
-      type: 'line',
-      data: {
-        // Labels: Dates
-        labels: this.allTimeDates,
-        datasets: [{
-          // Data : Calories
-          data: this.allTimeCalories,
-          backgroundColor: '#7FB3D5',
-          borderWidth: 1,
+    // Clean up any references stored to the chart object within Chart.js, along with any associated event listeners attached by Chart.js. This must be called before the canvas is reused for a new chart.
+    this.bars.forEach(chart => {
+      chart.destroy();
+    });
+
+    // Line Chart
+    const lineChartLabels = Array.from(this.dateCaloriesMap.keys());
+
+    const lineChartData = {
+      labels: lineChartLabels,
+      datasets: [{
+        data: Array.from(this.dateCaloriesMap.values()),
+        fill: true,
+        
+        borderColor: '#7fd5cc',
+        pointBorderColor:'#7f88d5',
+        pointBackgroundColor:'#7f88d5',
+        backgroundColor: '#7FB3D5',
+        borderWidth: 3,
+        tension: 0.3
+      }]
+    } as ChartData; 
+
+    const lineChartOptions = {
+      plugins: {
+        legend: {
+          display: false
         }
-        ]
       },
-      options: {
-        legend: null,
-        scales: {
-          yaxes: [{
-            ticks: {
-              beginAtZero: null
+      scales: {
+        x: {
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            // Include a dollar sign in the ticks
+            callback: function (value) {
+              return value + ' kcal';
             }
-          }]
+          }
         }
       }
+    } as ChartOptions;
+
+    this.bars.push(new Chart(this.lineChartCaloriesAllTime.nativeElement, {
+      type: 'line',
+      data: lineChartData,
+      options: lineChartOptions
     }));
+
+
+    // Doughnut Chart
+    const doughnutChartLabels = [(this.allTimeProteinCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Protein',
+    (this.allTimeUnsaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Unsaturated Fat',
+    (this.allTimeSaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Saturated Fat',
+    (this.allTimeCarbsCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Carbohydrates'];
+
+
+    
+    const doughnutChartData = {
+      labels: doughnutChartLabels,
+      datasets: [{
+        // Percentages of macros
+        data: [(this.allTimeProteinCalories / this.allTimeCaloriesCalculatedFromMacros),
+        (this.allTimeUnsaturatedCalories / this.allTimeCaloriesCalculatedFromMacros),
+        (this.allTimeSaturatedCalories / this.allTimeCaloriesCalculatedFromMacros),
+        (this.allTimeCarbsCalories / this.allTimeCaloriesCalculatedFromMacros)],
+        backgroundColor: ['#00bdaa', '#400082', '#fe346e', '#f1e7b6'],
+        borderColor: ['#00bdaa', '#400082', '#fe346e', '#f1e7b6'],
+        borderWidth: 1    
+      }]
+    } as ChartData;
+
+    const doughnutChartOptions = {
+      responsive: true,
+      hover:{
+        mode: null      
+      },
+      plugins: {
+        tooltip:{
+          enabled:false
+        },
+        legend: {
+          fullSize:true,
+          responsive: true,
+          position: 'right',
+          maxWidth: 1920,
+          labels: {
+            textAlign: 'left',
+            font: {
+              size: 13
+            }
+          }
+        },
+        title: {
+          display: false
+        },
+      }
+    } as ChartOptions;
 
     this.bars.push(new Chart(this.pieChartMacrosAllTime.nativeElement, {
       type: 'doughnut',
-      data: {
-        labels: [(this.allTimeProteinCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Protein',
-        (this.allTimeUnsaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Unsaturated Fat',
-        (this.allTimeSaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Saturated Fat',
-        (this.allTimeCarbsCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Carbohydrates'],
-        datasets: [{
-          // Percentages of macros
-          data: [(this.allTimeProteinCalories / this.allTimeCaloriesCalculatedFromMacros),
-          (this.allTimeUnsaturatedCalories / this.allTimeCaloriesCalculatedFromMacros),
-          (this.allTimeSaturatedCalories / this.allTimeCaloriesCalculatedFromMacros),
-          (this.allTimeCarbsCalories / this.allTimeCaloriesCalculatedFromMacros)],
-          backgroundColor: ['#00bdaa', '#400082', '#fe346e', '#f1e7b6'],
-          borderColor: ['#00bdaa', '#400082', '#fe346e', '#f1e7b6'],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        tooltips: { enabled: false },
-        hover: { mode: null },
-        legend: {
-          position: 'right'
-        },
-        scales: {
-          yAxes: [{
-            gridLines: {
-              display: false
-            },
-            ticks: {
-              display: false
-            }
-          }],
-          xAxes: [{
-            gridLines: {
-              display: false
-            },
-            ticks: {
-              display: false
-            },
-          }]
-
-        }
-      }
+      data: doughnutChartData,
+      options: doughnutChartOptions
     }));
   }
 }

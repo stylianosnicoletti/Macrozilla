@@ -24,3 +24,11 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+body {
+    background-color: 	rgb(204, 204, 204);
+}
+
+body[color-theme='dark']{
+    background-color: 	rgb(15, 15, 15);
+}

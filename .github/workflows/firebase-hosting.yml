@@ -28,7 +28,7 @@ jobs:
     - name: npm install, ionic build production
       run: |
         npm install
-        ionic build --prod
+        npm run build
     - name: Archive Build
       uses: actions/upload-artifact@v2
       with:

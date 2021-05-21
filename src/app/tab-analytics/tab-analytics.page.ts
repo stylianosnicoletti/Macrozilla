@@ -6,6 +6,7 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { AnalyticsService } from '../services/analytics.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { UserService } from '../services/user.service';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {
   Chart,
   ArcElement,
@@ -44,8 +45,8 @@ import {
 })
 export class TabAnalyticsPage {
 
-  @ViewChild('lineChartCaloriesAllTime') lineChartCaloriesAllTime;
-  @ViewChild('pieChartMacrosAllTime') pieChartMacrosAllTime;
+  @ViewChild('lineChartCalories') lineChartCalories;
+  @ViewChild('doughnutChartMacros') doughnutChartMacros;
 
   bars: Chart[] = [];
   lastDaysToRetrieve: number;
@@ -89,6 +90,7 @@ export class TabAnalyticsPage {
       //RadialLinearScale,
       //TimeScale,
       //TimeSeriesScale,
+      ChartDataLabels,
       Filler,
       Legend,
       Title,
@@ -216,18 +218,21 @@ export class TabAnalyticsPage {
       datasets: [{
         data: Array.from(this.dateCaloriesMap.values()),
         fill: true,
-        
+
         borderColor: '#7fd5cc',
-        pointBorderColor:'#7f88d5',
-        pointBackgroundColor:'#7f88d5',
+        pointBorderColor: '#7f88d5',
+        pointBackgroundColor: '#7f88d5',
         backgroundColor: '#7FB3D5',
         borderWidth: 3,
         tension: 0.3
       }]
-    } as ChartData; 
+    } as ChartData;
 
     const lineChartOptions = {
       plugins: {
+        datalabels: {
+          display: false
+        },
         legend: {
           display: false
         }
@@ -252,7 +257,7 @@ export class TabAnalyticsPage {
       }
     } as ChartOptions;
 
-    this.bars.push(new Chart(this.lineChartCaloriesAllTime.nativeElement, {
+    this.bars.push(new Chart(this.lineChartCalories.nativeElement, {
       type: 'line',
       data: lineChartData,
       options: lineChartOptions
@@ -260,13 +265,11 @@ export class TabAnalyticsPage {
 
 
     // Doughnut Chart
-    const doughnutChartLabels = [(this.allTimeProteinCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Protein',
-    (this.allTimeUnsaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Unsaturated Fat',
-    (this.allTimeSaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Saturated Fat',
-    (this.allTimeCarbsCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1) + '% ' + 'Carbohydrates'];
+    const doughnutChartLabels = [('🥩: ' + (this.allTimeProteinCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
+    ('🐖: ' + (this.allTimeUnsaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
+    ('🐖: ' + (this.allTimeSaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
+    ('🍞: ' + (this.allTimeCarbsCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%'];
 
-
-    
     const doughnutChartData = {
       labels: doughnutChartLabels,
       datasets: [{
@@ -275,30 +278,36 @@ export class TabAnalyticsPage {
         (this.allTimeUnsaturatedCalories / this.allTimeCaloriesCalculatedFromMacros),
         (this.allTimeSaturatedCalories / this.allTimeCaloriesCalculatedFromMacros),
         (this.allTimeCarbsCalories / this.allTimeCaloriesCalculatedFromMacros)],
-        backgroundColor: ['#00bdaa', '#400082', '#fe346e', '#f1e7b6'],
-        borderColor: ['#00bdaa', '#400082', '#fe346e', '#f1e7b6'],
-        borderWidth: 1    
+        backgroundColor: ['#400082', '#00bdaa', '#fe346e', '#f1e7b6'],
+        borderColor: ['#400082', '#00bdaa', '#fe346e', '#f1e7b6'],
+        borderWidth: 1,
+        clip: 0
       }]
     } as ChartData;
 
     const doughnutChartOptions = {
       responsive: true,
-      hover:{
-        mode: null      
+      hover: {
+        mode: null
       },
       plugins: {
-        tooltip:{
-          enabled:false
+        datalabels: {
+          display: true,
+          formatter: (value, context) => {
+            return context.chart.data.labels[context.dataIndex];
+          },
+          color: '#fff',
+          backgroundColor: '#696969',
+          font: {
+          }
+        },
+        tooltip: {
+          enabled: false
         },
         legend: {
-          fullSize:true,
-          responsive: true,
-          position: 'right',
-          maxWidth: 1920,
+          display: false,
           labels: {
-            textAlign: 'left',
             font: {
-              size: 13
             }
           }
         },
@@ -308,7 +317,7 @@ export class TabAnalyticsPage {
       }
     } as ChartOptions;
 
-    this.bars.push(new Chart(this.pieChartMacrosAllTime.nativeElement, {
+    this.bars.push(new Chart(this.doughnutChartMacros.nativeElement, {
       type: 'doughnut',
       data: doughnutChartData,
       options: doughnutChartOptions

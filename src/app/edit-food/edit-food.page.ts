@@ -75,8 +75,9 @@ export class EditFoodPage {
     await this.initialiseItems();
   }
 
-  ionViewWillLeave() {
+  async ionViewWillLeave() {
     console.log("leaving edit food page");
+    await this.closePopItems();
     this.isFormReadyToBuild = false;
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     this.unsubscribeNetwork();

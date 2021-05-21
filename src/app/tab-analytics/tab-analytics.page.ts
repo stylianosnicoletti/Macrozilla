@@ -265,10 +265,10 @@ export class TabAnalyticsPage {
 
 
     // Doughnut Chart
-    const doughnutChartLabels = [('🥩: ' + (this.allTimeProteinCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
-    ('🐖: ' + (this.allTimeUnsaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
-    ('🐖: ' + (this.allTimeSaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
-    ('🍞: ' + (this.allTimeCarbsCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%'];
+    const doughnutChartLabels = [('🥩 ' + (this.allTimeProteinCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
+    ('🐖 ' + (this.allTimeUnsaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
+    ('🐖 ' + (this.allTimeSaturatedCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%',
+    ('🍞 ' + (this.allTimeCarbsCalories * 100 / this.allTimeCaloriesCalculatedFromMacros).toFixed(1)) + '%'];
 
     const doughnutChartData = {
       labels: doughnutChartLabels,
@@ -286,7 +286,9 @@ export class TabAnalyticsPage {
     } as ChartData;
 
     const doughnutChartOptions = {
+      aspectRatio: 1.4, 
       responsive: true,
+      maintainAspectRatio: false,
       hover: {
         mode: null
       },

@@ -1,87 +1,102 @@
 <ion-app>
-  <ion-content>
   <ion-header translucent>
     <ion-toolbar>
       <ion-title>Daily Tracking</ion-title>
     </ion-toolbar>
   </ion-header>
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>
-          <strong>🔋{{ dailyEntry?.TotalCalories | number:'1.0-0' }} kcal</strong>
-        </ion-card-title>
-      </ion-card-header>
 
-      <ion-card-content>
-        <strong>
-          🥩
-          {{ dailyEntry?.TotalProteinGrams *4 / (dailyEntry?.TotalProteinGrams*4 + dailyEntry?.TotalCarbohydrateGrams*4
-          +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-          🍞
-          {{ dailyEntry?.TotalCarbohydrateGrams *4 / (dailyEntry?.TotalProteinGrams *4 +
-          dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-          🐖
-          {{ dailyEntry?.TotalFatGrams *9 / (dailyEntry?.TotalProteinGrams *4 + dailyEntry?.TotalCarbohydrateGrams*4
-          +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-          :
-          (
-          ✔️
-          {{ (dailyEntry?.TotalFatGrams-dailyEntry?.TotalSaturatedGrams ) * 9 / (dailyEntry?.TotalProteinGrams *4 +
-          dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-          ❌
-          {{ dailyEntry?.TotalSaturatedGrams *9 / (dailyEntry?.TotalProteinGrams *4 +
-          dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-          )
-        </strong>
-      </ion-card-content>
-    </ion-card>
-    <ion-card>
-      <ion-item>
-        <ion-label> Select Date</ion-label>
-        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date" (ionChange)="parseDate()" value={{date}}>
-        </ion-datetime>
-      </ion-item>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <strong>🔋{{ dailyEntry?.TotalCalories | number:'1.0-0' }} kcal</strong>
+      </ion-card-title>
+    </ion-card-header>
 
-    </ion-card>
+    <ion-card-content>
+      <strong>
+        🥩
+        {{ dailyEntry?.TotalProteinGrams *4 / (dailyEntry?.TotalProteinGrams*4 + dailyEntry?.TotalCarbohydrateGrams*4
+        +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
+        🍞
+        {{ dailyEntry?.TotalCarbohydrateGrams *4 / (dailyEntry?.TotalProteinGrams *4 +
+        dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
+        🐖
+        {{ dailyEntry?.TotalFatGrams *9 / (dailyEntry?.TotalProteinGrams *4 + dailyEntry?.TotalCarbohydrateGrams*4
+        +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
+        :
+        (
+        ✔️
+        {{ (dailyEntry?.TotalFatGrams-dailyEntry?.TotalSaturatedGrams ) * 9 / (dailyEntry?.TotalProteinGrams *4 +
+        dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
+        ❌
+        {{ dailyEntry?.TotalSaturatedGrams *9 / (dailyEntry?.TotalProteinGrams *4 +
+        dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
+        )
+      </strong>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-item>
+      <ion-label> Select Date</ion-label>
+      <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date" (ionChange)="parseDate()" value={{date}}>
+      </ion-datetime>
+    </ion-item>
+  </ion-card>
 
+  <ion-content>
+      <!-- Default Refresher -->
+      <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+    <ng-container
+    *ngIf="dailyEntry?.TotalCalories > 0; then showentries else nothingFound">
+  </ng-container>
 
-    <!-- Default Refresher -->
-    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-      <ion-refresher-content></ion-refresher-content>
-    </ion-refresher>
+    <!-- Skeleton: Nothing found -->
+    <ng-template #nothingFound>
+      <ion-card>
+        <ion-card-content>
+          There is no tracking activity yet for this date. 👨‍🍳 
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
 
-    <ion-list>
-      <ion-item-sliding *ngFor="let entry of dailyEntry?.Entries" #slidingItem>
-        <ion-item>
-          <ion-label class="ion-text-wrap">
-            <h2><strong>{{entry.Food.Name}}</strong></h2>
-            <h3>🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
-              {{entry.Food.Protein | number:'1.0-1' }}g 🍞
-              {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
-              {{entry.Food.Fats | number:'1.0-1' }}g</h3>
-          </ion-label>
-
-          <ion-chip slot="end" color="primary">
-            <strong>{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong>
-          </ion-chip>
-        </ion-item>
-        <ion-item-options side="end">
-          <ion-item-option color="danger" (click)="presentAlertConfirm(entry,slidingItem)">
-            <ion-icon name="trash"></ion-icon>
-            Delete
-          </ion-item-option>
-        </ion-item-options>
-      </ion-item-sliding>
-    </ion-list>
-
-    <!-- Fab placed to the bottom end -->
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button (click)="addNewEntry()">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
+    <!-- Skeleton: Showentries -->
+    <ng-template #showentries>
 
 
+      <ion-list>
+        <ion-item-sliding *ngFor="let entry of dailyEntry?.Entries" #slidingItem>
+          <ion-item>
+            <ion-label class="ion-text-wrap">
+              <h2><strong>{{entry.Food.Name}}</strong></h2>
+              <h3>🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
+                {{entry.Food.Protein | number:'1.0-1' }}g 🍞
+                {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
+                {{entry.Food.Fats | number:'1.0-1' }}g</h3>
+            </ion-label>
+
+            <ion-chip slot="end" color="primary">
+              <strong>{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong>
+            </ion-chip>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="presentAlertConfirm(entry,slidingItem)">
+              <ion-icon name="trash"></ion-icon>
+              Delete
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-list>
+
+      <!-- Fab placed to the bottom end -->
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button (click)="addNewEntry()">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+
+    </ng-template>
   </ion-content>
 </ion-app>

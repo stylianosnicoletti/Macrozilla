@@ -1,7 +1,7 @@
 <ion-app>
   <ion-header translucent>
     <ion-toolbar>
-      <ion-title>Details</ion-title>
+      <ion-title>Account</ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-content fullscreen>
@@ -10,6 +10,9 @@
         <ion-row>
           <ion-col>
             <ion-list>
+              <ion-list-header>
+                <ion-card-subtitle>Details</ion-card-subtitle>
+              </ion-list-header>
               <ion-item>
                 <ion-icon slot="start" name="person-circle-outline"></ion-icon>
                 <ion-label>{{userName}}</ion-label>
@@ -26,11 +29,8 @@
       </ion-grid>
 
     </ion-card>
-    &nbsp;
+  
 
-    <ion-toolbar>
-      <ion-title>Settings</ion-title>
-    </ion-toolbar>
     <ion-card>
       <ion-list>
         <ion-list-header>

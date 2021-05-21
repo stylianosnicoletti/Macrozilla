@@ -45,27 +45,24 @@
   </ion-card>
 
   <ion-content>
-      <!-- Default Refresher -->
-      <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-        <ion-refresher-content></ion-refresher-content>
-      </ion-refresher>
-    <ng-container
-    *ngIf="dailyEntry?.TotalCalories > 0; then showentries else nothingFound">
-  </ng-container>
+    <!-- Default Refresher -->
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+    <ng-container *ngIf="dailyEntry?.TotalCalories > 0; then showentries else nothingFound">
+    </ng-container>
 
     <!-- Skeleton: Nothing found -->
     <ng-template #nothingFound>
       <ion-card>
         <ion-card-content>
-          There is no tracking activity yet for this date. 👨‍🍳 
+          There is no tracking activity yet for this date. 👨‍🍳
         </ion-card-content>
       </ion-card>
     </ng-template>
 
     <!-- Skeleton: Showentries -->
     <ng-template #showentries>
-
-
       <ion-list>
         <ion-item-sliding *ngFor="let entry of dailyEntry?.Entries" #slidingItem>
           <ion-item>
@@ -89,14 +86,13 @@
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
-
-      <!-- Fab placed to the bottom end -->
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button (click)="addNewEntry()">
-          <ion-icon name="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
-
     </ng-template>
+
+    <!-- Fab placed to the bottom end -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button (click)="addNewEntry()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
   </ion-content>
 </ion-app>

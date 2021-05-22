@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { AddEntryPage } from './add-entry.page';
+import { AddEntryInputFormPage } from './add-entry-input-form.page';
 
 @NgModule({
   imports: [
@@ -13,10 +13,10 @@ import { AddEntryPage } from './add-entry.page';
     ReactiveFormsModule,
     RouterModule.forChild([{ 
       path: '',
-     component: AddEntryPage
+     component: AddEntryInputFormPage
      }
     ])
 ],
-  declarations: [AddEntryPage]
+  declarations: [AddEntryInputFormPage]
 })
-export class AddEntryPageModule {}
+export class AddEntryInputFormPageModule {}

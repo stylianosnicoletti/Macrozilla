@@ -116,11 +116,10 @@ export class EditFoodPage {
    */
   async foodExistGuard(): Promise<void> {
     this.foodDocId = this._activatedRoute.snapshot.params['food_doc_id'];
-    if ((await this._foodDatabaseService.doesFoodDocExists(this.foodDocId))) {
+    if ((await this._foodDatabaseService.doesPersonalFoodDocExists(this.foodDocId))) {
       this.isFormReadyToBuild = true;
     } else {
       this._router.navigate(["/tabs/foods_database"]);
-
     }
   }
 

@@ -286,7 +286,7 @@ export class TabAnalyticsPage {
     } as ChartData;
 
     const doughnutChartOptions = {
-      aspectRatio: 1.4, 
+      aspectRatio: 1.45, 
       responsive: true,
       maintainAspectRatio: false,
       hover: {

@@ -9,17 +9,17 @@ const routes: Routes = [
     path: 'login',
     // Remember to enter the guard to check if user is already logged in and redirect to tabs
     canActivate: [CanEnterLoginPageGuard],
-    loadChildren: './login/login.module#LoginPageModule'
+    loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)
   },
   // If user inserts /register in URL then do..
   {
     path: 'register',
-    loadChildren: './register/register.module#RegisterPageModule'
+    loadChildren: () => import('./register/register.module').then(m => m.RegisterPageModule)
   },
   // If user inserts /reset-password in URL then do..
   {
     path: 'reset_password',
-    loadChildren: './reset-password/reset-password.module#ResetPasswordPageModule'
+    loadChildren: () => import('./reset-password/reset-password.module').then(m => m.ResetPasswordPageModule)
   },
   // If user navigates to edit food page
   {

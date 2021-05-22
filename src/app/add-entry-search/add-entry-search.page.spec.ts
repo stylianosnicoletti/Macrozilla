@@ -1,19 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { AddEntryPage } from './add-entry.page';
+import { AddEntrySearchPage } from './add-entry-search.page';
 
-describe('AddEntryPage', () => {
-  let component: AddEntryPage;
-  let fixture: ComponentFixture<AddEntryPage>;
+describe('AddEntrySearchPage', () => {
+  let component: AddEntrySearchPage;
+  let fixture: ComponentFixture<AddEntrySearchPage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddEntryPage ],
+      declarations: [ AddEntrySearchPage ],
       imports: [IonicModule]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AddEntryPage);
+    fixture = TestBed.createComponent(AddEntrySearchPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

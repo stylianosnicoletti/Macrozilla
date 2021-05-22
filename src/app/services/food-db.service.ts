@@ -225,11 +225,11 @@ export class FoodDatabaseService {
   }
 
   /**
-   * Check to see if the food with that DocId already exist for that user
+   * Check to see if the food with that DocId already exists for that user
    * @param docId Document Id
    * @returns True if food document exists. False if food document does not exists.
    */
-  async doesFoodDocExists(docId: any): Promise<Boolean> {
+  async doesPersonalFoodDocExists(docId: any): Promise<Boolean> {
     // Current user id
     const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
 
@@ -244,7 +244,46 @@ export class FoodDatabaseService {
         }
       });
   }
-  
+
+  /**
+ * Get food with that DocId already exists in either Global or Personal Databases
+ * @param docId Document Id
+ * @returns Food if food document exists. Null if food document does not exists.
+ */
+  async getPersonalOrGlobalFoodDocExists(docId: any): Promise<Food> {
+    
+    // Current user id
+    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+
+    // Get food doc (global)
+    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/GlobalFoodDatabase/" + docId).get().toPromise()
+      .then(async docSnapshot => {
+        if (docSnapshot.exists) {
+          return <Food>{
+            DocumentId: docSnapshot.id,
+            IsFromPersonalDb: false,
+            ...docSnapshot.data()
+          }
+        }    
+        else {
+          // Get food doc (personal)
+          return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).get().toPromise()
+          .then(docSnapshot => {
+            if (docSnapshot.exists) {
+              return <Food>{
+                DocumentId: docSnapshot.id,
+                IsFromPersonalDb: false,
+                ...docSnapshot.data()
+              }
+            }
+            else {
+              return null;
+            }
+          });
+        }
+      });
+  }
+
 }
 
 

@@ -6,7 +6,7 @@ import { ToastService } from '../services/toast.service';
 import { Food } from '../models/food.model';
 import { ServingUnit } from '../models/servingUnit.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MyMacrosConstants } from '../my-macros-constants'
+import { MacrozillaConstants } from '../macrozilla-constants'
 import { PopoverController, IonInput, AlertController } from '@ionic/angular';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { GlobalVariablesService } from '../services/global-variables.service';
@@ -107,13 +107,13 @@ export class AddFoodPage {
   addFoodData(): void {
     this.addForm = this._formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]],
-      servingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
+      servingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MacrozillaConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
       servingUnit: ['', [Validators.required]],
-      protein: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
-      carbohydrates: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
-      fats: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
-      saturated: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
-      calories: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MyMacrosConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]]
+      protein: ['', [Validators.required, Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      carbohydrates: ['', [Validators.required, Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      fats: ['', [Validators.required, Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      saturated: ['', [Validators.required, Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
+      calories: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MacrozillaConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]]
     })
   }
 

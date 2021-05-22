@@ -1,6 +1,6 @@
 {
-  "appId": "io.ionic.mymacros",
-  "appName": "mymacros",
+  "appId": "io.ionic.macrozilla",
+  "appName": "macrozilla",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",

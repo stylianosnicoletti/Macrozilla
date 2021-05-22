@@ -43,7 +43,7 @@ export class DailyTrackingService {
        await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").add(entry);
     } else {
       // First Daily Entry
-      await this.setDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryAdd(null, consumedFood));
+      await this.setDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryAdd(null, consumedFood,selectedDate));
       // Add Entry
       await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").add(entry);
       // Increment size of collection
@@ -108,6 +108,7 @@ export class DailyTrackingService {
         withLatestFrom(entries$),
         map(([dailyEntry, entries]) => {
           return {
+            Date : dailyEntry?.Date,
             TotalCalories: dailyEntry?.TotalCalories,
             TotalFatGrams: dailyEntry?.TotalFatGrams,
             TotalSaturatedGrams: dailyEntry?.TotalSaturatedGrams,
@@ -120,6 +121,7 @@ export class DailyTrackingService {
       return dailyEntry$.pipe(
         map((dailyEntry: DailyEntry) => {
           return {
+            Date : dailyEntry?.Date,
             TotalCalories: dailyEntry?.TotalCalories,
             TotalFatGrams: dailyEntry?.TotalFatGrams,
             TotalSaturatedGrams: dailyEntry?.TotalSaturatedGrams,
@@ -149,6 +151,7 @@ export class DailyTrackingService {
     } else {
       return doc.pipe(map(c => ({
         DocumentId: c.id,
+        Date: c.data().Date,
         TotalCalories: c.data().TotalCalories,
         TotalFatGrams: c.data().TotalFatGrams,
         TotalSaturatedGrams: c.data().TotalSaturatedGrams,
@@ -215,11 +218,13 @@ export class DailyTrackingService {
    * Prepare an updated Daily Entry with the changes of the newly consumed food. If no currentDailyEntry is provided then current consumed food will only be used.
    * @param currentDailyEntry Current daily entry.
    * @param consumedFood Consumed Food added.
+   * @param selectedDate Needed when there is no current Daily Entry
    * @returns Updated Daily Entry.
    */
-  prepareUpdatedDailyEntryOnEntryAdd(currentDailyEntry: DailyEntry, consumedFood: Food): DailyEntry {
+  prepareUpdatedDailyEntryOnEntryAdd(currentDailyEntry: DailyEntry, consumedFood: Food, selectedDate?: string): DailyEntry {
     if (currentDailyEntry != null) {
       return {
+        Date: currentDailyEntry.Date,
         TotalCalories: currentDailyEntry.TotalCalories + consumedFood.Calories,
         TotalFatGrams: currentDailyEntry.TotalFatGrams + consumedFood.Fats,
         TotalSaturatedGrams: currentDailyEntry.TotalSaturatedGrams + consumedFood.Saturated,
@@ -228,6 +233,7 @@ export class DailyTrackingService {
       };
     } else {
       return {
+        Date: selectedDate,
         TotalCalories: consumedFood.Calories,
         TotalFatGrams: consumedFood.Fats,
         TotalSaturatedGrams: consumedFood.Saturated,
@@ -245,6 +251,7 @@ export class DailyTrackingService {
    */
   prepareUpdatedDailyEntryOnEntryDelete(currentDailyEntry: DailyEntry, consumedFood: Food): DailyEntry {
     return {
+      Date: currentDailyEntry.Date,
       TotalCalories: currentDailyEntry.TotalCalories - consumedFood.Calories,
       TotalFatGrams: currentDailyEntry.TotalFatGrams - consumedFood.Fats,
       TotalSaturatedGrams: currentDailyEntry.TotalSaturatedGrams - consumedFood.Saturated,

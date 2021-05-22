@@ -1,33 +1,26 @@
 <ion-header>
 
-  <ion-toolbar *ngIf="!isListHidden">
+  <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button (click)="goToDailyEntryTab()"></ion-back-button>
+      <ion-back-button defaultHref="tabs/daily_entry"></ion-back-button>
     </ion-buttons>
-    <ion-title *ngIf="!isListHidden">New Daily Entry</ion-title>
-  </ion-toolbar>
-
-  <ion-toolbar *ngIf="!isFormHidden">
-    <ion-buttons slot="start">
-      <ion-back-button (click)="goToSearchList()"></ion-back-button>
-    </ion-buttons>
-    <ion-title *ngIf="!isFormHidden">{{food.Name}}</ion-title>
+    <ion-title> New Daily Entry</ion-title>
   </ion-toolbar>
 
 </ion-header>
 
 <!-- Searchbar with cancel button shown on focus -->
-<ion-searchbar *ngIf="!isListHidden" debounce="380" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
+<ion-searchbar debounce="380" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
 </ion-searchbar>
 
 <ion-content>
 
   <!-- Default Refresher -->
-  <ion-refresher *ngIf="!isListHidden" slot="fixed" (ionRefresh)="doRefresh($event)">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div *ngIf="!isListHidden">
+  <div>
     <!-- Normal screen -->
     <ion-list *ngIf="searchTerm.length == 0; then viewIntroMessage else beginSearch">
       <!-- Skeleton in here-->
@@ -75,7 +68,7 @@
       </ion-item>
     </ng-template>
 
-    <!-- Skeleton dummy screen -->
+    <!-- Skeleton Loading screen -->
     <ng-template #loading>
       <ion-list>
         <ion-item>
@@ -125,58 +118,6 @@
       </ion-card>
     </ng-template>
 
-  </div>
-
-  <div *ngIf="!isFormHidden">
-    <form [formGroup]="addEntryForm" (ngSubmit)="submitForm()" novalidate>
-      <ion-item-divider>
-        <ion-label>Nutritional Information (Per {{food.ServingAmount}}{{food.ServingUnitShortCode}})</ion-label>
-      </ion-item-divider>
-      <ion-card>
-        <ion-list>
-
-          <ion-item disabled>
-            <ion-label>🔋 {{food.Calories}} kcal</ion-label>
-          </ion-item>
-          <ion-item disabled>
-            <ion-label>🐖 {{food.Fats | number:'.1'}}g 🍞 {{food.Carbohydrates |
-              number:'.1'}}g 🥩 {{food.Protein | number:'.1'}}g</ion-label>
-          </ion-item>
-        </ion-list>
-      </ion-card>
-
-
-      <ion-item-divider>
-        <ion-label>Enter Consumed Amount</ion-label>
-      </ion-item-divider>
-
-      <ion-card>
-        <ion-item>
-          <ion-label position="floating">{{food.ServingUnit}}</ion-label>
-          <ion-input formControlName="qty" type="text" inputmode="numeric"
-            (ionChange)="prepareConsumedFood($event.target.value)" #qtyInput></ion-input>
-        </ion-item>
-      </ion-card>
-
-      <ion-card>
-        <ion-list>
-          <ion-item disabled>
-            <ion-label>🔋 {{consumedFood.Calories | number:'1.0-0'}} kcal</ion-label>
-          </ion-item>
-          <ion-item disabled>
-            <ion-label>🐖 {{consumedFood.Fats | number:'.1'}}g 🍞 {{consumedFood.Carbohydrates |
-              number:'.1'}}g 🥩 {{consumedFood.Protein | number:'.1'}}g</ion-label>
-          </ion-item>
-        </ion-list>
-      </ion-card>
-      <ion-row>
-        <ion-col>
-          <ion-button type="submit" color="danger" expand="block">Submit</ion-button>
-        </ion-col>
-      </ion-row>
-
-
-    </form>
   </div>
 
 </ion-content>

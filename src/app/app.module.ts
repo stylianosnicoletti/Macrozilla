@@ -16,7 +16,6 @@ import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import { Network } from '@ionic-native/network/ngx';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
-import 'chartjs-plugin-zoom';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
@@ -30,7 +29,6 @@ import { ServiceWorkerModule } from '@angular/service-worker';
             BrowserModule,
             IonicModule.forRoot(),
             AppRoutingModule,
-            ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
             ServiceWorkerModule.register('ngsw-worker.js', {
               enabled: environment.production,
               // Register the ServiceWorker as soon as the app is stable

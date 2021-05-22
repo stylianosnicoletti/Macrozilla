@@ -139,7 +139,7 @@ export class TabDailyEntryPage {
    * Add New Entry
    */
   async addNewEntry(): Promise<void> {
-    await this._router.navigate(["/add_entry/" + this.date]);
+    await this._router.navigate(["/add_entry_search/" + this.date]);
   }
 
 }

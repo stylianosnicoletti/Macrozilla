@@ -1,4 +1,4 @@
-# MyMacros
+# Macrozilla
 
 To Run Web Version
 -------------------
@@ -31,7 +31,7 @@ To Run Andoid Version NEW
 * run app in Android Studio
 
 Development Environment in Windows
-------------------------
+----------------------------------
 * Configure Ubuntu WSL on Windows 
 * Add Remote-WSL on VSCode
 * Install Nodejs and npm using: https://github.com/nodesource/distributions/blob/master/README.md
@@ -40,7 +40,7 @@ Development Environment in Windows
 * Use Remote-WSL and bash for development
 * ionic serve --external (use external ip not local since local fails ERR_CONNECTION_REFUSED)
 
-Deployment Fireabse
+Deployment Firebase
 -------------------
 * Use guide: https://ionicframework.com/docs/angular/pwa
 * sudo npm install -g firebase-tools

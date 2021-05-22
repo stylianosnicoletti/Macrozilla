@@ -9,17 +9,17 @@ const routes: Routes = [
     path: 'login',
     // Remember to enter the guard to check if user is already logged in and redirect to tabs
     canActivate: [CanEnterLoginPageGuard],
-    loadChildren: './login/login.module#LoginPageModule'
+    loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)
   },
   // If user inserts /register in URL then do..
   {
     path: 'register',
-    loadChildren: './register/register.module#RegisterPageModule'
+    loadChildren: () => import('./register/register.module').then(m => m.RegisterPageModule)
   },
   // If user inserts /reset-password in URL then do..
   {
     path: 'reset_password',
-    loadChildren: './reset-password/reset-password.module#ResetPasswordPageModule'
+    loadChildren: () => import('./reset-password/reset-password.module').then(m => m.ResetPasswordPageModule)
   },
   // If user navigates to edit food page
   {
@@ -27,15 +27,23 @@ const routes: Routes = [
     canActivate: [CanEnterTabsPageGuard],
     loadChildren: () => import('./edit-food/edit-food.module').then(m => m.EditFoodPageModule)
   },
+  // If user navigates to add food page
   {
     path: 'add_food',
     canActivate: [CanEnterTabsPageGuard],
     loadChildren: () => import('./add-food/add-food.module').then(m => m.AddFoodPageModule)
   },
+  // If user navigates to add entry search page
   {
-    path: 'add_entry/:date_selected',
+    path: 'add_entry_search/:date_selected',
     canActivate: [CanEnterTabsPageGuard],
-    loadChildren: () => import('./add-entry/add-entry.module').then(m => m.AddEntryPageModule)
+    loadChildren: () => import('./add-entry-search/add-entry-search.module').then(m => m.AddEntrySearchPageModule)
+  },
+  // If user navigates to add entry input form page
+  {
+    path: 'add_entry_input_form/:date_selected/:food_doc_id',
+    canActivate: [CanEnterTabsPageGuard],
+    loadChildren: () => import('./add-entry-input-form/add-entry-input-form.module').then(m => m.AddEntryInputFormPageModule)
   },
   {
     canActivate: [CanEnterTabsPageGuard],

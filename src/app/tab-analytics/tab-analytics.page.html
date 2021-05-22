@@ -4,12 +4,12 @@
       <ion-title>Analytics</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-content fullscreen>
+
     <ng-container
     *ngIf="minDaysThatCanBeRetrieved < 1; then nothingFound else analytics">
   </ng-container>
 
-  </ion-content>
+
 </ion-app>
 
 
@@ -24,6 +24,7 @@
 
 <!-- Skeleton: Analytics -->
 <ng-template #analytics>
+  
   <ion-card style="text-align: center;">
     <ion-card-header>
       <ion-card-subtitle><strong>Select Range:</strong> Last {{lastDaysToRetrieve}} days</ion-card-subtitle>
@@ -34,32 +35,27 @@
       </ion-range>
     </ion-card-header>
   </ion-card>
+  <ion-content>
 
-  <ion-grid>
-    <ion-row>
-
-      <ion-col col-12 col-md-6 col-lg-4 col-xl-3>
         <ion-card style="text-align: center;">
           <ion-card-header>
             <ion-card-subtitle><strong>Average Calories:</strong> {{allTimeAverageCalories}} kcal</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
-            <canvas #lineChartCaloriesAllTime></canvas>
+            <canvas #lineChartCalories></canvas>
           </ion-card-content>
         </ion-card>
-      </ion-col>
+   
 
-      <ion-col col-12 col-md-6 col-lg-4 col-xl-3>
         <ion-card style="text-align: center;">
           <ion-card-header>
             <ion-card-subtitle><strong>Average Macro Ratio</strong></ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
-            <canvas #pieChartMacrosAllTime></canvas>
+            <canvas #doughnutChartMacros></canvas>
           </ion-card-content>
         </ion-card>
-      </ion-col>
-
-    </ion-row>
-  </ion-grid>
+     
+      </ion-content>
+  
 </ng-template>

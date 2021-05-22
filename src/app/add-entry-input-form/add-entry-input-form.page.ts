@@ -10,7 +10,7 @@ import { FoodDatabaseService } from '../services/food-db.service';
 import { UserService } from '../services/user.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { Entry } from '../models/dailyEntry';
-import { MyMacrosConstants } from '../my-macros-constants';
+import { MacrozillaConstants } from '../macrozilla-constants';
 import { GlobalVariablesService } from '../services/global-variables.service';
 import { ServingUnit } from '../models/servingUnit.model';
 import { DailyTrackingService } from '../services/daily-tracking.service';
@@ -108,7 +108,7 @@ export class AddEntryInputFormPage {
 
     // Check date
     this.date = this._activatedRoute.snapshot.params['date_selected'];
-    if (MyMacrosConstants.REGEX_DATE.test(this.date)) {
+    if (MacrozillaConstants.REGEX_DATE.test(this.date)) {
       this.defaultBackNoHistory = "add_entry_search/" + this.date;
       // Check food doc id
       this.foodDocId = this._activatedRoute.snapshot.params['food_doc_id'];
@@ -168,7 +168,7 @@ export class AddEntryInputFormPage {
    **/
   addEntryData(): void {
     this.addEntryForm = this._formBuilder.group({
-      qty: ['', [Validators.required, Validators.pattern(MyMacrosConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]]
+      qty: ['', [Validators.required, Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]]
     })
   }
 
@@ -193,7 +193,7 @@ export class AddEntryInputFormPage {
    * @param qty Input
    */
   prepareConsumedFood(qty: string): void {
-    if (MyMacrosConstants.REGEX_DECIMAL_PATTERN.test(qty)) {
+    if (MacrozillaConstants.REGEX_DECIMAL_PATTERN.test(qty)) {
       this.consumedFood.Calories = this.food.Calories * Number(qty) / this.food.ServingAmount;
       this.consumedFood.Fats = this.food.Fats * Number(qty) / this.food.ServingAmount;
       this.consumedFood.Saturated = this.food.Saturated * Number(qty) / this.food.ServingAmount;

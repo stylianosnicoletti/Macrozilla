@@ -23,9 +23,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: sudo npm install -g @ionic/cli
+    #- run: sudo npm install -g @ionic/cli
     #- run: sudo npm install -g @angular/cli
-    - name: npm install, ionic build production
+    - name: npm install, npm run build
       run: |
         npm install
         npm run build
@@ -46,7 +46,7 @@ jobs:
         with:
           name: www
           path: www
-      - name: Depoy to Firebase
+      - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
           args: deploy --only hosting

@@ -224,11 +224,13 @@ export class TabAnalyticsPage {
         pointBackgroundColor: '#7f88d5',
         backgroundColor: '#7FB3D5',
         borderWidth: 3,
+        pointBorderWidth: 5,
         tension: 0.3
       }]
     } as ChartData;
 
     const lineChartOptions = {
+      aspectRatio: 2.5, 
       plugins: {
         datalabels: {
           display: false

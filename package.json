@@ -1,6 +1,6 @@
 {
-  "name": "mymacros",
-  "version": "0.0.2",
+  "name": "macrozilla",
+  "version": "0.0.3",
   "author": "Stelios Nicoletti",
   "scripts": {
     "ng": "ng",

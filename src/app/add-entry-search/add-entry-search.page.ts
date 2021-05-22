@@ -7,7 +7,7 @@ import { Food } from '../models/food.model';
 import { FoodDatabaseService } from '../services/food-db.service';
 import { UserService } from '../services/user.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
-import { MyMacrosConstants } from '../my-macros-constants';
+import { MacrozillaConstants } from '../macrozilla-constants';
 
 @Component({
   selector: 'app-add-entry-search',
@@ -107,7 +107,7 @@ export class AddEntrySearchPage {
   // Check if the route param key matches a date
   enterGuard() {
     this.date = this._activatedRoute.snapshot.params['date_selected'];
-    if (!MyMacrosConstants.REGEX_DATE.test(this.date)) this._router.navigate(["/tabs/daily_entry"]);
+    if (!MacrozillaConstants.REGEX_DATE.test(this.date)) this._router.navigate(["/tabs/daily_entry"]);
   }
 
   // No network alert

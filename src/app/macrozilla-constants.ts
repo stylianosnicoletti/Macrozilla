@@ -1,4 +1,4 @@
-export const MyMacrosConstants = {
+export const MacrozillaConstants = {
   /**
    * @returns {RegExp} /^(\d*\.)?\d+$/
    */

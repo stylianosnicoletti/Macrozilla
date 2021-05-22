@@ -29,7 +29,6 @@ import { ServiceWorkerModule } from '@angular/service-worker';
             BrowserModule,
             IonicModule.forRoot(),
             AppRoutingModule,
-            ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
             ServiceWorkerModule.register('ngsw-worker.js', {
               enabled: environment.production,
               // Register the ServiceWorker as soon as the app is stable

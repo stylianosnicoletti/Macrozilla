@@ -23,12 +23,12 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    #- run: sudo npm install -g @ionic/cli
+    - run: sudo npm install -g @ionic/cli
     #- run: sudo npm install -g @angular/cli
     - name: npm install, npm run build
       run: |
         npm install
-        npm run build
+        ionic build --prod
     - name: Archive Build
       uses: actions/upload-artifact@v2
       with:

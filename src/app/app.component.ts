@@ -25,11 +25,12 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      console.log("Platform: " +Capacitor.getPlatform());
+      console.log("Platform: " + Capacitor.getPlatform());
       if (Capacitor.isNativePlatform()) {
         console.log("Is Native");
-        StatusBar.show();
         SplashScreen.hide();
+        StatusBar.show();
+
       }
     });
   }

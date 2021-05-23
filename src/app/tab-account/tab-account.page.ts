@@ -3,8 +3,9 @@ import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { AlertController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
-import { Network } from '@ionic-native/network/ngx';
+import { Network } from '@capacitor/network';
 import { User, Options } from '../models/user.model';
+import { UnsubscribeService } from '../services/unsubscribe.service';
 
 @Component({
   selector: 'app-tab-account',
@@ -28,29 +29,31 @@ export class TabAccountPage {
     private _authService: AuthService,
     private _userService: UserService,
     private _alertController: AlertController,
-    private _network: Network) {
+    private _unsubscribeService: UnsubscribeService) {
   }
   async ionViewWillEnter() {
 
     console.log("entering account page");
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this.unsubscribeData();
-      await this.presentNetworkAlert();
-      console.log('network was disconnected :-(');
-      if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
-    });
 
-    this.connectSubscription = this._network.onConnect().subscribe(async () => {
-      this.unsubscribeData();
-      await this.initialiseItems();
-      console.log('network connected!');
+    Network.addListener('networkStatusChange', async status => {
+      if (status.connected) {
+        console.log('Network connected!');
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        await this.initialiseItems();
+      }
+      else {
+        console.log('Network disconnected!');
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        await this.presentNetworkAlert();
+      }
     });
-
+    
     await this.initialiseItems();
   }
 
   ionViewWillLeave() {
-    this.unsubscribeData();
+    this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+    Network.removeAllListeners();
     console.log("leaving acount page");
   }
 
@@ -145,15 +148,5 @@ export class TabAccountPage {
       buttons: ['OK']
     });
     await alert.present();
-  }
-
-  /**
-  * Unsubscribes all subscriptions initiated in this tab.
-  */
-  unsubscribeData(): void {
-    this.subscriptionsList.forEach(item => {
-      if (!item.closed) item.unsubscribe();
-    })
-    this.subscriptionsList = [];
   }
 }

@@ -11,6 +11,7 @@ import { PopoverController, IonInput, AlertController } from '@ionic/angular';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { GlobalVariablesService } from '../services/global-variables.service';
 import { UserService } from '../services/user.service';
+import { Network } from '@capacitor/network';
 
 @Component({
   selector: 'app-add-food',
@@ -58,7 +59,22 @@ export class AddFoodPage {
   */
   ionViewWillEnter() {
     console.log("entering add food page");
-    this.setFocus();
+
+    Network.addListener('networkStatusChange', async status => {
+      if (status.connected) {
+        console.log('Network connected!');
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        await this.initialiseItems();
+      }
+      else {
+        console.log('Network disconnected!');
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        //don't alert cz inherits from mother page
+        this.goToFoodsDatabaseTab()     
+      }
+    });
+    
+    this.initialiseItems();
   }
 
   /**
@@ -74,6 +90,7 @@ export class AddFoodPage {
   * Initialises Items. (E.g. Serving Units)
   */
   initialiseItems(): void {
+    this.setFocus();
     this.subscriptionsList.push(
       this._globalVariableService.getServingUnits().subscribe(res => {
         console.log(res);

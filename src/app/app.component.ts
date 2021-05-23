@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { StatusBar } from '@capacitor/status-bar';
 import { Subscription } from 'rxjs';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { Capacitor } from '@capacitor/core';
@@ -18,8 +18,6 @@ export class AppComponent {
 
   constructor(
     private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
     private _angularFireDatabase: AngularFireDatabase) {
     this.initializeApp();
     this.initializePauseResumeSubscriptions();
@@ -27,11 +25,11 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      console.log("Platform: " +Capacitor.platform);
-      if (Capacitor.isNative) {
+      console.log("Platform: " +Capacitor.getPlatform());
+      if (Capacitor.isNativePlatform()) {
         console.log("Is Native");
-        this.statusBar.show();
-        this.splashScreen.hide();
+        StatusBar.show();
+        SplashScreen.hide();
       }
     });
   }

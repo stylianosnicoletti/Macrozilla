@@ -1,8 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AlertController } from '@ionic/angular';
-import { Network } from '@ionic-native/network/ngx';
-import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
+import { Network } from '@capacitor/network';
 import { AnalyticsService } from '../services/analytics.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { UserService } from '../services/user.service';
@@ -68,8 +67,6 @@ export class TabAnalyticsPage {
     private _analyticsService: AnalyticsService,
     private _userService: UserService,
     private _alertController: AlertController,
-    private _network: Network,
-    private _screenOrientation: ScreenOrientation,
     private _unsubscribeService: UnsubscribeService) {
     Chart.register(
       ArcElement,
@@ -100,24 +97,17 @@ export class TabAnalyticsPage {
 
   async ionViewWillEnter() {
     console.log("entering analytics page");
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-      await this.presentNetworkAlert();
-      console.log('network was disconnected :-(');
-    });
-
-    this.connectSubscription = this._network.onConnect().subscribe(() => {
-      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-      this.initialiseItems();
-      console.log('network connected!');
-    });
-
-    this.screenOrientationSubscription = this._screenOrientation.onChange().subscribe(() => {
-      console.log("Orientation Changed");
-      this.ionViewWillLeave();
-      //need to find a better way
-      //now am enabling portrain only from android manifest
-      //location.reload();
+    Network.addListener('networkStatusChange', async status => {
+      if (status.connected) {
+        console.log('Network connected!');
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        this.initialiseItems();
+      }
+      else {
+        console.log('Network disconnected!');
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        await this.presentNetworkAlert();   
+      }
     });
     await this.initialiseItems();
   }
@@ -125,17 +115,7 @@ export class TabAnalyticsPage {
   ionViewWillLeave() {
     console.log("leaving analytics page");
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-    this.unsubscribeNetwork();
-    this.unsubscribeOrientation();
-  }
-
-  unsubscribeNetwork() {
-    if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
-    if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
-  }
-
-  unsubscribeOrientation() {
-    if (!this.screenOrientationSubscription.closed) this.screenOrientationSubscription.unsubscribe();
+    Network.removeAllListeners();
   }
 
   async initialiseItems() {

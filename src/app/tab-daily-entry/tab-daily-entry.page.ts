@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AlertController } from '@ionic/angular';
 import { LoadingService } from '../services/loading.service';
-import { Network } from '@ionic-native/network/ngx'
+import { Network } from '@capacitor/network';
 import { DailyEntry, Entry } from '../models/dailyEntry';
 import { DailyTrackingService } from '../services/daily-tracking.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
@@ -28,37 +28,32 @@ export class TabDailyEntryPage {
     private _loadingService: LoadingService,
     private _dailyTrackingService: DailyTrackingService,
     private _alertController: AlertController,
-    private _network: Network,
     private _unsubscribeService: UnsubscribeService) {
   }
 
   async ionViewWillEnter() {
     console.log("entering daily entries page");
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-      await this.presentNetworkAlert();
-      console.log('network was disconnected :-(');
-      if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
-    });
 
-    this.connectSubscription = this._network.onConnect().subscribe(async () => {
-      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-      await this.initialiseItems();
-      console.log('network connected!');
+    Network.addListener('networkStatusChange', async status => {
+      if (status.connected) {
+        console.log('Network connected!');
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        await this.initialiseItems();
+      }
+      else {
+        console.log('Network disconnected!');
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        await this.presentNetworkAlert();      
+      }
     });
-
+    
     await this.initialiseItems();
   }
 
   ionViewWillLeave() {
     console.log("leaving daily entries page");
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-    this.unsubscribeNetwork();
-  }
-
-  unsubscribeNetwork() {
-    if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
-    if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
+    Network.removeAllListeners();
   }
 
   async initialiseItems() {

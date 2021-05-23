@@ -8,14 +8,8 @@ import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { GooglePlus } from '@ionic-native/google-plus/ngx';
-import { NativeStorage } from '@ionic-native/native-storage/ngx';
-import { Network } from '@ionic-native/network/ngx';
-import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
@@ -36,12 +30,6 @@ import { ServiceWorkerModule } from '@angular/service-worker';
               registrationStrategy: 'registerWhenStable:30000'
             })],
   providers: [
-    StatusBar,
-    GooglePlus,
-    NativeStorage,
-    Network,
-    ScreenOrientation,
-    SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

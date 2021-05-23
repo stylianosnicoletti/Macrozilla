@@ -1,8 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgZone } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AngularFireDatabase } from '@angular/fire/database';
 import {  Subject } from 'rxjs';
@@ -10,7 +8,7 @@ import {  Subject } from 'rxjs';
 describe('AppComponent', () => {
 
   let statusBarSpy;
-  let splashScreenSpy;
+  //let splashScreenSpy;
   let platformReadySpy;
   let platformPauseResumeSubject: Subject<void>;
   let platformSpy;
@@ -19,8 +17,8 @@ describe('AppComponent', () => {
   let angularFireDatabaseSpy;
 
   beforeEach((() => {
-    statusBarSpy = jasmine.createSpyObj('StatusBar', ['styleDefault']);
-    splashScreenSpy = jasmine.createSpyObj('SplashScreen', ['hide']);
+    //statusBarSpy = jasmine.createSpyObj('StatusBar', ['styleDefault']);
+    //splashScreenSpy = jasmine.createSpyObj('SplashScreen', ['hide']);
     platformReadySpy = Promise.resolve();
     platformPauseResumeSubject =  new Subject();
     platformSpy = jasmine.createSpyObj('Platform',
@@ -34,8 +32,8 @@ describe('AppComponent', () => {
       declarations: [AppComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        { provide: StatusBar, useValue: statusBarSpy },
-        { provide: SplashScreen, useValue: splashScreenSpy },
+        //{ provide: StatusBar, useValue: statusBarSpy },
+        //{ provide: SplashScreen, useValue: splashScreenSpy },
         { provide: Platform, useValue: platformSpy },
         { provide: AngularFireDatabase, useValue: angularFireDatabaseSpy }
       ],
@@ -52,8 +50,8 @@ describe('AppComponent', () => {
     TestBed.createComponent(AppComponent);
     expect(platformSpy.ready).toHaveBeenCalled();
     await platformReadySpy;
-    expect(statusBarSpy.styleDefault).toHaveBeenCalled();
-    expect(splashScreenSpy.hide).toHaveBeenCalled();
+    //expect(statusBarSpy.styleDefault).toHaveBeenCalled();
+    //expect(splashScreenSpy.hide).toHaveBeenCalled();
   });
 
   // TODO: add more tests!

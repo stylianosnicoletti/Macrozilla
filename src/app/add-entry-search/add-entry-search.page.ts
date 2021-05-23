@@ -1,7 +1,7 @@
 import { Component, Renderer2 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { combineLatest, Subscription } from 'rxjs';
-import { Network } from '@ionic-native/network/ngx'
+import { Network } from '@capacitor/network';
 import { AlertController } from '@ionic/angular';
 import { Food } from '../models/food.model';
 import { FoodDatabaseService } from '../services/food-db.service';
@@ -37,7 +37,6 @@ export class AddEntrySearchPage {
     private _foodDatabaseService: FoodDatabaseService,
     private _unSubscribeService: UnsubscribeService,
     private _userService: UserService,
-    private _network: Network,
     private _alertController: AlertController,
     private _renderer: Renderer2) {
   }
@@ -52,23 +51,24 @@ export class AddEntrySearchPage {
   async ionViewWillEnter() {
     console.log("entering add entry search page");
 
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
-      this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
-      this.searchTerm = "";
-      // Don't alert becuase daily entry tabs page will do that
-      console.log('network was disconnected :-(');
-      await this.goToDailyEntryTab();
+    Network.addListener('networkStatusChange', async status => {
+      if (status.connected) {
+        console.log('Network connected!');
+        this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+        this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
+        await this.initialiseItems();
+        this.searchTerm = "";       
+      }
+      else {
+        console.log('Network disconnected!');
+        this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+        this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
+        this.searchTerm = "";
+        await this.goToDailyEntryTab();
+        
+      }
     });
-
-    this.connectSubscription = this._network.onConnect().subscribe(async () => {
-      this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
-      this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
-      await this.initialiseItems();
-      this.searchTerm = "";
-      console.log('network connected!');
-    });
-
+    
     await this.initialiseItems();
   }
 
@@ -76,12 +76,7 @@ export class AddEntrySearchPage {
     console.log("leaving add entry search page");
     this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
     this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
-    this.unsubscribeNetwork();
-  }
-
-  unsubscribeNetwork() {
-    if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
-    if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
+    Network.removeAllListeners();
   }
 
   /**

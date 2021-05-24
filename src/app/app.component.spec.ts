@@ -2,7 +2,6 @@ import { CUSTOM_ELEMENTS_SCHEMA, NgZone } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Platform } from '@ionic/angular';
 import { AppComponent } from './app.component';
-import { AngularFireDatabase } from '@angular/fire/database';
 import {  Subject } from 'rxjs';
 
 describe('AppComponent', () => {
@@ -12,9 +11,7 @@ describe('AppComponent', () => {
   let platformReadySpy;
   let platformPauseResumeSubject: Subject<void>;
   let platformSpy;
-  let angularFireDatabaseGoOfflineSpy;
-  let angularFireDatabaseGoOnlineSpy;
-  let angularFireDatabaseSpy;
+
 
   beforeEach((() => {
     //statusBarSpy = jasmine.createSpyObj('StatusBar', ['styleDefault']);
@@ -24,9 +21,7 @@ describe('AppComponent', () => {
     platformSpy = jasmine.createSpyObj('Platform',
                   {ready: platformReadySpy},
                   {pause: platformPauseResumeSubject.asObservable(), resume: platformPauseResumeSubject.asObservable() });
-    angularFireDatabaseGoOfflineSpy = jasmine.any;
-    angularFireDatabaseGoOnlineSpy = jasmine.any;
-    angularFireDatabaseSpy = jasmine.createSpyObj('AngularFireDatabase.database', { goOffline: angularFireDatabaseGoOfflineSpy, goOnline: angularFireDatabaseGoOnlineSpy});
+
 
     TestBed.configureTestingModule({
       declarations: [AppComponent],
@@ -34,8 +29,7 @@ describe('AppComponent', () => {
       providers: [
         //{ provide: StatusBar, useValue: statusBarSpy },
         //{ provide: SplashScreen, useValue: splashScreenSpy },
-        { provide: Platform, useValue: platformSpy },
-        { provide: AngularFireDatabase, useValue: angularFireDatabaseSpy }
+        { provide: Platform, useValue: platformSpy }
       ],
     }).compileComponents();
   }));

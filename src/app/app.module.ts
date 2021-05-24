@@ -4,7 +4,6 @@ import { RouteReuseStrategy } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule} from '@angular/fire/auth';
-import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -17,7 +16,6 @@ import { ServiceWorkerModule } from '@angular/service-worker';
   entryComponents: [],
   imports: [AngularFireModule.initializeApp(environment.firebase),
             AngularFireAuthModule,
-            AngularFireDatabaseModule,
             AngularFirestoreModule,
             HttpClientModule,
             BrowserModule,
@@ -34,5 +32,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+  
+}
 

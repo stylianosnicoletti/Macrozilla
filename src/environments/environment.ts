@@ -3,11 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  appVersion: require('../../package.json').version,
   production: false,
   firebase: {
     apiKey: "AIzaSyB3ZV0ywK9bv1hZn1oEoJaBtwJ7wVT2CEk",
     authDomain: "themacrodiet-s.firebaseapp.com",
-    databaseURL: "https://themacrodiet-s.firebaseio.com",
+    databaseURL: "https://macrozilla-maintenance.europe-west1.firebasedatabase.app",
     projectId: "themacrodiet-s",
     storageBucket: "themacrodiet-s.appspot.com",
     messagingSenderId: "399063775779",

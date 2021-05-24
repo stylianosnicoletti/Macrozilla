@@ -51,6 +51,7 @@ export class LoginPage implements OnInit {
    */
   ionViewWillEnter() {
     console.log("Entering login page");
+    // Android hardware back button actions 
     App.addListener('backButton', data => {
       App.exitApp();
     });

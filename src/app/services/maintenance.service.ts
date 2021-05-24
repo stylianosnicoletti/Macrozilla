@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { Maintenance } from '../models/maintenance.model';
 
 @Injectable({
@@ -9,15 +9,23 @@ import { Maintenance } from '../models/maintenance.model';
 export class MaintenanceService {
 
   constructor(
-    private _angularFireStore: AngularFirestore) { }
+    private _angularFireDatabase: AngularFireDatabase) { }
 
   /**
-   * Get maintenance document.
-   * @returns Observable of Maintenance.
+   * Get Maintenance values for Android
+   * @returns Maintenance Observable
    */
-  async getMaintenance(): Promise<Observable<Maintenance>> {
-
-    return this._angularFireStore.doc<Maintenance>("/TheMacroDiet/Production/Configuration/Maintenance").valueChanges();
+  async getMaintenanceAndroid(): Promise<Observable<Maintenance>> {
+    const fireObjectMaintenance = this._angularFireDatabase.object<Maintenance>('/Android');
+    return await fireObjectMaintenance.valueChanges();
   }
 
+    /**
+   * Get Maintenance values for Web
+   * @returns Maintenance Observable
+   */
+     async getMaintenanceWeb(): Promise<Observable<Maintenance>> {
+      const fireObjectMaintenance = this._angularFireDatabase.object<Maintenance>('/Web');
+      return await fireObjectMaintenance.valueChanges();
+    }
 }

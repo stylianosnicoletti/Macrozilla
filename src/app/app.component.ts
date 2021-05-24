@@ -3,8 +3,10 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar } from '@capacitor/status-bar';
 import { Subscription } from 'rxjs';
-import { AngularFireDatabase } from '@angular/fire/database';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
+import { environment } from '../environments/environment';
+import { MaintenanceService } from '../app/services/maintenance.service';
 
 @Component({
   selector: 'app-root',
@@ -17,33 +19,60 @@ export class AppComponent {
   platformResumeSubsciption: Subscription;
 
   constructor(
-    private platform: Platform,
-    private _angularFireDatabase: AngularFireDatabase) {
-    this.initializeApp();
+    private _platform: Platform,
+    private _maintenanceService: MaintenanceService) {
     this.initializePauseResumeSubscriptions();
+    this.initializeApp();
   }
 
   initializeApp() {
-    this.platform.ready().then(() => {
-      console.log("Platform: " + Capacitor.getPlatform());
+    this._platform.ready().then(async () => {
+
+      const platform = Capacitor.getPlatform();
+
+      // Native Platform (Android/iOS)
       if (Capacitor.isNativePlatform()) {
         console.log("Is Native");
         SplashScreen.hide();
         StatusBar.show();
-
+        // Android Platform
+        if (platform == 'android') {
+          console.log("Is Android");
+          App.getInfo().then(e => console.log("Current Version: " + e.version));
+          await (await this._maintenanceService.getMaintenanceAndroid()).subscribe(r => {
+            console.log(r.Enabled);
+            console.log(r.EnabledMessage);
+            console.log(r.UpdateLatestMajor);
+            console.log(r.UpdateMessage);
+            console.log(r.UpdateUrl);
+          });
+        }
+      } else {
+        // Web Platform
+        if (platform == 'web') {
+          console.log("Is Web");
+          console.log("Current Version: " + environment.appVersion);
+          //this._platform.platforms.getInfo().then(e => console.log("Current Version: " + e.version));
+          await (await this._maintenanceService.getMaintenanceWeb()).subscribe(r => {
+            console.log(r.Enabled);
+            console.log(r.EnabledMessage);
+            console.log(r.UpdateLatestMajor);
+            console.log(r.UpdateMessage);
+            console.log(r.UpdateUrl);
+          });
+        }
       }
     });
   }
 
   initializePauseResumeSubscriptions() {
-    this.platformPauseSubsciption = this.platform.pause.subscribe(async () => {
+    this.platformPauseSubsciption = this._platform.pause.subscribe(async () => {
       console.log('paused!');
 
     });
 
-    this.platformResumeSubsciption = this.platform.resume.subscribe(async () => {
-      this._angularFireDatabase.database.goOffline();
-      this._angularFireDatabase.database.goOnline();
+    this.platformResumeSubsciption = this._platform.resume.subscribe(async () => {
+
       console.log('resumed!');
     });
   }

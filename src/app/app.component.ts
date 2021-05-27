@@ -44,7 +44,7 @@ export class AppComponent {
             appVersionAndroid = e.version;
           });
           await (await this._maintenanceService.getMaintenanceAndroid()).subscribe(async maintenance => {
-            await this._maintenanceService.checkForUpdateOrAvailabilityWeb(appVersionAndroid, maintenance);
+            await this._maintenanceService.checkForUpdateOrAvailabilityAndroid(appVersionAndroid, maintenance);
           });
         }
       } else {

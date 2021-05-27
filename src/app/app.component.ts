@@ -38,13 +38,13 @@ export class AppComponent {
         // Android Platform
         if (platform == 'android') {
           console.log("Is Android");
-          App.getInfo().then(e => console.log("Current Version: " + e.version));
-          await (await this._maintenanceService.getMaintenanceAndroid()).subscribe(r => {
-            console.log(r.Enabled);
-            console.log(r.EnabledMessage);
-            console.log(r.UpdateLatestMajor);
-            console.log(r.UpdateMessage);
-            console.log(r.UpdateUrl);
+          let appVersionAndroid: string;
+          App.getInfo().then(e => {
+            console.log("Current Version: " + e.version);
+            appVersionAndroid = e.version;
+          });
+          await (await this._maintenanceService.getMaintenanceAndroid()).subscribe(async maintenance => {
+            await this._maintenanceService.checkForUpdateOrAvailabilityWeb(appVersionAndroid, maintenance);
           });
         }
       } else {
@@ -52,13 +52,8 @@ export class AppComponent {
         if (platform == 'web') {
           console.log("Is Web");
           console.log("Current Version: " + environment.appVersion);
-          //this._platform.platforms.getInfo().then(e => console.log("Current Version: " + e.version));
-          await (await this._maintenanceService.getMaintenanceWeb()).subscribe(r => {
-            console.log(r.Enabled);
-            console.log(r.EnabledMessage);
-            console.log(r.UpdateLatestMajor);
-            console.log(r.UpdateMessage);
-            console.log(r.UpdateUrl);
+          await (await this._maintenanceService.getMaintenanceWeb()).subscribe(async maintenance => {
+            await this._maintenanceService.checkForUpdateOrAvailabilityWeb(environment.appVersion, maintenance);
           });
         }
       }

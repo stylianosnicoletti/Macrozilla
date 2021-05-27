@@ -35,7 +35,7 @@ export class MaintenanceService {
 
   /**
    * Checks if there is an update and displace the corresponding alert for Android.
-   * @param currentVersion Current Android version (E.g. 1.00) (1: Major, 0: Minor, 0: Patch)
+   * @param currentVersion Current Android version (E.g. 1.000) (1: Major, 0: Minor, 00: Patch)
    * @param latestMaintenanceSettings Latest Maintenance object for Android
    * @returns Present the corresponding alert
    */

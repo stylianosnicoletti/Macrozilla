@@ -4,6 +4,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { Maintenance } from '../models/maintenance.model';
 import { AlertController } from '@ionic/angular';
 import { SwUpdate } from '@angular/service-worker';
+import { App } from '@capacitor/app';
 
 @Injectable({
   providedIn: 'root'
@@ -42,10 +43,24 @@ export class MaintenanceService {
   async checkForUpdateOrAvailabilityAndroid(currentVersion: string, latestMaintenanceSettings: Maintenance): Promise<void> {
     // App unavailable
     if (!latestMaintenanceSettings.Enabled) {
+      // Maintenance site
+      // TODO
+
+      // Android hardware back button actions 
+      App.addListener('backButton', data => {
+        App.exitApp();
+      });
       return this.presentAlertUnavailableWeb(latestMaintenanceSettings.EnabledMessage);
     }
     // Check Major
     if (Number.parseInt(currentVersion[0]) < Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[0])) {
+      // Maintenance site
+      // TODO
+
+      // Android hardware back button actions 
+      App.addListener('backButton', data => {
+        App.exitApp();
+      });
       return this.presentAlertMajorUpdateAndroid(latestMaintenanceSettings.UpdateMessageMajor, latestMaintenanceSettings.UpdateUrl);
     }
     // Check Minor
@@ -63,10 +78,14 @@ export class MaintenanceService {
   async checkForUpdateOrAvailabilityWeb(currentVersion: string, latestMaintenanceSettings: Maintenance): Promise<void> {
     // App unavailable
     if (!latestMaintenanceSettings.Enabled) {
+      // Maintenance site & no back button 
+      // TODO
       return this.presentAlertUnavailableWeb(latestMaintenanceSettings.EnabledMessage);
     }
     // Check Major
     if (Number.parseInt(currentVersion[0]) < Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[0])) {
+      // Maintenance site & no back button 
+      // TODO
       return this.presentAlertMajorUpdateWeb(latestMaintenanceSettings.UpdateMessageMajor);
     }
     // Check Minor
@@ -100,6 +119,7 @@ export class MaintenanceService {
           text: 'Update',
           handler: () => {
             window.location.href = updateUrl;
+            return false;
           }
         }
       ]

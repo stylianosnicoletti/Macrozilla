@@ -28,6 +28,7 @@ export class TabFoodsDatabasePage {
   personalDbSearchExecutionInProcess: boolean = false;
   globalDbSearchExecutionInProcess: boolean = false;
   loadingFlag: boolean = false;
+  lastNetworkStatusIsConnected = true;
 
   constructor
     (
@@ -47,15 +48,17 @@ export class TabFoodsDatabasePage {
     console.log("entering foods dbs page");
 
     Network.addListener('networkStatusChange', async status => {
-      if (status.connected) {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
         console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
         await this.initialiseItems();
         this.searchTerm = "";
       }
-      else {
+      else if(!status.connected) {
         console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
         this.searchTerm = "";

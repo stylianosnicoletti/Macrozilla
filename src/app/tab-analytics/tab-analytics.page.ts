@@ -62,6 +62,7 @@ export class TabAnalyticsPage {
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
   screenOrientationSubscription: Subscription;
+  lastNetworkStatusIsConnected = true;
 
   constructor(
     private _analyticsService: AnalyticsService,
@@ -98,13 +99,15 @@ export class TabAnalyticsPage {
   async ionViewWillEnter() {
     console.log("entering analytics page");
     Network.addListener('networkStatusChange', async status => {
-      if (status.connected) {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
         console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         this.initialiseItems();
       }
-      else {
+      else if(!status.connected) {
         console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.presentNetworkAlert();   
       }

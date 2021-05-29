@@ -30,6 +30,7 @@ export class EditFoodPage {
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
   isFormReadyToBuild = false;
+  lastNetworkStatusIsConnected = true;
 
   constructor(
     private _router: Router,
@@ -59,14 +60,16 @@ export class EditFoodPage {
     console.log("entering edit food page");
     
     Network.addListener('networkStatusChange', async status => {
-      if (status.connected) {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
         console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
         this.isFormReadyToBuild = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.initialiseItems();
       }
-      else {
+      else if(!status.connected) {
         console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         //don't alert cz inherits from mother page
         this.goToFoodsDatabaseTab()     
@@ -212,7 +215,7 @@ export class EditFoodPage {
     this.food = this.fillFood(this.editForm.value);
 
     // Saturated Fats Check
-    if (this.food.Saturated > this.food.Fats) {
+    if (!this.fatDifferenceCheckPassed(this.food.Fats, this.food.Saturated)) {
       await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
       return false;
     }
@@ -220,6 +223,20 @@ export class EditFoodPage {
     await this.presentAlertConfirmEdit(this.food);
 
   }
+
+    /**
+   * Fat difference check.
+   * @param fats Fats
+   * @param satFats Saturated Fats
+   * @returns True when passes validation.
+   */
+     fatDifferenceCheckPassed(fats: number, satFats: number): boolean {
+      console.log((fats - satFats) > 0);
+      if ((fats - satFats) > 0) {
+        return true;
+      }
+      return false;
+    }
 
   /**
    * Delete Confirmation Alert

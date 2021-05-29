@@ -19,6 +19,7 @@ export class TabAccountPage {
   userName: string;
   darkMode: boolean;
   useOnlyPersonalDb: string;
+  lastNetworkStatusIsConnected = true;
 
 
   subscriptionsList: Subscription[] = [];
@@ -36,13 +37,15 @@ export class TabAccountPage {
     console.log("entering account page");
 
     Network.addListener('networkStatusChange', async status => {
-      if (status.connected) {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
         console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.initialiseItems();
       }
-      else {
+      else if(!status.connected) {
         console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.presentNetworkAlert();
       }

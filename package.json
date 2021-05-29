@@ -1,6 +1,6 @@
 {
   "name": "macrozilla",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Stelios Nicoletti",
   "scripts": {
     "ng": "ng",

@@ -1,5 +1,7 @@
 import { Component, Renderer2 } from '@angular/core';
 import { UserService } from '../services/user.service';
+import { App } from '@capacitor/app';
+
 
 @Component({
   selector: 'app-tabs',
@@ -28,6 +30,10 @@ export class TabsPage {
    */
   async ionViewWillEnter() {
     console.log("Entering Tabs Common page.");
+    // Android hardware back button actions 
+    App.addListener('backButton', data => {
+      App.exitApp();
+    });
   }
 
   /**
@@ -44,6 +50,7 @@ export class TabsPage {
 
   ionViewWillLeave() {
     console.log("Leaving Tabs Common page.");
+    App.removeAllListeners();
   }
 }
 

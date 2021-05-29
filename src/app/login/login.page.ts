@@ -3,6 +3,7 @@ import { Validators, FormBuilder, FormGroup, FormControl } from '@angular/forms'
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../services/toast.service';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-login',
@@ -43,6 +44,22 @@ export class LoginPage implements OnInit {
         Validators.required
       ])),
     });
+  }
+
+  /**
+   * Will be triggered, if you come back to a page.
+   */
+  ionViewWillEnter() {
+    console.log("Entering login page");
+    // Android hardware back button actions 
+    App.addListener('backButton', data => {
+      App.exitApp();
+    });
+  }
+
+  ionViewWillLeave() {
+    console.log("leaving login page");
+    App.removeAllListeners();
   }
 
   async tryLogin(value) {

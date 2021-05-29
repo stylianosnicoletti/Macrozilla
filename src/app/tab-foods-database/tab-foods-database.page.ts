@@ -4,7 +4,7 @@ import { Food } from '../models/food.model';
 import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { LoadingService } from '../services/loading.service';
-import { Network } from '@ionic-native/network/ngx';
+import { Network } from '@capacitor/network';
 import { FoodDatabaseService } from '../services/food-db.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { UserService } from '../services/user.service';
@@ -28,6 +28,7 @@ export class TabFoodsDatabasePage {
   personalDbSearchExecutionInProcess: boolean = false;
   globalDbSearchExecutionInProcess: boolean = false;
   loadingFlag: boolean = false;
+  lastNetworkStatusIsConnected = true;
 
   constructor
     (
@@ -35,7 +36,6 @@ export class TabFoodsDatabasePage {
       private _loadingService: LoadingService,
       private _router: Router,
       private _alertController: AlertController,
-      private _network: Network,
       private _unSubscribeService: UnsubscribeService,
       private _userService: UserService) {
   }
@@ -46,22 +46,26 @@ export class TabFoodsDatabasePage {
 
   async ionViewWillEnter() {
     console.log("entering foods dbs page");
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
-      this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
-      this.searchTerm = "";
-      await this.presentNetworkAlert();
-      console.log('network was disconnected :-(');
-    });
 
-    this.connectSubscription = this._network.onConnect().subscribe(async () => {
-      this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
-      this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
-      await this.initialiseItems();
-      this.searchTerm = "";
-      console.log('network connected!');
+    Network.addListener('networkStatusChange', async status => {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
+        console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
+        this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+        this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
+        await this.initialiseItems();
+        this.searchTerm = "";
+      }
+      else if(!status.connected) {
+        console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
+        this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+        this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
+        this.searchTerm = "";
+        await this.presentNetworkAlert();     
+      }
     });
-
+    
     await this.initialiseItems();
   }
 
@@ -69,12 +73,7 @@ export class TabFoodsDatabasePage {
     console.log("leaving foods dbs page");
     this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
     this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
-    this.unsubscribeNetwork();
-  }
-
-  unsubscribeNetwork() {
-    if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
-    if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
+    Network.removeAllListeners();
   }
 
   /**

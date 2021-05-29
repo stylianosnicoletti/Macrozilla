@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { StatusBar } from '@capacitor/status-bar';
 import { Subscription } from 'rxjs';
-import { AngularFireDatabase } from '@angular/fire/database';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
+import { environment } from '../environments/environment';
+import { MaintenanceService } from '../app/services/maintenance.service';
 
 @Component({
   selector: 'app-root',
@@ -17,34 +19,55 @@ export class AppComponent {
   platformResumeSubsciption: Subscription;
 
   constructor(
-    private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
-    private _angularFireDatabase: AngularFireDatabase) {
-    this.initializeApp();
+    private _platform: Platform,
+    private _maintenanceService: MaintenanceService) {
     this.initializePauseResumeSubscriptions();
+    this.initializeApp();
   }
 
   initializeApp() {
-    this.platform.ready().then(() => {
-      console.log("Platform: " +Capacitor.platform);
-      if (Capacitor.isNative) {
+    this._platform.ready().then(async () => {
+
+      const platform = Capacitor.getPlatform();
+
+      // Native Platform (Android/iOS)
+      if (Capacitor.isNativePlatform()) {
         console.log("Is Native");
-        this.statusBar.show();
-        this.splashScreen.hide();
+        SplashScreen.hide();
+        StatusBar.show();
+        // Android Platform
+        if (platform == 'android') {
+          console.log("Is Android");
+          let appVersionAndroid: string;
+          App.getInfo().then(e => {
+            console.log("Current Version: " + e.version);
+            appVersionAndroid = e.version;
+          });
+          await (await this._maintenanceService.getMaintenanceAndroid()).subscribe(async maintenance => {
+            await this._maintenanceService.checkForUpdateOrAvailabilityAndroid(appVersionAndroid, maintenance);
+          });
+        }
+      } else {
+        // Web Platform
+        if (platform == 'web') {
+          console.log("Is Web");
+          console.log("Current Version: " + environment.appVersion);
+          await (await this._maintenanceService.getMaintenanceWeb()).subscribe(async maintenance => {
+            await this._maintenanceService.checkForUpdateOrAvailabilityWeb(environment.appVersion, maintenance);
+          });
+        }
       }
     });
   }
 
   initializePauseResumeSubscriptions() {
-    this.platformPauseSubsciption = this.platform.pause.subscribe(async () => {
+    this.platformPauseSubsciption = this._platform.pause.subscribe(async () => {
       console.log('paused!');
 
     });
 
-    this.platformResumeSubsciption = this.platform.resume.subscribe(async () => {
-      this._angularFireDatabase.database.goOffline();
-      this._angularFireDatabase.database.goOnline();
+    this.platformResumeSubsciption = this._platform.resume.subscribe(async () => {
+
       console.log('resumed!');
     });
   }

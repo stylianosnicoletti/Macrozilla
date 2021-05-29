@@ -4,7 +4,7 @@ import { FoodDatabaseService } from '../services/food-db.service';
 import { ToastService } from '../services/toast.service';
 import { Subscription } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Network } from '@ionic-native/network/ngx'
+import { Network } from '@capacitor/network'
 import { AlertController, PopoverController } from '@ionic/angular';
 import { MacrozillaConstants } from '../macrozilla-constants';
 import { Food } from '../models/food.model';
@@ -30,6 +30,7 @@ export class EditFoodPage {
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
   isFormReadyToBuild = false;
+  lastNetworkStatusIsConnected = true;
 
   constructor(
     private _router: Router,
@@ -39,7 +40,6 @@ export class EditFoodPage {
     private _globalVariableService: GlobalVariablesService,
     private _userService: UserService,
     private _renderer: Renderer2,
-    private _network: Network,
     private _unsubscribeService: UnsubscribeService,
     private _alertController: AlertController,
     private _toastService: ToastService,
@@ -58,20 +58,24 @@ export class EditFoodPage {
 
   async ionViewWillEnter() {
     console.log("entering edit food page");
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(() => {
-      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-      //don't alert cz inherits from mother page
-      console.log('network was disconnected :-(');
-      this.goToFoodsDatabaseTab()
+    
+    Network.addListener('networkStatusChange', async status => {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
+        console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
+        this.isFormReadyToBuild = false;
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        await this.initialiseItems();
+      }
+      else if(!status.connected) {
+        console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
+        this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+        //don't alert cz inherits from mother page
+        this.goToFoodsDatabaseTab()     
+      }
     });
-
-    this.connectSubscription = this._network.onConnect().subscribe(async () => {
-      this.isFormReadyToBuild = false;
-      this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-      await this.initialiseItems();
-      console.log('network connected!');
-    });
-
+    
     await this.initialiseItems();
   }
 
@@ -80,15 +84,7 @@ export class EditFoodPage {
     await this.closePopItems();
     this.isFormReadyToBuild = false;
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
-    this.unsubscribeNetwork();
-  }
-
-  /**
-   * Unsubscribe network.
-   */
-  unsubscribeNetwork(): void {
-    if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
-    if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
+    Network.removeAllListeners();
   }
 
   /**
@@ -219,7 +215,7 @@ export class EditFoodPage {
     this.food = this.fillFood(this.editForm.value);
 
     // Saturated Fats Check
-    if (this.food.Saturated > this.food.Fats) {
+    if (!this.fatDifferenceCheckPassed(this.food.Fats, this.food.Saturated)) {
       await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
       return false;
     }
@@ -227,6 +223,20 @@ export class EditFoodPage {
     await this.presentAlertConfirmEdit(this.food);
 
   }
+
+    /**
+   * Fat difference check.
+   * @param fats Fats
+   * @param satFats Saturated Fats
+   * @returns True when passes validation.
+   */
+     fatDifferenceCheckPassed(fats: number, satFats: number): boolean {
+      console.log((fats - satFats) > 0);
+      if ((fats - satFats) > 0) {
+        return true;
+      }
+      return false;
+    }
 
   /**
    * Delete Confirmation Alert

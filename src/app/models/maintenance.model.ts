@@ -3,35 +3,18 @@
  */
 export interface Maintenance {
 
-    Android: Android;
+    Enabled: boolean;
 
-    Web: Web;
-}
+    EnabledMessage: string;
+    /**
+     * Latest Android version (E.g. 2.130) -> (2: Major, 1: Minor, 30: Patch).
+     * Latest Web version (E.g. 2.1.3) -> (2: Major, 1: Minor, 3: Patch)
+     */
+    UpdateLatestVersion: string;
 
-export interface Android {
+    UpdateMessageMajor: string;
 
-    Availability: Availability
+    UpdateMessageMinor: string;
 
-    Updates: Updates
-}
-
-export interface Web {
-
-    Availability: Availability
-}
-
-export interface Updates {
-
-    LatestMajorVersion: number,
-
-    Message: string,
-
-    Url: string
-}
-
-export interface Availability {
-
-    EnableApp: boolean,
-
-    Message: string
+    UpdateUrl?: string;
 }

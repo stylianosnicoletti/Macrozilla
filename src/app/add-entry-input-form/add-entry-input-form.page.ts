@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastService } from '../services/toast.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Network } from '@ionic-native/network/ngx'
+import { Network } from '@capacitor/network'
 import { AlertController, IonInput } from '@ionic/angular';
 import { Food } from '../models/food.model';
 import { FoodDatabaseService } from '../services/food-db.service';
@@ -38,6 +38,7 @@ export class AddEntryInputFormPage {
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
   isFormReadyToBuild = false;
+  lastNetworkStatusIsConnected = true;
 
   constructor(
     private _router: Router,
@@ -49,7 +50,6 @@ export class AddEntryInputFormPage {
     private _unSubscribeService: UnsubscribeService,
     private _userService: UserService,
     private _toastService: ToastService,
-    private _network: Network,
     private _alertController: AlertController,
     private _renderer: Renderer2) {
   }
@@ -64,20 +64,23 @@ export class AddEntryInputFormPage {
   async ionViewWillEnter() {
     console.log("entering add entry input form page");
 
-    this.disconnectSubscription = this._network.onDisconnect().subscribe(async () => {
-      this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
-      // Don't alert becuase daily entry tabs page will do that
-      console.log('network was disconnected :-(');
-      await this.goToDailyEntryTab();
+    Network.addListener('networkStatusChange', async status => {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
+        console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
+        this.isFormReadyToBuild = false;
+        this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+        await this.initialiseItems();
+      }
+      else if(!status.connected) {
+        console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
+        this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
+        // Don't alert becuase daily entry tabs page will do that
+        await this.goToDailyEntryTab();   
+      }
     });
-
-    this.connectSubscription = this._network.onConnect().subscribe(async () => {
-      this.isFormReadyToBuild = false;
-      this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
-      await this.initialiseItems();
-      console.log('network connected!');
-    });
-
+    
     await this.initialiseItems();
   }
 
@@ -85,12 +88,7 @@ export class AddEntryInputFormPage {
     console.log("leaving add entry input form page");
     this.isFormReadyToBuild = false;
     this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
-    this.unsubscribeNetwork();
-  }
-
-  unsubscribeNetwork() {
-    if (!this.connectSubscription.closed) this.connectSubscription.unsubscribe();
-    if (!this.disconnectSubscription.closed) this.disconnectSubscription.unsubscribe();
+    Network.removeAllListeners();
   }
 
   /**

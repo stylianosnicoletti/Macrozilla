@@ -30,6 +30,7 @@ export class AddEntrySearchPage {
   loadingFlag: boolean = false;
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
+  lastNetworkStatusIsConnected = true;
 
   constructor(
     private _router: Router,
@@ -52,15 +53,17 @@ export class AddEntrySearchPage {
     console.log("entering add entry search page");
 
     Network.addListener('networkStatusChange', async status => {
-      if (status.connected) {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
         console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
         await this.initialiseItems();
         this.searchTerm = "";       
       }
-      else {
+      else if(!status.connected) {
         console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
         this.searchTerm = "";

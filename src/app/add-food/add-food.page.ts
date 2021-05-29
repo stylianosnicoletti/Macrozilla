@@ -28,6 +28,7 @@ export class AddFoodPage {
   isSubmitted = false;
   servingUnits: ServingUnit[];
   subscriptionsList: Subscription[] = [];
+  lastNetworkStatusIsConnected = true;
 
   constructor(
     private _router: Router,
@@ -61,19 +62,21 @@ export class AddFoodPage {
     console.log("entering add food page");
 
     Network.addListener('networkStatusChange', async status => {
-      if (status.connected) {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
         console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.initialiseItems();
       }
-      else {
+      else if(!status.connected) {
         console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         //don't alert cz inherits from mother page
-        this.goToFoodsDatabaseTab()     
+        this.goToFoodsDatabaseTab()
       }
     });
-    
+
     this.initialiseItems();
   }
 
@@ -158,7 +161,7 @@ export class AddFoodPage {
     console.log(this.food);
 
     // Saturated Fats Check
-    if (this.food.Saturated > this.food.Fats) {
+    if (!this.fatDifferenceCheckPassed(this.food.Fats, this.food.Saturated)) {
       await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
       return false;
     }
@@ -169,6 +172,19 @@ export class AddFoodPage {
     await this._toastService.presentToast('Food Successfully Added');
   }
 
+  /**
+   * Fat difference check.
+   * @param fats Fats
+   * @param satFats Saturated Fats
+   * @returns True when passes validation.
+   */
+  fatDifferenceCheckPassed(fats: number, satFats: number): boolean {
+    console.log((fats - satFats) > 0);
+    if ((fats - satFats) > 0) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * No network alert

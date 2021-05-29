@@ -38,6 +38,7 @@ export class AddEntryInputFormPage {
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
   isFormReadyToBuild = false;
+  lastNetworkStatusIsConnected = true;
 
   constructor(
     private _router: Router,
@@ -64,14 +65,16 @@ export class AddEntryInputFormPage {
     console.log("entering add entry input form page");
 
     Network.addListener('networkStatusChange', async status => {
-      if (status.connected) {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
         console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
         this.isFormReadyToBuild = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         await this.initialiseItems();
       }
-      else {
+      else if(!status.connected) {
         console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         // Don't alert becuase daily entry tabs page will do that
         await this.goToDailyEntryTab();   

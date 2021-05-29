@@ -21,6 +21,7 @@ export class TabDailyEntryPage {
   subscriptionsList: Subscription[] = [];
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
+  lastNetworkStatusIsConnected = true;
 
   constructor(
     private _router: Router,
@@ -35,13 +36,15 @@ export class TabDailyEntryPage {
     console.log("entering daily entries page");
 
     Network.addListener('networkStatusChange', async status => {
-      if (status.connected) {
+      if (status.connected && !this.lastNetworkStatusIsConnected) {
         console.log('Network connected!');
+        this.lastNetworkStatusIsConnected = true;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.initialiseItems();
       }
-      else {
+      else if(!status.connected) {
         console.log('Network disconnected!');
+        this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.presentNetworkAlert();      
       }

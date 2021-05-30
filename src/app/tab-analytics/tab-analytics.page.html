@@ -5,8 +5,7 @@
     </ion-toolbar>
   </ion-header>
 
-    <ng-container
-    *ngIf="minDaysThatCanBeRetrieved < 1; then nothingFound else analytics">
+  <ng-container *ngIf="minDaysThatCanBeRetrieved < 1; then nothingFound else analytics">
   </ng-container>
 
 
@@ -15,19 +14,20 @@
 
 <!-- Skeleton: Nothing found -->
 <ng-template #nothingFound>
-  <ion-card>
-    <ion-card-content>
-      There is no tracking activity yet to prepare analytics. 🥺
-    </ion-card-content>
-  </ion-card>
+  <ion-content>
+    <ion-card>
+      <ion-card-content>
+        There is no tracking activity yet to prepare analytics. 🥺
+      </ion-card-content>
+    </ion-card>
+  </ion-content>
 </ng-template>
 
 <!-- Skeleton: Analytics -->
 <ng-template #analytics>
-  
   <ion-card style="text-align: center;">
     <ion-card-header>
-      <ion-card-subtitle><strong>Select Range:</strong> Last {{lastDaysToRetrieve}} days</ion-card-subtitle>
+      <ion-card-subtitle><strong>Selected Range:</strong> Last {{lastDaysToRetrieve}} tracked days</ion-card-subtitle>
       <ion-range [min]="minDaysThatCanBeRetrieved" [max]="maxDaysThatCanBeRetrieved" debounce="350"
         [(ngModel)]="lastDaysToRetrieve" (ionChange)="selectedRange()" pin color="primary">
         <ion-badge slot="start"><strong>Last Day</strong></ion-badge>
@@ -37,25 +37,25 @@
   </ion-card>
   <ion-content>
 
-        <ion-card style="text-align: center;">
-          <ion-card-header>
-            <ion-card-subtitle><strong>Average Calories:</strong> {{allTimeAverageCalories}} kcal</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <canvas #lineChartCalories></canvas>
-          </ion-card-content>
-        </ion-card>
-   
+    <ion-card style="text-align: center;">
+      <ion-card-header>
+        <ion-card-subtitle><strong>Average Calories:</strong> {{allTimeAverageCalories}} kcal</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <canvas #lineChartCalories></canvas>
+      </ion-card-content>
+    </ion-card>
 
-        <ion-card style="text-align: center;">
-          <ion-card-header>
-            <ion-card-subtitle><strong>Average Macro Ratio</strong></ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <canvas #doughnutChartMacros></canvas>
-          </ion-card-content>
-        </ion-card>
-     
-      </ion-content>
-  
+
+    <ion-card style="text-align: center;">
+      <ion-card-header>
+        <ion-card-subtitle><strong>Average Macro Ratio</strong></ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <canvas #doughnutChartMacros></canvas>
+      </ion-card-content>
+    </ion-card>
+
+  </ion-content>
+
 </ng-template>

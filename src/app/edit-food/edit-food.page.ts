@@ -231,8 +231,7 @@ export class EditFoodPage {
    * @returns True when passes validation.
    */
      fatDifferenceCheckPassed(fats: number, satFats: number): boolean {
-      console.log((fats - satFats) > 0);
-      if ((fats - satFats) > 0) {
+      if ((fats - satFats) >= 0) {
         return true;
       }
       return false;

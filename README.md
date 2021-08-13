@@ -16,20 +16,20 @@ Native and web app experience.
 ## Features
 
 - __Authentication__:
--- Register
--- Login
--- Confirm email
--- Recover password
+    - Register
+    - Login
+    - Confirm email
+    - Recover password
 - __Track daily food__
 - __Analytics__
--- Average macro ratio
--- Average calories
+    - Average macro ratio
+    - Average calories
 - __Food database__
--- Use publicly available food database
--- Add/Edit/Delete your own private foods
+    - Use publicly available food database
+    - Add/Edit/Delete your own private foods
 - __Theme__
--- Dark
--- Light
+    - Dark
+    - Light
 
 ## Technologies
 

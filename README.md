@@ -55,7 +55,7 @@ Dillinger uses a number of open source projects to work properly:
     </tr>
     <tr>
       <td valign="top"><img src="https://play-lh.googleusercontent.com/n_3FkddolO2IGn9hT921NGWky_s8zlPY-_EHIfNSaboawmXFP88ZbdS0THtgD80b9dM=w1904-h1764-rw" width="156" height="300"></td>
-    <td valign="top"><img src="https://play-lh.googleusercontent.com/QGWeQ-OB-QCGNLsbl2xkMKFSRbYligNXPwaL0FYeMj1PiFOg1Klo0Ttlh2V7rH-4CbI=w1904-h1764-rw" width="156" height="400"></td>
+    <td valign="top"><img src="https://play-lh.googleusercontent.com/QGWeQ-OB-QCGNLsbl2xkMKFSRbYligNXPwaL0FYeMj1PiFOg1Klo0Ttlh2V7rH-4CbI=w1904-h1764-rw" width="156" height="300"></td>
       </tr>
     <tr>
         <td valign="top"><img src="https://play-lh.googleusercontent.com/E6u5D_XtKu6dQNyoe7FV89W5j0orVSzuqRhHFuLu-3QUuTtj3ajI9Na1OiBr7XwCshrB=w1904-h1764-rw" width="156" height="300"></td>

@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Log In</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="form-content">
+  <form class="form" [formGroup]="validations_form" (ngSubmit)="tryLogin(validations_form.value)"
+    (keyup.enter)="tryLogin(validations_form.value)">
+    <ion-item>
+      <ion-label position="floating" color="primary">Email</ion-label>
+      <ion-input type="text" formControlName="email"></ion-input>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validation_messages.email">
+        <div class="error-message-email"
+          *ngIf="validations_form.get('email').hasError(validation.type) && (validations_form.get('email').dirty || validations_form.get('email').touched)">
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-item>
+      <ion-label position="floating" color="primary">Password</ion-label>
+      <ion-input type="password" formControlName="password"></ion-input>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validation_messages.password">
+        <div class="error-message-password"
+          *ngIf="validations_form.get('password').hasError(validation.type) && (validations_form.get('password').dirty || validations_form.get('password').touched)">
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-button class="email-log-in-button" expand="block" type="submit" [disabled]="!validations_form.valid">Log In
+    </ion-button>
+
+    <p class="go-to-forgot-password">
+      Forgot you password? <a (click)="goResetPasswordPage()">Recover it.</a>
+    </p>
+    <!--  <ion-button class="google-log-in-button" color="danger" expand="block" (click)="presentToast('Currently not available')">
+        LOG IN WITH GOOGLE
+    </ion-button>-->
+    <ion-button class="register-button" color="success" expand="block" (click)="goRegisterPage()">
+      REGISTER
+    </ion-button>
+    <label class="error-message-login">{{errorMessage}}</label>
+  </form>
+
+</ion-content>

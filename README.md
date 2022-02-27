@@ -8,7 +8,7 @@ Native and web app experience.
 
 | Application | URL |
 | ------ | ------ |
-| Web | https://themacrodiet-s.web.app |
+| Web | https://themacrozilla.com |
 | Android | https://play.google.com/store/apps/details?id=io.ionic.macrozilla |
 | iOS | Coming soon 🚧 |
 

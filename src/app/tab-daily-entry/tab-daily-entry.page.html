@@ -36,13 +36,26 @@
       </strong>
     </ion-card-content>
   </ion-card>
-  <ion-card>
+
+  <ion-card id="open-date-input">
     <ion-item>
-      <ion-label> Select Date</ion-label>
-      <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date" (ionChange)="parseDate()" value={{date}}>
-      </ion-datetime>
+      <ion-label>
+        Select Date:
+      </ion-label>
+      <ion-label slot="end">
+        {{ date }}
+      </ion-label>
     </ion-item>
   </ion-card>
+
+  <!-- Date Selection Pop Over -->
+  <ion-popover id="popover-bottom" size='cover' arrow='false' trigger="open-date-input" show-backdrop="true">
+    <ng-template>
+      <ion-datetime size='cover' showDefaultButtons='true' presentation='date' displayFormat="DD/MM/YYYY"
+        [(ngModel)]="date" (ionChange)="parseDate()" value={{date}}>
+      </ion-datetime>
+    </ng-template>
+  </ion-popover>
 
   <ion-content>
     <!-- Default Refresher -->

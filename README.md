@@ -39,4 +39,4 @@ Deployment Firebase
 * Set no cache for "ngsw-worker.js", etc in firabase.json
 * firebase login
 * firebase init hosting (follow steps and also create workflows for github)
-* firebase login:ci (To get token)
+* firebase login:ci (To get token) - You might need to update the ${{ secrets.FIREBASE_SERVICE_ACCOUNT_THEMACRODIET_S }} by rerunning this command if you face any issues with automatic deployment.

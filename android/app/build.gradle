@@ -6,8 +6,8 @@ android {
         applicationId "io.ionic.macrozilla"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName '1.100'
+        versionCode 3
+        versionName "1.250"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -47,5 +47,5 @@ try {
         apply plugin: 'com.google.gms.google-services'
     }
 } catch(Exception e) {
-    logger.warn("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }

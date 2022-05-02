@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AngularFireDatabase } from '@angular/fire/database';
+import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { Maintenance } from '../models/maintenance.model';
 import { AlertController } from '@ionic/angular';
 import { SwUpdate } from '@angular/service-worker';

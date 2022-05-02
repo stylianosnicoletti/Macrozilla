@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 import { Network } from '@capacitor/network'
 import { AlertController, IonInput } from '@ionic/angular';
 import { Food } from '../models/food.model';
-import { FoodDatabaseService } from '../services/food-db.service';
 import { UserService } from '../services/user.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { Entry } from '../models/dailyEntry';
@@ -16,23 +15,23 @@ import { ServingUnit } from '../models/servingUnit.model';
 import { DailyTrackingService } from '../services/daily-tracking.service';
 
 @Component({
-  selector: 'app-add-entry-input-form',
-  templateUrl: './add-entry-input-form.page.html',
-  styleUrls: ['./add-entry-input-form.page.scss'],
+  selector: 'app-edit-entry-input-form',
+  templateUrl: './edit-entry-input-form.page.html',
+  styleUrls: ['./edit-entry-input-form.page.scss'],
 })
 
-export class AddEntryInputFormPage {
+export class EditEntryInputFormPage {
 
   @ViewChild('qtyInput') qtyInput: IonInput;
 
   defaultBackNoHistory: string;
   date: string;
-  foodDocId: string;
+  entryDocId: string;
   food: Food;
   consumedFood: Food;
   servingUnitsMap = new Map<String, ServingUnit>();
   entry: Entry;
-  addEntryForm: FormGroup;
+  editEntryForm: FormGroup;
   isSubmitted = false;
   generalSubscriptionsList: Subscription[] = [];
   disconnectSubscription: Subscription;
@@ -45,7 +44,6 @@ export class AddEntryInputFormPage {
     private _formBuilder: FormBuilder,
     private _activatedRoute: ActivatedRoute,
     private _dailyTrackingService: DailyTrackingService,
-    private _foodDatabaseService: FoodDatabaseService,
     private _globalVariableService: GlobalVariablesService,
     private _unSubscribeService: UnsubscribeService,
     private _userService: UserService,
@@ -55,14 +53,14 @@ export class AddEntryInputFormPage {
   }
 
   async ngOnInit() {
-    console.log("ngOnInit Add New Daily Entry Input Form");
+    console.log("ngOnInit Edit Daily Entry Input Form");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });
   }
 
   async ionViewWillEnter() {
-    console.log("entering add entry input form page");
+    console.log("entering edit entry input form page");
 
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
@@ -85,7 +83,7 @@ export class AddEntryInputFormPage {
   }
 
   ionViewWillLeave() {
-    console.log("leaving add entry input form page");
+    console.log("leaving edit entry input form page");
     this.isFormReadyToBuild = false;
     this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
     Network.removeAllListeners();
@@ -96,7 +94,7 @@ export class AddEntryInputFormPage {
    */
   async initialiseItems(): Promise<void> {
     await this.enterGuard();
-    await this.addEntryData();
+    await this.editEntryData();
   }
 
   /**
@@ -107,13 +105,12 @@ export class AddEntryInputFormPage {
     // Check date
     this.date = this._activatedRoute.snapshot.params['date_selected'];
     if (MacrozillaConstants.REGEX_DATE.test(this.date)) {
-      this.defaultBackNoHistory = "add_entry_search/" + this.date;
-      // Check food doc id
-      this.foodDocId = this._activatedRoute.snapshot.params['food_doc_id'];
-      console.log(this.foodDocId);
-      const food: Food = await this._foodDatabaseService.getPersonalOrGlobalFoodDocExists(this.foodDocId);
-      if (food != null) {
-        await this.prepareFoodSelected(food);
+      this.defaultBackNoHistory = "tabs/daily_entry";
+      // Check entry doc id
+      this.entryDocId = this._activatedRoute.snapshot.params['entry_doc_id'];
+      this.entry = await this._dailyTrackingService.getEntry(this.entryDocId, this.date);
+      if (this.entry != null) {
+        await this.prepareEntryFoodSelected(this.entry.Food);
         this.isFormReadyToBuild = true;
         await this.setFocus();
       } else {
@@ -135,10 +132,10 @@ export class AddEntryInputFormPage {
   }
 
   /**
-   * When food is selected from search list.
+   * When food entry is selected to be edited.
    * @param food Selected food.
    */
-  async prepareFoodSelected(food: Food): Promise<void> {
+  async prepareEntryFoodSelected(food: Food): Promise<void> {
     // Selected food
     this.food = food;
     // Prepare consumed food based on details of selected food
@@ -164,8 +161,8 @@ export class AddEntryInputFormPage {
   /**
    * Contains Reactive Form logic
    **/
-  addEntryData(): void {
-    this.addEntryForm = this._formBuilder.group({
+  editEntryData(): void {
+    this.editEntryForm = this._formBuilder.group({
       qty: ['', [Validators.required, Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6), Validators.min(0.001)]]
     })
   }
@@ -175,14 +172,14 @@ export class AddEntryInputFormPage {
    **/
   async submitForm() {
     this.isSubmitted = true;
-    if (!this.addEntryForm.valid) {
+    if (!this.editEntryForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!');
       return false;
     } else {
-      // Add entry in sub-collection of Entries on DailyEntry doc
-      await this._dailyTrackingService.addEntryAndUpdateDailyEntryFields(this.date, this.consumedFood);
+      // Update entry in sub-collection of Entries on DailyEntry doc. 
+      await this._dailyTrackingService.editEntryAndUpdateDailyEntryFields(this.date, this.entry, this.consumedFood);
       await this._router.navigate(["/tabs/daily_entry"]);
-      await this._toastService.presentToast('Entry Successfully Added!');
+      await this._toastService.presentToast('Entry Successfully Edited!');
     }
   }
 
@@ -235,19 +232,11 @@ export class AddEntryInputFormPage {
   }
 
   /**
-   * Navigates back to search list (in same view).
-   */
-  async goToSearchList(): Promise<void> {
-    await this._router.navigate(["/add_entry_search/" + this.date]);
-  }
-
-  /**
    * Navigates back to daily entry tab
    */
   async goToDailyEntryTab(): Promise<void> {
     await this._router.navigate(["/tabs/daily_entry"]);
   }
-
 
   /**
    * Set focus on quantity input

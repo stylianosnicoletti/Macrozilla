@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="defaultBackNoHistory"></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="isFormReadyToBuild">{{food.Name}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <div *ngIf="isFormReadyToBuild">
+
+    <form [formGroup]="editEntryForm" (ngSubmit)="submitForm()" novalidate>
+      <ion-item-divider>
+        <ion-label>Nutritional Information (Per {{food.ServingAmount}}{{food.ServingUnitShortCode}})</ion-label>
+      </ion-item-divider>
+      <ion-card>
+        <ion-list>
+
+          <ion-item disabled>
+            <ion-label>🔋 {{food.Calories | number:'1.0-0'}} kcal</ion-label>
+          </ion-item>
+          <ion-item disabled>
+            <ion-label>🐖 {{food.Fats | number:'.1'}}g 🍞 {{food.Carbohydrates |
+              number:'.1'}}g 🥩 {{food.Protein | number:'.1'}}g</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+
+
+      <ion-item-divider>
+        <ion-label>Enter Consumed Amount</ion-label>
+      </ion-item-divider>
+
+      <ion-card>
+        <ion-item>
+          <ion-label position="floating">{{food.ServingUnit}}</ion-label>
+          <ion-input formControlName="qty" type="text" inputmode="numeric"
+            (ionChange)="prepareConsumedFood($event.target.value)" #qtyInput></ion-input>
+        </ion-item>
+      </ion-card>
+
+      <ion-card>
+        <ion-list>
+          <ion-item disabled>
+            <ion-label>🔋 {{consumedFood.Calories | number:'1.0-0'}} kcal</ion-label>
+          </ion-item>
+          <ion-item disabled>
+            <ion-label>🐖 {{consumedFood.Fats | number:'.1'}}g 🍞 {{consumedFood.Carbohydrates |
+              number:'.1'}}g 🥩 {{consumedFood.Protein | number:'.1'}}g</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+      <ion-row>
+        <ion-col>
+          <ion-button type="submit" color="warning" expand="block">Change</ion-button>
+        </ion-col>
+      </ion-row>
+    </form>
+
+  </div>
+</ion-content>

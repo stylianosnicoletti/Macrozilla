@@ -140,5 +140,13 @@ export class TabDailyEntryPage {
     await this._router.navigate(["/add_entry_search/" + this.date]);
   }
 
+    /**
+   * Edit Entry. Route to EditEntryInputFormPage.
+   */
+     async editEntry(entryArg: Entry, slidingItem: any): Promise<void> {
+      slidingItem.close();
+      await this._router.navigate(["/edit_entry_input_form/" + this.date +"/" + entryArg.DocumentId]);
+    }
+
 }
 

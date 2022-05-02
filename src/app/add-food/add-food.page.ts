@@ -127,7 +127,7 @@ export class AddFoodPage {
   addFoodData(): void {
     this.addForm = this._formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]],
-      servingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MacrozillaConstants.REGEX_INTEGER_PATTERN), Validators.maxLength(6)]],
+      servingAmount: ['', [Validators.required, Validators.minLength(1), Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6), Validators.min(0.001) ]],
       servingUnit: ['', [Validators.required]],
       protein: ['', [Validators.required, Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],
       carbohydrates: ['', [Validators.required, Validators.pattern(MacrozillaConstants.REGEX_DECIMAL_PATTERN), Validators.maxLength(6)]],

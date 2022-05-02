@@ -7,16 +7,68 @@ import { DailyEntry, Entry } from '../models/dailyEntry';
 import { Food } from '../models/food.model';
 import { UserService } from './user.service';
 
-
 @Injectable({
   providedIn: 'root'
 })
+
 export class DailyTrackingService {
   constructor(
     private _angularFireStore: AngularFirestore,
     private _authService: AuthService,
     private _userService: UserService) { }
 
+  /**
+   * Get entry of a food consumed that date.
+   * @param entryDocId Entry document Id.
+   * @param date Date food consumed.
+   * @returns Entry.
+   */
+     async getEntry(entryDocId: string, date: string ): Promise<Entry> {
+
+      // Current user id
+      const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+      // Reference to document
+      const docRef = await this._angularFireStore.doc<Entry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + date + "/Entries/" + entryDocId );
+      const doc = await docRef.get();
+
+    if (!(await doc.toPromise()).exists) {
+      return null;
+    } else {
+      return doc.pipe(map(c => ({
+        DocumentId: c.id,
+        CreatedAt: c.data().CreatedAt,
+        Food: c.data().Food,        
+      }))).toPromise();
+    }
+  }  
+
+  /**
+   * Update an entry to the Entries sub-collection of daily entries.
+   * Updates Daily Entry document field based on the entry (consumed food) edited.
+   * @param selectedDate Selected date.
+   * @param entryBefore Entry before edit.
+   * @param consumedFoodAfter Consumed food after edit.
+   * @returns 
+   */
+     async editEntryAndUpdateDailyEntryFields(selectedDate: string, entryBefore: Entry, consumedFoodAfter: Food): Promise<any> {
+
+      // Current user id.
+      const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+  
+      // Get current Daily Entry Doc if exists
+      const existingDailyEntry = await this.getDailyEntry(selectedDate);
+
+      // Create entry to be updated in Entries sub-collection.
+      const entryAfter = this.createEntry(consumedFoodAfter);
+  
+      if (existingDailyEntry != null) {
+        // Update Existing Daily Entry.
+        await this.updateDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryEdit(existingDailyEntry, entryBefore.Food, consumedFoodAfter));
+        // Update Entry.
+        await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entryBefore.DocumentId).update(entryAfter);
+      } 
+  
+    }
 
   /**
    * Add a new entry to the Entries sub-collection of daily entries.
@@ -190,10 +242,10 @@ export class DailyTrackingService {
   }
 
   /**
-  * Delete Daily Entry.
-  * @param selectedDate Selected Date.
-  * @returns 
-  */
+   * Delete Daily Entry.
+   * @param selectedDate Selected Date.
+   * @returns 
+   */
   async deleteDailyEntry(selectedDate: string): Promise<void> {
 
     // Current user id
@@ -259,6 +311,24 @@ export class DailyTrackingService {
       TotalProteinGrams: currentDailyEntry.TotalProteinGrams - consumedFood.Protein,
     };
   }
+
+  /**
+   * Prepare an updated Daily Entry when a consumed food is edited.
+   * @param currentDailyEntry Current daily entry.
+   * @param consumedFood Consumed Food edited.
+   * @returns Updated Daily Entry.
+   */
+  prepareUpdatedDailyEntryOnEntryEdit(currentDailyEntry: DailyEntry, consumedFoodBefore: Food, consumedFoodAfter: Food): DailyEntry {
+    return {
+      Date: currentDailyEntry.Date,
+      TotalCalories: currentDailyEntry.TotalCalories - consumedFoodBefore.Calories + consumedFoodAfter.Calories,
+      TotalFatGrams: currentDailyEntry.TotalFatGrams - consumedFoodBefore.Fats + consumedFoodAfter.Fats,
+      TotalSaturatedGrams: currentDailyEntry.TotalSaturatedGrams - consumedFoodBefore.Saturated + consumedFoodAfter.Saturated,
+      TotalCarbohydrateGrams: currentDailyEntry.TotalCarbohydrateGrams - consumedFoodBefore.Carbohydrates + consumedFoodAfter.Carbohydrates,
+      TotalProteinGrams: currentDailyEntry.TotalProteinGrams - consumedFoodBefore.Protein + consumedFoodAfter.Protein,
+    };
+  }
+  
 }
 
 

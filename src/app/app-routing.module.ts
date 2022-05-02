@@ -39,6 +39,12 @@ const routes: Routes = [
     canActivate: [CanEnterTabsPageGuard],
     loadChildren: () => import('./add-entry-search/add-entry-search.module').then(m => m.AddEntrySearchPageModule)
   },
+  // If user navigates to edit entry
+  {
+    path: 'edit_entry_input_form/:date_selected/:entry_doc_id',
+    canActivate: [CanEnterTabsPageGuard],
+    loadChildren: () => import('./edit-entry-input-form/edit-entry-input-form.module').then(m => m.EditEntryInputFormPageModule)
+  },
   // If user navigates to add entry input form page
   {
     path: 'add_entry_input_form/:date_selected/:food_doc_id',

@@ -49,7 +49,7 @@ export class AddFoodPage {
    * Will not be triggered, if you come back to a page after putting it into a stack.
    */
   async ngOnInit() {
-    console.log("ngOnInit AddFood Tab.");
+    //console.log("ngOnInit AddFood Tab.");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });
@@ -59,17 +59,17 @@ export class AddFoodPage {
   * Do before enter page.
   */
   ionViewWillEnter() {
-    console.log("entering add food page");
+    //console.log("entering add food page");
 
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.initialiseItems();
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         //don't alert cz inherits from mother page
@@ -84,7 +84,7 @@ export class AddFoodPage {
   * Do before leave page.
   */
   async ionViewWillLeave() {
-    console.log("Leaving add food page");
+    //console.log("Leaving add food page");
     await this.closePopItems();
     this.subscriptionsList = this._unsubscribeService.unsubscribeData(this.subscriptionsList);
   }
@@ -96,7 +96,7 @@ export class AddFoodPage {
     this.setFocus();
     this.subscriptionsList.push(
       this._globalVariableService.getServingUnits().subscribe(res => {
-        console.log(res);
+        //console.log(res);
         this.servingUnits = res.ServingUnits;
       }));
     this.addFoodData();
@@ -106,7 +106,7 @@ export class AddFoodPage {
   * Closing pop items (E.g. Service Unit Select).
   */
   async closePopItems(): Promise<void> {
-    console.log("Close pop items.");
+    //console.log("Close pop items.");
     const popover = await this._popController.getTop();
     if (popover)
       await popover.dismiss(null);
@@ -158,7 +158,7 @@ export class AddFoodPage {
     }
 
     this.food = this.fillFood(this.addForm.value);
-    console.log(this.food);
+    //console.log(this.food);
 
     // Saturated Fats Check
     if (!this.fatDifferenceCheckPassed(this.food.Fats, this.food.Saturated)) {
@@ -179,7 +179,7 @@ export class AddFoodPage {
    * @returns True when passes validation.
    */
   fatDifferenceCheckPassed(fats: number, satFats: number): boolean {
-    console.log((fats - satFats) >= 0);
+    //console.log((fats - satFats) >= 0);
     if ((fats - satFats) >= 0) {
       return true;
     }

@@ -97,16 +97,16 @@ export class TabAnalyticsPage {
   }
 
   async ionViewWillEnter() {
-    console.log("entering analytics page");
+    //console.log("entering analytics page");
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         this.initialiseItems();
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.presentNetworkAlert();   
@@ -116,7 +116,7 @@ export class TabAnalyticsPage {
   }
 
   ionViewWillLeave() {
-    console.log("leaving analytics page");
+    //console.log("leaving analytics page");
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     Network.removeAllListeners();
   }

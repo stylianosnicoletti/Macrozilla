@@ -41,15 +41,15 @@ export class TabFoodsDatabasePage {
   }
 
   ngOnInit() {
-    console.log("ngOnInit Food DB Tab");
+    //console.log("ngOnInit Food DB Tab");
   }
 
   async ionViewWillEnter() {
-    console.log("entering foods dbs page");
+    //console.log("entering foods dbs page");
 
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
@@ -57,7 +57,7 @@ export class TabFoodsDatabasePage {
         this.searchTerm = "";
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
@@ -70,7 +70,7 @@ export class TabFoodsDatabasePage {
   }
 
   ionViewWillLeave() {
-    console.log("leaving foods dbs page");
+    //console.log("leaving foods dbs page");
     this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
     this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
     Network.removeAllListeners();

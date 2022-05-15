@@ -19,7 +19,7 @@ export class TabsPage {
    * Will not be triggered, if you come back to a page after putting it into a stack.
    */
   async ngOnInit() {
-    console.log("ngOnInit Tabs Common.");
+    //console.log("ngOnInit Tabs Common.");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });
@@ -29,7 +29,7 @@ export class TabsPage {
    * Will be triggered, if you come back to a page.
    */
   async ionViewWillEnter() {
-    console.log("Entering Tabs Common page.");
+    //console.log("Entering Tabs Common page.");
     // Android hardware back button actions 
     App.addListener('backButton', data => {
       App.exitApp();
@@ -49,7 +49,7 @@ export class TabsPage {
   }
 
   ionViewWillLeave() {
-    console.log("Leaving Tabs Common page.");
+    //console.log("Leaving Tabs Common page.");
     App.removeAllListeners();
   }
 }

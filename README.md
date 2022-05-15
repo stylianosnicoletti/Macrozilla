@@ -30,6 +30,14 @@ Development Environment in Windows
 * Use Remote-WSL and bash for development
 * ionic serve --external (use external ip not local since local fails ERR_CONNECTION_REFUSED)
 
+Deployment Android
+-------------------
+ionic capacitor add andoid
+ionic capacitor copy android --prod
+export CAPACITOR_ANDROID_STUDIO_PATH='..the path to android studio sh..' >> ~/.bashrc
+source ~./bashrc
+ionic capacitor open android
+
 Deployment Firebase
 -------------------
 * Use guide: https://ionicframework.com/docs/angular/pwa

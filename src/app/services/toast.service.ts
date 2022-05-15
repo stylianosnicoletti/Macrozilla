@@ -29,13 +29,13 @@ export class ToastService {
           icon: 'star',
           text: 'Favorite',
           handler: () => {
-            console.log('Favorite clicked');
+            //console.log('Favorite clicked');
           }
         }, {
           text: 'Done',
           role: 'cancel',
           handler: () => {
-            console.log('Cancel clicked');
+            //console.log('Cancel clicked');
           }
         }
       ]

@@ -50,7 +50,7 @@ export class LoginPage implements OnInit {
    * Will be triggered, if you come back to a page.
    */
   ionViewWillEnter() {
-    console.log("Entering login page");
+    //console.log("Entering login page");
     // Android hardware back button actions 
     App.addListener('backButton', data => {
       App.exitApp();
@@ -58,7 +58,7 @@ export class LoginPage implements OnInit {
   }
 
   ionViewWillLeave() {
-    console.log("leaving login page");
+    //console.log("leaving login page");
     App.removeAllListeners();
   }
 

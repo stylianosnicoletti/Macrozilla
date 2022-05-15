@@ -34,17 +34,17 @@ export class TabAccountPage {
   }
   async ionViewWillEnter() {
 
-    console.log("entering account page");
+    //console.log("entering account page");
 
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.initialiseItems();
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.presentNetworkAlert();
@@ -57,7 +57,7 @@ export class TabAccountPage {
   ionViewWillLeave() {
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     Network.removeAllListeners();
-    console.log("leaving acount page");
+    //console.log("leaving acount page");
   }
 
   /**
@@ -117,7 +117,7 @@ export class TabAccountPage {
   * Erases personal database.
   */
   async erasePersonalDb(): Promise<void> {
-    console.log("TODO: Erasing personal database!!");
+    //console.log("TODO: Erasing personal database!!");
   }
 
 
@@ -125,7 +125,7 @@ export class TabAccountPage {
   * Erases all daily tracking records.
   */
   async eraseDailyTrackingRecords(): Promise<void> {
-    console.log("TODO: Erase all daily tracking records!!");
+    //console.log("TODO: Erase all daily tracking records!!");
   }
 
   /**

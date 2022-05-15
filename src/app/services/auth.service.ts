@@ -88,7 +88,7 @@ export class AuthService {
       .then(res => {
         resolve(res);
       }, err => {
-        console.log(err);
+        //console.log(err);
         reject(err);
       })
     })
@@ -102,7 +102,7 @@ export class AuthService {
       .then(res => {
         resolve(res);
       }, err => {
-        console.log(err);
+        //console.log(err);
         reject(err);
       })
     })
@@ -118,7 +118,7 @@ export class AuthService {
       .then(res => {
         resolve(res);
       }, err => {
-        console.log(err);
+        //console.log(err);
         reject(err);
       })
     })

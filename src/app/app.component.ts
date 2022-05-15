@@ -32,15 +32,15 @@ export class AppComponent {
 
       // Native Platform (Android/iOS)
       if (Capacitor.isNativePlatform()) {
-        console.log("Is Native");
+        //console.log("Is Native");
         SplashScreen.hide();
         StatusBar.show();
         // Android Platform
         if (platform == 'android') {
-          console.log("Is Android");
+          //console.log("Is Android");
           let appVersionAndroid: string;
           App.getInfo().then(e => {
-            console.log("Current Version: " + e.version);
+            //console.log("Current Version: " + e.version);
             appVersionAndroid = e.version;
           });
           await (await this._maintenanceService.getMaintenanceAndroid()).subscribe(async maintenance => {
@@ -50,8 +50,8 @@ export class AppComponent {
       } else {
         // Web Platform
         if (platform == 'web') {
-          console.log("Is Web");
-          console.log("Current Version: " + environment.appVersion);
+          //console.log("Is Web");
+          //console.log("Current Version: " + environment.appVersion);
           await (await this._maintenanceService.getMaintenanceWeb()).subscribe(async maintenance => {
             await this._maintenanceService.checkForUpdateOrAvailabilityWeb(environment.appVersion, maintenance);
           });
@@ -62,13 +62,13 @@ export class AppComponent {
 
   initializePauseResumeSubscriptions() {
     this.platformPauseSubsciption = this._platform.pause.subscribe(async () => {
-      console.log('paused!');
+      //console.log('paused!');
 
     });
 
     this.platformResumeSubsciption = this._platform.resume.subscribe(async () => {
 
-      console.log('resumed!');
+      //console.log('resumed!');
     });
   }
 }

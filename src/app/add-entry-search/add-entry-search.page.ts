@@ -43,18 +43,18 @@ export class AddEntrySearchPage {
   }
 
   async ngOnInit() {
-    console.log("ngOnInit Add New Daily Entry Search");
+    //console.log("ngOnInit Add New Daily Entry Search");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });
   }
 
   async ionViewWillEnter() {
-    console.log("entering add entry search page");
+    //console.log("entering add entry search page");
 
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
@@ -62,7 +62,7 @@ export class AddEntrySearchPage {
         this.searchTerm = "";       
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
@@ -76,7 +76,7 @@ export class AddEntrySearchPage {
   }
 
   ionViewWillLeave() {
-    console.log("leaving add entry search page");
+    //console.log("leaving add entry search page");
     this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
     this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
     Network.removeAllListeners();
@@ -198,7 +198,7 @@ export class AddEntrySearchPage {
    * @param food Selected food.
    */
   async foodSelected(food: Food): Promise<void> {
-    console.log(food.DocumentId);
+    //console.log(food.DocumentId);
     await this._router.navigate(["/add_entry_input_form/" + this.date +"/" + food.DocumentId]);
   }
 

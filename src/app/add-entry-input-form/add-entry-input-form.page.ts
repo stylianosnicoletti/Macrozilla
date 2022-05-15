@@ -55,25 +55,25 @@ export class AddEntryInputFormPage {
   }
 
   async ngOnInit() {
-    console.log("ngOnInit Add New Daily Entry Input Form");
+    //console.log("ngOnInit Add New Daily Entry Input Form");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });
   }
 
   async ionViewWillEnter() {
-    console.log("entering add entry input form page");
+    //console.log("entering add entry input form page");
 
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this.isFormReadyToBuild = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         await this.initialiseItems();
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         // Don't alert becuase daily entry tabs page will do that
@@ -85,7 +85,7 @@ export class AddEntryInputFormPage {
   }
 
   ionViewWillLeave() {
-    console.log("leaving add entry input form page");
+    //console.log("leaving add entry input form page");
     this.isFormReadyToBuild = false;
     this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
     Network.removeAllListeners();
@@ -110,7 +110,7 @@ export class AddEntryInputFormPage {
       this.defaultBackNoHistory = "add_entry_search/" + this.date;
       // Check food doc id
       this.foodDocId = this._activatedRoute.snapshot.params['food_doc_id'];
-      console.log(this.foodDocId);
+      //console.log(this.foodDocId);
       const food: Food = await this._foodDatabaseService.getPersonalOrGlobalFoodDocExists(this.foodDocId);
       if (food != null) {
         await this.prepareFoodSelected(food);

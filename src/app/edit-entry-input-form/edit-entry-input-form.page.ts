@@ -53,25 +53,25 @@ export class EditEntryInputFormPage {
   }
 
   async ngOnInit() {
-    console.log("ngOnInit Edit Daily Entry Input Form");
+    //console.log("ngOnInit Edit Daily Entry Input Form");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });
   }
 
   async ionViewWillEnter() {
-    console.log("entering edit entry input form page");
+    //console.log("entering edit entry input form page");
 
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this.isFormReadyToBuild = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         await this.initialiseItems();
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         // Don't alert becuase daily entry tabs page will do that
@@ -83,7 +83,7 @@ export class EditEntryInputFormPage {
   }
 
   ionViewWillLeave() {
-    console.log("leaving edit entry input form page");
+    //console.log("leaving edit entry input form page");
     this.isFormReadyToBuild = false;
     this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
     Network.removeAllListeners();

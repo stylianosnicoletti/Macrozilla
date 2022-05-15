@@ -33,17 +33,17 @@ export class TabDailyEntryPage {
   }
 
   async ionViewWillEnter() {
-    console.log("entering daily entries page");
+    //console.log("entering daily entries page");
 
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.initialiseItems();
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.presentNetworkAlert();      
@@ -54,7 +54,7 @@ export class TabDailyEntryPage {
   }
 
   ionViewWillLeave() {
-    console.log("leaving daily entries page");
+    //console.log("leaving daily entries page");
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     Network.removeAllListeners();
   }

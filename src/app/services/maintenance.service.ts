@@ -181,7 +181,7 @@ export class MaintenanceService {
           handler: () => {
             // Update ng-worker
             if (this._swUpdate.isEnabled) {
-              console.log("Updating ng-worker")
+              //console.log("Updating ng-worker")
               this._swUpdate.activateUpdate()
             }
             // Force refresh
@@ -207,7 +207,7 @@ export class MaintenanceService {
           handler: () => {
             // Update ng-worker
             if (this._swUpdate.isEnabled) {
-              console.log("Updating ng-worker")
+              //console.log("Updating ng-worker")
               this._swUpdate.activateUpdate()
             }
             // Force refresh

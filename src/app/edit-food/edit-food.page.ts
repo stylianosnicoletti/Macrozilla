@@ -50,25 +50,25 @@ export class EditFoodPage {
    * Will not be triggered, if you come back to a page after putting it into a stack.
    */
   async ngOnInit() {
-    console.log("ngOnInit EditFood Tab.");
+    //console.log("ngOnInit EditFood Tab.");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });
   }
 
   async ionViewWillEnter() {
-    console.log("entering edit food page");
+    //console.log("entering edit food page");
     
     Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        console.log('Network connected!');
+        //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
         this.isFormReadyToBuild = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         await this.initialiseItems();
       }
       else if(!status.connected) {
-        console.log('Network disconnected!');
+        //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
         this._unsubscribeService.unsubscribeData(this.subscriptionsList);
         //don't alert cz inherits from mother page
@@ -80,7 +80,7 @@ export class EditFoodPage {
   }
 
   async ionViewWillLeave() {
-    console.log("leaving edit food page");
+    //console.log("leaving edit food page");
     await this.closePopItems();
     this.isFormReadyToBuild = false;
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);

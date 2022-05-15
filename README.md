@@ -32,11 +32,11 @@ Development Environment in Windows
 
 Deployment Android
 -------------------
-ionic capacitor add andoid
-ionic capacitor copy android --prod
-export CAPACITOR_ANDROID_STUDIO_PATH='..the path to android studio sh..' >> ~/.bashrc
-source ~./bashrc
-ionic capacitor open android
+* ionic capacitor add andoid
+* ionic capacitor copy android --prod
+* export CAPACITOR_ANDROID_STUDIO_PATH='..the path to android studio sh..' >> ~/.bashrc
+* source ~./bashrc
+* ionic capacitor open android
 
 Deployment Firebase
 -------------------

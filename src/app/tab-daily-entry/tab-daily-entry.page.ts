@@ -140,7 +140,14 @@ export class TabDailyEntryPage {
     await this._router.navigate(["/add_entry_search/" + this.date]);
   }
 
-    /**
+  /**
+  * Repeat Entries
+  */
+    async repeatPastEntries(): Promise<void> {
+    await this._router.navigate(["/repeat_entries/" + this.date]);
+  }
+
+  /**
    * Edit Entry. Route to EditEntryInputFormPage.
    */
      async editEntry(entryArg: Entry, slidingItem: any): Promise<void> {

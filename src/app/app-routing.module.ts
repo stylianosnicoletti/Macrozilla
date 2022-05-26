@@ -39,6 +39,12 @@ const routes: Routes = [
     canActivate: [CanEnterTabsPageGuard],
     loadChildren: () => import('./add-entry-search/add-entry-search.module').then(m => m.AddEntrySearchPageModule)
   },
+  // If user navigates to repeat entriespage
+  {
+    path: 'repeat_entries/:date_selected',
+    canActivate: [CanEnterTabsPageGuard],
+    loadChildren: () => import('./repeat-entries/repeat-entries.module').then(m => m.RepeatEntriesPageModule)
+  },
   // If user navigates to edit entry
   {
     path: 'edit_entry_input_form/:date_selected/:entry_doc_id',

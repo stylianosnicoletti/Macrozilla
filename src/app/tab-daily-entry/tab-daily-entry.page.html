@@ -5,7 +5,6 @@
     </ion-toolbar>
   </ion-header>
 
-
   <ion-card>
     <ion-card-header>
       <ion-card-title>
@@ -15,44 +14,49 @@
 
     <ion-card-content>
       <strong>
-        🥩
-        {{ dailyEntry?.TotalProteinGrams *4 / (dailyEntry?.TotalProteinGrams*4 + dailyEntry?.TotalCarbohydrateGrams*4
-        +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-        🍞
-        {{ dailyEntry?.TotalCarbohydrateGrams *4 / (dailyEntry?.TotalProteinGrams *4 +
-        dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-        🐖
-        {{ dailyEntry?.TotalFatGrams *9 / (dailyEntry?.TotalProteinGrams *4 + dailyEntry?.TotalCarbohydrateGrams*4
-        +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-        :
-        (
-        ✔️
-        {{ (dailyEntry?.TotalFatGrams-dailyEntry?.TotalSaturatedGrams ) * 9 / (dailyEntry?.TotalProteinGrams *4 +
-        dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-        ❌
-        {{ dailyEntry?.TotalSaturatedGrams *9 / (dailyEntry?.TotalProteinGrams *4 +
-        dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}%
-        )
+        🥩 {{ dailyEntry?.TotalProteinGrams *4 /
+        (dailyEntry?.TotalProteinGrams*4 + dailyEntry?.TotalCarbohydrateGrams*4
+        +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}% 🍞 {{
+        dailyEntry?.TotalCarbohydrateGrams *4 / (dailyEntry?.TotalProteinGrams
+        *4 + dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9)
+        * 100 | number:'1.0-0'}}% 🐖 {{ dailyEntry?.TotalFatGrams *9 /
+        (dailyEntry?.TotalProteinGrams *4 + dailyEntry?.TotalCarbohydrateGrams*4
+        +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}% : ( ✔️ {{
+        (dailyEntry?.TotalFatGrams-dailyEntry?.TotalSaturatedGrams ) * 9 /
+        (dailyEntry?.TotalProteinGrams *4 + dailyEntry?.TotalCarbohydrateGrams*4
+        +dailyEntry?.TotalFatGrams*9) * 100 | number:'1.0-0'}}% ❌ {{
+        dailyEntry?.TotalSaturatedGrams *9 / (dailyEntry?.TotalProteinGrams *4 +
+        dailyEntry?.TotalCarbohydrateGrams*4 +dailyEntry?.TotalFatGrams*9) * 100
+        | number:'1.0-0'}}% )
       </strong>
     </ion-card-content>
   </ion-card>
 
   <ion-card id="open-date-input">
     <ion-item>
-      <ion-label>
-        Select Date:
-      </ion-label>
-      <ion-label slot="end">
-        {{date  | date:'EEEE, MMMM d, y'}}
-      </ion-label>
+      <ion-label> Select Date: </ion-label>
+      <ion-label slot="end"> {{date | date:'EEEE, MMMM d, y'}} </ion-label>
     </ion-item>
   </ion-card>
 
   <!-- Date Selection Pop Over -->
-  <ion-popover id="popover-bottom" size='cover' arrow='false' trigger="open-date-input" show-backdrop="true">
+  <ion-popover
+    id="popover-bottom"
+    size="cover"
+    arrow="false"
+    trigger="open-date-input"
+    show-backdrop="true"
+  >
     <ng-template>
-      <ion-datetime size='cover' showDefaultButtons='true' presentation='date' displayFormat="DD/MM/YYYY"
-        [(ngModel)]="date" (ionChange)="parseDate()" value={{date}}>
+      <ion-datetime
+        size="cover"
+        showDefaultButtons="true"
+        presentation="date"
+        displayFormat="DD/MM/YYYY"
+        [(ngModel)]="date"
+        (ionChange)="parseDate()"
+        value="{{date}}"
+      >
       </ion-datetime>
     </ng-template>
   </ion-popover>
@@ -62,7 +66,9 @@
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
       <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
-    <ng-container *ngIf="dailyEntry?.TotalCalories > 0; then showentries else nothingFound">
+    <ng-container
+      *ngIf="dailyEntry?.TotalCalories > 0; then showentries else nothingFound"
+    >
     </ng-container>
 
     <!-- Skeleton: Nothing found -->
@@ -72,44 +78,71 @@
           There is no tracking activity yet for this date. 👨‍🍳
         </ion-card-content>
       </ion-card>
+
+      <!-- fab placed in the center of the content with a list on each side -->
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button>
+          <ion-icon name="caret-up"></ion-icon>
+        </ion-fab-button>
+        <ion-fab-list side="top">
+          <ion-fab-button (click)="repeatPastEntries()">
+            <ion-icon name="repeat"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-button (click)="addNewEntry()">
+            <ion-icon name="add"></ion-icon>
+          </ion-fab-button>
+        </ion-fab-list>
+      </ion-fab>
     </ng-template>
 
     <!-- Skeleton: Showentries -->
     <ng-template #showentries>
       <ion-list>
-        <ion-item-sliding *ngFor="let entry of dailyEntry?.Entries" #slidingItem>
+        <ion-item-sliding
+          *ngFor="let entry of dailyEntry?.Entries"
+          #slidingItem
+        >
           <ion-item>
             <ion-label class="ion-text-wrap">
               <h2><strong>{{entry.Food.Name}}</strong></h2>
-              <h3>🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
+              <h3>
+                🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
                 {{entry.Food.Protein | number:'1.0-1' }}g 🍞
                 {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
-                {{entry.Food.Fats | number:'1.0-1' }}g</h3>
+                {{entry.Food.Fats | number:'1.0-1' }}g
+              </h3>
             </ion-label>
 
             <ion-chip slot="end" color="primary">
-              <strong>{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong>
+              <strong
+                >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
+              >
             </ion-chip>
           </ion-item>
           <ion-item-options side="end">
-            <ion-item-option color="warning" (click)="editEntry(entry,slidingItem)">
+            <ion-item-option
+              color="warning"
+              (click)="editEntry(entry,slidingItem)"
+            >
               <ion-icon name="create"></ion-icon>
               Edit
             </ion-item-option>
-            <ion-item-option color="danger" (click)="presentAlertConfirm(entry,slidingItem)">
+            <ion-item-option
+              color="danger"
+              (click)="presentAlertConfirm(entry,slidingItem)"
+            >
               <ion-icon name="trash"></ion-icon>
               Delete
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
+      <!-- Fab placed to the bottom end -->
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button (click)="addNewEntry()">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
     </ng-template>
-
-    <!-- Fab placed to the bottom end -->
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button (click)="addNewEntry()">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
   </ion-content>
 </ion-app>

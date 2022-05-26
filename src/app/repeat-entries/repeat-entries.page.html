@@ -1,0 +1,34 @@
+<ion-app>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="tabs/daily_entry"></ion-back-button>
+      </ion-buttons>
+      <ion-title> Repeat a Daily Entry</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title> Select Daily Entry to repeat: </ion-card-title>
+    </ion-card-header>
+    <ion-datetime
+      size="cover"
+      presentation="date"
+      displayFormat="DD/MM/YYYY"
+      [(ngModel)]="dateToRepeat"
+      (ionChange)="parseDate()"
+      value="{{dateToRepeat}}"
+    >
+    </ion-datetime>
+
+  </ion-card>
+      <ion-card>
+        <ion-card-content>
+          <strong> Transfer records from: {{dateToRepeat}} to Current Daily Entry: {{date}} </strong>
+        </ion-card-content>
+      </ion-card>
+
+
+  <ion-content> </ion-content>
+</ion-app>

@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { RepeatEntriesPage } from './repeat-entries.page';
+import { TransferEntriesPage } from './transfer-entries.page';
 
 @NgModule({
   imports: [
@@ -13,12 +13,12 @@ import { RepeatEntriesPage } from './repeat-entries.page';
     ReactiveFormsModule,
     RouterModule.forChild([{ 
       path: '',
-     component: RepeatEntriesPage
+     component: TransferEntriesPage
      }
     ])
 ],
-declarations: [RepeatEntriesPage],
+declarations: [TransferEntriesPage],
 providers: [
   DatePipe]
 })
-export class RepeatEntriesPageModule {}
+export class TransferEntriesPageModule {}

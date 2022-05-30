@@ -1,0 +1,152 @@
+<ion-app>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="tabs/daily_entry"></ion-back-button>
+      </ion-buttons>
+      <ion-title> Transfer Entries</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card color="tertiary" id="open-fromdate-input">
+    <ion-item color="tertiary">
+      <ion-label> Select From Date: </ion-label>
+      <ion-label slot="end">
+        {{dateToTransfer | date:'EEEE, MMMM d, y'}}
+      </ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ng-container
+    *ngIf="dailyEntryToTransfer?.TotalCalories > 0; then showentries else nothingFound"
+  >
+  </ng-container>
+
+  <!-- Skeleton: Nothing found -->
+  <ng-template #nothingFound>
+    <ion-content>
+    <ion-card>
+      <ion-card-content>
+        There is no tracking activity yet for this date. 👨‍🍳
+      </ion-card-content>
+    </ion-card>
+  </ion-content>
+  </ng-template>
+
+  <!-- Skeleton: Showentries -->
+  <ng-template #showentries>
+    <ion-content>
+      <ion-list>
+        <ion-item-sliding
+          *ngFor="let entry of dailyEntryToTransfer?.Entries"
+          #slidingItem
+        >
+          <ion-item>
+            <ion-label class="ion-text-wrap">
+              <h2><strong>{{entry.Food.Name}}</strong></h2>
+              <h3>
+                🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
+                {{entry.Food.Protein | number:'1.0-1' }}g 🍞
+                {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
+                {{entry.Food.Fats | number:'1.0-1' }}g
+              </h3>
+            </ion-label>
+
+            <ion-chip slot="end" color="primary">
+              <strong
+                >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
+              >
+            </ion-chip>
+            <ion-checkbox
+              slot="end"
+              [(ngModel)]="entry.isChecked"
+            ></ion-checkbox>
+          </ion-item>
+        </ion-item-sliding>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+
+  <ion-card color="dark" disabled>
+    <ion-item color="dark">
+      <ion-label> To Date: </ion-label>
+      <ion-label slot="end"> {{date | date:'EEEE, MMMM d, y'}} </ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ng-container
+    *ngIf="dailyEntryToTransfer?.TotalCalories > 0; then showentries else nothingFound"
+  >
+  </ng-container>
+
+  <!-- Skeleton: Nothing found -->
+  <ng-template #nothingFound>
+    <ion-content>
+    <ion-card>
+      <ion-card-content>
+        There is no tracking activity yet for this date. 👨‍🍳
+      </ion-card-content>
+    </ion-card>
+  </ion-content>
+  </ng-template>
+
+  <!-- Skeleton: Showentries -->
+  <ng-template #showentries>
+    <ion-content>
+      <ion-list>
+        <ion-item-sliding
+          *ngFor="let entry of dailyEntryToTransfer?.Entries"
+          #slidingItem
+        >
+          <ion-item>
+            <ion-label class="ion-text-wrap">
+              <h2><strong>{{entry.Food.Name}}</strong></h2>
+              <h3>
+                🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
+                {{entry.Food.Protein | number:'1.0-1' }}g 🍞
+                {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
+                {{entry.Food.Fats | number:'1.0-1' }}g
+              </h3>
+            </ion-label>
+
+            <ion-chip slot="end" color="primary">
+              <strong
+                >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
+              >
+            </ion-chip>
+            <ion-checkbox
+              slot="end"
+              [(ngModel)]="entry.isChecked"
+            ></ion-checkbox>
+          </ion-item>
+        </ion-item-sliding>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+
+  <ion-button expand="block">A block button</ion-button>
+  <ion-button expand="block">A block button</ion-button>
+
+  <!-- Date Selection Pop Over -->
+  <ion-popover
+    id="popover-bottom"
+    size="cover"
+    arrow="false"
+    trigger="open-fromdate-input"
+    show-backdrop="true"
+  >
+    <ng-template>
+      <ion-datetime
+        size="cover"
+        color="tertiary"
+        showDefaultButtons="true"
+        presentation="date"
+        displayFormat="DD/MM/YYYY"
+        [(ngModel)]="dateToTransfer"
+        (ionChange)="parseDate()"
+        value="{{dateToTransfer}}"
+      >
+      </ion-datetime>
+    </ng-template>
+  </ion-popover>
+</ion-app>

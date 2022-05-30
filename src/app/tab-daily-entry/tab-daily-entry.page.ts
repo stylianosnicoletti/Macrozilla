@@ -141,10 +141,10 @@ export class TabDailyEntryPage {
   }
 
   /**
-  * Repeat Entries
+  * transfer Entries
   */
-    async repeatPastEntries(): Promise<void> {
-    await this._router.navigate(["/repeat_entries/" + this.date]);
+    async transferEntries(): Promise<void> {
+    await this._router.navigate(["/transfer_entries/" + this.date]);
   }
 
   /**

@@ -39,11 +39,11 @@ const routes: Routes = [
     canActivate: [CanEnterTabsPageGuard],
     loadChildren: () => import('./add-entry-search/add-entry-search.module').then(m => m.AddEntrySearchPageModule)
   },
-  // If user navigates to repeat entriespage
+  // If user navigates to transfer entriespage
   {
-    path: 'repeat_entries/:date_selected',
+    path: 'transfer_entries/:date_selected',
     canActivate: [CanEnterTabsPageGuard],
-    loadChildren: () => import('./repeat-entries/repeat-entries.module').then(m => m.RepeatEntriesPageModule)
+    loadChildren: () => import('./transfer-entries/transfer-entries.module').then(m => m.TransferEntriesPageModule)
   },
   // If user navigates to edit entry
   {

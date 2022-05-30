@@ -10,16 +10,16 @@ import { DailyTrackingService } from '../services/daily-tracking.service';
 import { DailyEntry, Entry } from '../models/dailyEntry';
 
 @Component({
-  selector: 'app-repeat-entries',
-  templateUrl: './repeat-entries.page.html',
-  styleUrls: ['./repeat-entries.page.scss'],
+  selector: 'app-transfer-entries',
+  templateUrl: './transfer-entries.page.html',
+  styleUrls: ['./transfer-entries.page.scss'],
 })
 
-export class RepeatEntriesPage {
+export class TransferEntriesPage {
 
   date: string;
-  dateToRepeat: string;
-  dailyEntryToRepeat: DailyEntry;
+  dateToTransfer: string;
+  dailyEntryToTransfer: DailyEntry;
   subscriptionsList: Subscription[] = [];
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
@@ -84,7 +84,7 @@ export class RepeatEntriesPage {
   // Check if the route param key matches a date
   enterGuard() {
     this.date = this._activatedRoute.snapshot.params['date_selected'];
-    this.dateToRepeat = this.date;
+    this.dateToTransfer = this.date;
     console.log(this.date);
     if (!MacrozillaConstants.REGEX_DATE.test(this.date)) this._router.navigate(["/tabs/daily_entry"]);
   }
@@ -111,10 +111,10 @@ export class RepeatEntriesPage {
    * @param myDate Date.
    */
      async transformDateAndReadDailyEntry(myDate) {
-      this.dateToRepeat = await this._datePipe.transform(myDate, 'yyyy-MM-dd');
-      this.subscriptionsList.push((await this._dailyTrackingService.readDailyEntry(this.dateToRepeat, true)).subscribe(x => {
-        this.dailyEntryToRepeat = x
-        console.log(this.dailyEntryToRepeat.Entries);
+      this.dateToTransfer = await this._datePipe.transform(myDate, 'yyyy-MM-dd');
+      this.subscriptionsList.push((await this._dailyTrackingService.readDailyEntry(this.dateToTransfer, true)).subscribe(x => {
+        this.dailyEntryToTransfer = x
+        console.log(this.dailyEntryToTransfer.Entries);
       }));
     }
   
@@ -122,7 +122,7 @@ export class RepeatEntriesPage {
      * Parse selected date.
      */
     async parseDate(): Promise<void> {
-      await this.transformDateAndReadDailyEntry(this.dateToRepeat);
+      await this.transformDateAndReadDailyEntry(this.dateToTransfer);
     }
 
 

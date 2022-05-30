@@ -1,19 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { RepeatEntriesPage } from './repeat-entries.page';
+import { TransferEntriesPage } from './transfer-entries.page';
 
 describe('AddEntrySearchPage', () => {
-  let component: RepeatEntriesPage;
-  let fixture: ComponentFixture<RepeatEntriesPage>;
+  let component: TransferEntriesPage;
+  let fixture: ComponentFixture<TransferEntriesPage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RepeatEntriesPage ],
+      declarations: [ TransferEntriesPage ],
       imports: [IonicModule]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(RepeatEntriesPage);
+    fixture = TestBed.createComponent(TransferEntriesPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

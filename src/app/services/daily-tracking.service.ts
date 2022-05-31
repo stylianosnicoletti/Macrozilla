@@ -1,21 +1,21 @@
-import { Injectable } from '@angular/core';
-import { AuthService } from './auth.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
-import { DailyEntry, Entry } from '../models/dailyEntry';
-import { Food } from '../models/food.model';
-import { UserService } from './user.service';
+import { Injectable } from "@angular/core";
+import { AuthService } from "./auth.service";
+import { AngularFirestore } from "@angular/fire/compat/firestore";
+import { Observable } from "rxjs";
+import { map, withLatestFrom } from "rxjs/operators";
+import { DailyEntry, Entry } from "../models/dailyEntry";
+import { Food } from "../models/food.model";
+import { UserService } from "./user.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
-
 export class DailyTrackingService {
   constructor(
     private _angularFireStore: AngularFirestore,
     private _authService: AuthService,
-    private _userService: UserService) { }
+    private _userService: UserService
+  ) {}
 
   /**
    * Get entry of a food consumed that date.
@@ -23,24 +23,36 @@ export class DailyTrackingService {
    * @param date Date food consumed.
    * @returns Entry.
    */
-     async getEntry(entryDocId: string, date: string ): Promise<Entry> {
-
-      // Current user id
-      const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-      // Reference to document
-      const docRef = await this._angularFireStore.doc<Entry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + date + "/Entries/" + entryDocId );
-      const doc = await docRef.get();
+  async getEntry(entryDocId: string, date: string): Promise<Entry> {
+    // Current user id
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
+    // Reference to document
+    const docRef = await this._angularFireStore.doc<Entry>(
+      "/TheMacroDiet/Production/Users/" +
+        currentUserUid +
+        "/DailyEntries/" +
+        date +
+        "/Entries/" +
+        entryDocId
+    );
+    const doc = await docRef.get();
 
     if (!(await doc.toPromise()).exists) {
       return null;
     } else {
-      return doc.pipe(map(c => ({
-        DocumentId: c.id,
-        CreatedAt: c.data().CreatedAt,
-        Food: c.data().Food,        
-      }))).toPromise();
+      return doc
+        .pipe(
+          map((c) => ({
+            DocumentId: c.id,
+            CreatedAt: c.data().CreatedAt,
+            Food: c.data().Food,
+          }))
+        )
+        .toPromise();
     }
-  }  
+  }
 
   /**
    * Update an entry to the Entries sub-collection of daily entries.
@@ -48,39 +60,63 @@ export class DailyTrackingService {
    * @param selectedDate Selected date.
    * @param entryBefore Entry before edit.
    * @param consumedFoodAfter Consumed food after edit.
-   * @returns 
+   * @returns
    */
-     async editEntryAndUpdateDailyEntryFields(selectedDate: string, entryBefore: Entry, consumedFoodAfter: Food): Promise<any> {
+  async editEntryAndUpdateDailyEntryFields(
+    selectedDate: string,
+    entryBefore: Entry,
+    consumedFoodAfter: Food
+  ): Promise<any> {
+    // Current user id.
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
 
-      // Current user id.
-      const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-  
-      // Get current Daily Entry Doc if exists
-      const existingDailyEntry = await this.getDailyEntry(selectedDate);
+    // Get current Daily Entry Doc if exists
+    const existingDailyEntry = await this.getDailyEntry(selectedDate);
 
-      // Create entry to be updated in Entries sub-collection.
-      const entryAfter = this.createEntry(consumedFoodAfter);
-  
-      if (existingDailyEntry != null) {
-        // Update Existing Daily Entry.
-        await this.updateDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryEdit(existingDailyEntry, entryBefore.Food, consumedFoodAfter));
-        // Update Entry.
-        await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entryBefore.DocumentId).update(entryAfter);
-      } 
-  
+    // Create entry to be updated in Entries sub-collection.
+    const entryAfter = this.createEntry(consumedFoodAfter);
+
+    if (existingDailyEntry != null) {
+      // Update Existing Daily Entry.
+      await this.updateDailyEntry(
+        selectedDate,
+        this.prepareUpdatedDailyEntryOnEntryEdit(
+          existingDailyEntry,
+          entryBefore.Food,
+          consumedFoodAfter
+        )
+      );
+      // Update Entry.
+      await this._angularFireStore
+        .doc(
+          "/TheMacroDiet/Production/Users/" +
+            currentUserUid +
+            "/DailyEntries/" +
+            selectedDate +
+            "/Entries/" +
+            entryBefore.DocumentId
+        )
+        .update(entryAfter);
     }
+  }
 
   /**
    * Add a new entry to the Entries sub-collection of daily entries.
    * Updates Daily Entry document field based on the new entry (consumed food) added.
    * @param selectedDate Selected date.
    * @param consumedFood Consumed food.
-   * @returns 
+   * @returns
    */
-  async addEntryAndUpdateDailyEntryFields(selectedDate: string, consumedFood: Food): Promise<any> {
-
+  async addEntryAndUpdateDailyEntryFields(
+    selectedDate: string,
+    consumedFood: Food
+  ): Promise<any> {
     // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
 
     // Get current Daily Entry Doc if exists
     const existingDailyEntry = await this.getDailyEntry(selectedDate);
@@ -90,18 +126,46 @@ export class DailyTrackingService {
 
     if (existingDailyEntry != null) {
       // Update Existing Daily Entry
-      await this.updateDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryAdd(existingDailyEntry, consumedFood))
-       // Add Entry
-       await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").add(entry);
+      await this.updateDailyEntry(
+        selectedDate,
+        this.prepareUpdatedDailyEntryOnEntryAdd(
+          existingDailyEntry,
+          consumedFood
+        )
+      );
+      // Add Entry
+      await this._angularFireStore
+        .collection(
+          "/TheMacroDiet/Production/Users/" +
+            currentUserUid +
+            "/DailyEntries/" +
+            selectedDate +
+            "/Entries"
+        )
+        .add(entry);
     } else {
       // First Daily Entry
-      await this.setDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryAdd(null, consumedFood,selectedDate));
+      await this.setDailyEntry(
+        selectedDate,
+        this.prepareUpdatedDailyEntryOnEntryAdd(
+          null,
+          consumedFood,
+          selectedDate
+        )
+      );
       // Add Entry
-      await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").add(entry);
+      await this._angularFireStore
+        .collection(
+          "/TheMacroDiet/Production/Users/" +
+            currentUserUid +
+            "/DailyEntries/" +
+            selectedDate +
+            "/Entries"
+        )
+        .add(entry);
       // Increment size of collection
       await this._userService.DailyEntriesSizeIncrement();
     }
-
   }
 
   /**
@@ -109,29 +173,35 @@ export class DailyTrackingService {
    * Updates Daily Entry document field based on entry (consumed food) deletion.
    * @param selectedDate Selected date.
    * @param entry Entry (Consumed food with document Id and createdAt fields).
-   * @param lengthOfEntries Size of the subcollection Entries
-   * @returns 
+   * @returns
    */
-  async deleteEntryAndUpdateDailyEntryFields(selectedDate: string, entry: Entry, lengthOfEntries: number): Promise<any> {
-
+  async deleteEntryAndUpdateDailyEntryFields(
+    selectedDate: string,
+    entry: Entry
+  ): Promise<any> {
     // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
 
+    //TODO FIND A WAY TO GET COUNTS WITHOUT ENTERING IT AS AN ARGUMENT
     // Get current Daily Entry Doc if exists
     const existingDailyEntry = await this.getDailyEntry(selectedDate);
-
-    if (lengthOfEntries > 1) {
+    console.log(existingDailyEntry);
+    if (existingDailyEntry?.Entries?.length > 1) {
+      console.log(">1");
       // Delete entry from Entries collections
-      await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entry.DocumentId).delete();
+      //await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entry.DocumentId).delete();
       // Update Existing Daily Entry
-      await this.updateDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryDelete(existingDailyEntry, entry.Food));
+      //await this.updateDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryDelete(existingDailyEntry, entry.Food));
     } else {
+      console.log("NOT >1");
       // Delete entry from Entries collections (needed since when deleting docs subcollections remain)
-      await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entry.DocumentId).delete();
-      // Remove whole Daily Entry on last Entry deletion 
-      await this.deleteDailyEntry(selectedDate);
+      //await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entry.DocumentId).delete();
+      // Remove whole Daily Entry on last Entry deletion
+      //await this.deleteDailyEntry(selectedDate);
       // Decrement size of collection
-      await this._userService.DailyEntriesSizeDecrement();
+      //await this._userService.DailyEntriesSizeDecrement();
     }
   }
 
@@ -139,119 +209,201 @@ export class DailyTrackingService {
    * Read Daily Entry doc with fields based on date. (Sub-collection of Entries can be fetched in descending orded of the time added.)
    * @param selectedDate Selected date.
    * @param includeSubCollection If true the Entries sub-collection is included. (Default = false)
-   * @returns 
+   * @returns
    */
-  async readDailyEntry(selectedDate: string, includeSubCollection: boolean = false): Promise<Observable<DailyEntry>> {
-
+  async readDailyEntry(
+    selectedDate: string,
+    includeSubCollection: boolean = false
+  ): Promise<Observable<DailyEntry>> {
     // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
 
     // Daily Entry document
-    const dailyEntryDocRef = this._angularFireStore.doc<DailyEntry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate);
+    const dailyEntryDocRef = this._angularFireStore.doc<DailyEntry>(
+      "/TheMacroDiet/Production/Users/" +
+        currentUserUid +
+        "/DailyEntries/" +
+        selectedDate
+    );
     const dailyEntry$ = dailyEntryDocRef.valueChanges();
 
     if (includeSubCollection) {
       // Entries collection
-      const entriesCollectionRef = await this._angularFireStore.collection<Entry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/", ref => ref
-        .orderBy("CreatedAt", "desc"));
-      const entries$ = entriesCollectionRef.valueChanges({ idField: 'DocumentId' });
+      const entriesCollectionRef =
+        await this._angularFireStore.collection<Entry>(
+          "/TheMacroDiet/Production/Users/" +
+            currentUserUid +
+            "/DailyEntries/" +
+            selectedDate +
+            "/Entries/",
+          (ref) => ref.orderBy("CreatedAt", "desc")
+        );
+      const entries$ = entriesCollectionRef.valueChanges({
+        idField: "DocumentId",
+      });
 
       return dailyEntry$.pipe(
         withLatestFrom(entries$),
         map(([dailyEntry, entries]) => {
           return {
-            Date : dailyEntry?.Date,
+            Date: dailyEntry?.Date,
             TotalCalories: dailyEntry?.TotalCalories,
             TotalFatGrams: dailyEntry?.TotalFatGrams,
             TotalSaturatedGrams: dailyEntry?.TotalSaturatedGrams,
             TotalCarbohydrateGrams: dailyEntry?.TotalCarbohydrateGrams,
             TotalProteinGrams: dailyEntry?.TotalProteinGrams,
-            Entries: entries
-          }
-        }));
+            Entries: entries,
+          };
+        })
+      );
     } else {
       return dailyEntry$.pipe(
         map((dailyEntry: DailyEntry) => {
           return {
-            Date : dailyEntry?.Date,
+            Date: dailyEntry?.Date,
             TotalCalories: dailyEntry?.TotalCalories,
             TotalFatGrams: dailyEntry?.TotalFatGrams,
             TotalSaturatedGrams: dailyEntry?.TotalSaturatedGrams,
             TotalCarbohydrateGrams: dailyEntry?.TotalCarbohydrateGrams,
             TotalProteinGrams: dailyEntry?.TotalProteinGrams,
-          }
-        }));
+          };
+        })
+      );
     }
   }
 
   /**
    * Get Daily Entry doc with fields based on date. (No Sub-collection of Entries is fetched)
    * @param selectedDate Selected date.
-   * @returns 
+   * @returns
    */
   async getDailyEntry(selectedDate: string): Promise<DailyEntry> {
-
     // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
 
     // Reference to document
-    const userDocRef = await this._angularFireStore.doc<DailyEntry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate);
+    const userDocRef = await this._angularFireStore.doc<DailyEntry>(
+      "/TheMacroDiet/Production/Users/" +
+        currentUserUid +
+        "/DailyEntries/" +
+        selectedDate
+    );
     const doc = await userDocRef.get();
 
     if (!(await doc.toPromise()).exists) {
       return null;
     } else {
-      return doc.pipe(map(c => ({
-        DocumentId: c.id,
-        Date: c.data().Date,
-        TotalCalories: c.data().TotalCalories,
-        TotalFatGrams: c.data().TotalFatGrams,
-        TotalSaturatedGrams: c.data().TotalSaturatedGrams,
-        TotalCarbohydrateGrams: c.data().TotalCarbohydrateGrams,
-        TotalProteinGrams: c.data().TotalProteinGrams
-      }))).toPromise();
+      return doc
+        .pipe(
+          map((c) => ({
+            DocumentId: c.id,
+            Date: c.data().Date,
+            TotalCalories: c.data().TotalCalories,
+            TotalFatGrams: c.data().TotalFatGrams,
+            TotalSaturatedGrams: c.data().TotalSaturatedGrams,
+            TotalCarbohydrateGrams: c.data().TotalCarbohydrateGrams,
+            TotalProteinGrams: c.data().TotalProteinGrams,
+          }))
+        )
+        .toPromise();
     }
   }
 
   /**
+   * Get Entries collection length from Daily Entry doc based on date.
+   * @param selectedDate Selected date.
+   * @returns
+   */
+  //async getEntriesLengthFromDailyEntry(selectedDate: string): Promise<number> {
+
+  // Current user id
+  //  const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+  /*
+      // Reference to document
+      const userDocRef = await this._angularFireStore.doc<DailyEntry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate);
+      const doc = await userDocRef.get();
+       await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").get(); 
+       a.s
+       const query = firestore.collection("fruits");
+const snapshot = await query.get();
+const count = snapshot.size;
+       .subscribe( result => {
+       console.log(result.length);
+       })*/
+  // }
+  /**
    * Update Daily Entry.
    * @param selectedDate Selected Date.
    * @param dailyEntry Updated Daily Entry.
-   * @returns 
+   * @returns
    */
-  async updateDailyEntry(selectedDate: string, dailyEntry: DailyEntry): Promise<any> {
-
+  async updateDailyEntry(
+    selectedDate: string,
+    dailyEntry: DailyEntry
+  ): Promise<any> {
     // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
 
-    return await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate).update(dailyEntry);
+    return await this._angularFireStore
+      .doc(
+        "/TheMacroDiet/Production/Users/" +
+          currentUserUid +
+          "/DailyEntries/" +
+          selectedDate
+      )
+      .update(dailyEntry);
   }
 
   /**
    * Set Daily Entry. (Used to initialise Daily Entry)
    * @param selectedDate Selected Date.
    * @param dailyEntry Daily Entry to be set.
-   * @returns 
+   * @returns
    */
-  async setDailyEntry(selectedDate: string, dailyEntry: DailyEntry): Promise<any> {
-
+  async setDailyEntry(
+    selectedDate: string,
+    dailyEntry: DailyEntry
+  ): Promise<any> {
     // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
 
-    return await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate).set(dailyEntry);
+    return await this._angularFireStore
+      .doc(
+        "/TheMacroDiet/Production/Users/" +
+          currentUserUid +
+          "/DailyEntries/" +
+          selectedDate
+      )
+      .set(dailyEntry);
   }
 
   /**
    * Delete Daily Entry.
    * @param selectedDate Selected Date.
-   * @returns 
+   * @returns
    */
   async deleteDailyEntry(selectedDate: string): Promise<void> {
-
     // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.afAuth.currentUser.then(
+      (u) => u.uid
+    );
 
-    return await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate).delete();
+    return await this._angularFireStore
+      .doc(
+        "/TheMacroDiet/Production/Users/" +
+          currentUserUid +
+          "/DailyEntries/" +
+          selectedDate
+      )
+      .delete();
   }
 
   /**
@@ -262,7 +414,7 @@ export class DailyTrackingService {
   createEntry(food: Food): Entry {
     return {
       CreatedAt: Math.floor(Date.now() / 1000), //unix timestamp in seconds
-      Food: food
+      Food: food,
     };
   }
 
@@ -273,15 +425,22 @@ export class DailyTrackingService {
    * @param selectedDate Needed when there is no current Daily Entry
    * @returns Updated Daily Entry.
    */
-  prepareUpdatedDailyEntryOnEntryAdd(currentDailyEntry: DailyEntry, consumedFood: Food, selectedDate?: string): DailyEntry {
+  prepareUpdatedDailyEntryOnEntryAdd(
+    currentDailyEntry: DailyEntry,
+    consumedFood: Food,
+    selectedDate?: string
+  ): DailyEntry {
     if (currentDailyEntry != null) {
       return {
         Date: currentDailyEntry.Date,
         TotalCalories: currentDailyEntry.TotalCalories + consumedFood.Calories,
         TotalFatGrams: currentDailyEntry.TotalFatGrams + consumedFood.Fats,
-        TotalSaturatedGrams: currentDailyEntry.TotalSaturatedGrams + consumedFood.Saturated,
-        TotalCarbohydrateGrams: currentDailyEntry.TotalCarbohydrateGrams + consumedFood.Carbohydrates,
-        TotalProteinGrams: currentDailyEntry.TotalProteinGrams + consumedFood.Protein,
+        TotalSaturatedGrams:
+          currentDailyEntry.TotalSaturatedGrams + consumedFood.Saturated,
+        TotalCarbohydrateGrams:
+          currentDailyEntry.TotalCarbohydrateGrams + consumedFood.Carbohydrates,
+        TotalProteinGrams:
+          currentDailyEntry.TotalProteinGrams + consumedFood.Protein,
       };
     } else {
       return {
@@ -301,14 +460,20 @@ export class DailyTrackingService {
    * @param consumedFood Consumed Food deleted.
    * @returns Updated Daily Entry.
    */
-  prepareUpdatedDailyEntryOnEntryDelete(currentDailyEntry: DailyEntry, consumedFood: Food): DailyEntry {
+  prepareUpdatedDailyEntryOnEntryDelete(
+    currentDailyEntry: DailyEntry,
+    consumedFood: Food
+  ): DailyEntry {
     return {
       Date: currentDailyEntry.Date,
       TotalCalories: currentDailyEntry.TotalCalories - consumedFood.Calories,
       TotalFatGrams: currentDailyEntry.TotalFatGrams - consumedFood.Fats,
-      TotalSaturatedGrams: currentDailyEntry.TotalSaturatedGrams - consumedFood.Saturated,
-      TotalCarbohydrateGrams: currentDailyEntry.TotalCarbohydrateGrams - consumedFood.Carbohydrates,
-      TotalProteinGrams: currentDailyEntry.TotalProteinGrams - consumedFood.Protein,
+      TotalSaturatedGrams:
+        currentDailyEntry.TotalSaturatedGrams - consumedFood.Saturated,
+      TotalCarbohydrateGrams:
+        currentDailyEntry.TotalCarbohydrateGrams - consumedFood.Carbohydrates,
+      TotalProteinGrams:
+        currentDailyEntry.TotalProteinGrams - consumedFood.Protein,
     };
   }
 
@@ -318,20 +483,33 @@ export class DailyTrackingService {
    * @param consumedFood Consumed Food edited.
    * @returns Updated Daily Entry.
    */
-  prepareUpdatedDailyEntryOnEntryEdit(currentDailyEntry: DailyEntry, consumedFoodBefore: Food, consumedFoodAfter: Food): DailyEntry {
+  prepareUpdatedDailyEntryOnEntryEdit(
+    currentDailyEntry: DailyEntry,
+    consumedFoodBefore: Food,
+    consumedFoodAfter: Food
+  ): DailyEntry {
     return {
       Date: currentDailyEntry.Date,
-      TotalCalories: currentDailyEntry.TotalCalories - consumedFoodBefore.Calories + consumedFoodAfter.Calories,
-      TotalFatGrams: currentDailyEntry.TotalFatGrams - consumedFoodBefore.Fats + consumedFoodAfter.Fats,
-      TotalSaturatedGrams: currentDailyEntry.TotalSaturatedGrams - consumedFoodBefore.Saturated + consumedFoodAfter.Saturated,
-      TotalCarbohydrateGrams: currentDailyEntry.TotalCarbohydrateGrams - consumedFoodBefore.Carbohydrates + consumedFoodAfter.Carbohydrates,
-      TotalProteinGrams: currentDailyEntry.TotalProteinGrams - consumedFoodBefore.Protein + consumedFoodAfter.Protein,
+      TotalCalories:
+        currentDailyEntry.TotalCalories -
+        consumedFoodBefore.Calories +
+        consumedFoodAfter.Calories,
+      TotalFatGrams:
+        currentDailyEntry.TotalFatGrams -
+        consumedFoodBefore.Fats +
+        consumedFoodAfter.Fats,
+      TotalSaturatedGrams:
+        currentDailyEntry.TotalSaturatedGrams -
+        consumedFoodBefore.Saturated +
+        consumedFoodAfter.Saturated,
+      TotalCarbohydrateGrams:
+        currentDailyEntry.TotalCarbohydrateGrams -
+        consumedFoodBefore.Carbohydrates +
+        consumedFoodAfter.Carbohydrates,
+      TotalProteinGrams:
+        currentDailyEntry.TotalProteinGrams -
+        consumedFoodBefore.Protein +
+        consumedFoodAfter.Protein,
     };
   }
-  
 }
-
-
-
-
-

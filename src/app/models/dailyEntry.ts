@@ -30,4 +30,6 @@ export interface Entry {
     CreatedAt: number;
 
     Food: Food;
+
+    IsChecked?: boolean;
 }

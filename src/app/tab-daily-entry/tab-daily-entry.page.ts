@@ -123,9 +123,10 @@ export class TabDailyEntryPage {
         }, {
           text: 'Yes',
           handler: async () => {
-            await this._dailyTrackingService.deleteEntryAndUpdateDailyEntryFields(this.date, entryArg, this.dailyEntry.Entries.length);
+            var loadingElement = await this._loadingService.createAndPresentLoading('Deleting..');
+            await this._dailyTrackingService.deleteEntryAndUpdateDailyEntryFields(this.date, entryArg);//, this.dailyEntry.Entries.length);
             slidingItem.close();
-            await this._loadingService.presentLoading('Deleting..', 500);
+            await this._loadingService.dismissLoading(loadingElement);  
           }
         }
       ]

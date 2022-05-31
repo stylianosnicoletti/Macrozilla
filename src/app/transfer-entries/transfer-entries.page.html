@@ -10,35 +10,33 @@
 
   <ion-card color="tertiary" id="open-fromdate-input">
     <ion-item color="tertiary">
-      <ion-label> Select From Date: </ion-label>
-      <ion-label slot="end">
-        {{dateToTransfer | date:'EEEE, MMMM d, y'}}
-      </ion-label>
+      <ion-label>From Date: </ion-label>
+      <ion-label slot="end"> {{dateFrom | date:'EEEE, MMMM d, y'}} </ion-label>
     </ion-item>
   </ion-card>
 
   <ng-container
-    *ngIf="dailyEntryToTransfer?.TotalCalories > 0; then showentries else nothingFound"
+    *ngIf="dailyEntryFrom?.TotalCalories > 0; then showentriesFrom else nothingFoundFrom"
   >
   </ng-container>
 
-  <!-- Skeleton: Nothing found -->
-  <ng-template #nothingFound>
+  <!-- Skeleton: Nothing found from-->
+  <ng-template #nothingFoundFrom>
     <ion-content>
-    <ion-card>
-      <ion-card-content>
-        There is no tracking activity yet for this date. 👨‍🍳
-      </ion-card-content>
-    </ion-card>
-  </ion-content>
+      <ion-card>
+        <ion-card-content>
+          There is no tracking activity yet for this date. 👨‍🍳
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
   </ng-template>
 
-  <!-- Skeleton: Showentries -->
-  <ng-template #showentries>
+  <!-- Skeleton: Showentries from -->
+  <ng-template #showentriesFrom>
     <ion-content>
       <ion-list>
         <ion-item-sliding
-          *ngFor="let entry of dailyEntryToTransfer?.Entries"
+          *ngFor="let entry of dailyEntryFrom?.Entries"
           #slidingItem
         >
           <ion-item>
@@ -58,8 +56,8 @@
               >
             </ion-chip>
             <ion-checkbox
-              slot="end"
-              [(ngModel)]="entry.isChecked"
+              slot="end"          
+              [(ngModel)]="entry.IsChecked"
             ></ion-checkbox>
           </ion-item>
         </ion-item-sliding>
@@ -70,32 +68,32 @@
   <ion-card color="dark" disabled>
     <ion-item color="dark">
       <ion-label> To Date: </ion-label>
-      <ion-label slot="end"> {{date | date:'EEEE, MMMM d, y'}} </ion-label>
+      <ion-label slot="end"> {{dateTo | date:'EEEE, MMMM d, y'}} </ion-label>
     </ion-item>
   </ion-card>
 
   <ng-container
-    *ngIf="dailyEntryToTransfer?.TotalCalories > 0; then showentries else nothingFound"
+    *ngIf="dailyEntryTo?.TotalCalories > 0; then showentriesTo else nothingFoundTo"
   >
   </ng-container>
 
-  <!-- Skeleton: Nothing found -->
-  <ng-template #nothingFound>
+  <!-- Skeleton: Nothing found To-->
+  <ng-template #nothingFoundTo>
     <ion-content>
-    <ion-card>
-      <ion-card-content>
-        There is no tracking activity yet for this date. 👨‍🍳
-      </ion-card-content>
-    </ion-card>
-  </ion-content>
+      <ion-card>
+        <ion-card-content>
+          There is no tracking activity yet for this date. 👨‍🍳
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
   </ng-template>
 
-  <!-- Skeleton: Showentries -->
-  <ng-template #showentries>
+  <!-- Skeleton: Showentries To-->
+  <ng-template #showentriesTo>
     <ion-content>
       <ion-list>
         <ion-item-sliding
-          *ngFor="let entry of dailyEntryToTransfer?.Entries"
+          *ngFor="let entry of dailyEntryTo?.Entries"
           #slidingItem
         >
           <ion-item>
@@ -114,18 +112,18 @@
                 >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
               >
             </ion-chip>
-            <ion-checkbox
-              slot="end"
-              [(ngModel)]="entry.isChecked"
-            ></ion-checkbox>
           </ion-item>
         </ion-item-sliding>
       </ion-list>
     </ion-content>
   </ng-template>
 
-  <ion-button expand="block">A block button</ion-button>
-  <ion-button expand="block">A block button</ion-button>
+  <ion-button expand="block" color="primary" (click)="copyEntries()"
+    >Copy</ion-button
+  >
+  <ion-button expand="block" color="warning" (click)="moveEntries()"
+    >Move</ion-button
+  >
 
   <!-- Date Selection Pop Over -->
   <ion-popover
@@ -142,9 +140,9 @@
         showDefaultButtons="true"
         presentation="date"
         displayFormat="DD/MM/YYYY"
-        [(ngModel)]="dateToTransfer"
-        (ionChange)="parseDate()"
-        value="{{dateToTransfer}}"
+        [(ngModel)]="dateFrom"
+        (ionChange)="transformDateAndReadDailyEntry('FROM')"
+        value="{{dateFrom}}"
       >
       </ion-datetime>
     </ng-template>

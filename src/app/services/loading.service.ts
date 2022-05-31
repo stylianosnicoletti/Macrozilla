@@ -17,6 +17,18 @@ export class LoadingService {
     const { role, data } = await loading.onDidDismiss();
   }
 
+  async createAndPresentLoading(messageText: string): Promise<HTMLIonLoadingElement>{
+    const loading = await this.loadingController.create({
+      message: messageText
+    });
+    await loading.present();
+    return loading;
+  }
+
+  async dismissLoading(loading :HTMLIonLoadingElement){
+    loading.dismiss();
+  }
+
   async presentLoadingWithOptions() {
     const loading = await this.loadingController.create({
       spinner: null,

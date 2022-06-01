@@ -21,6 +21,8 @@ export interface DailyEntry {
     TotalCarbohydrateGrams: number;
 
     TotalProteinGrams: number;
+    
+    SizeOfEntries: number;
 }
 
 export interface Entry {
@@ -30,4 +32,6 @@ export interface Entry {
     CreatedAt: number;
 
     Food: Food;
+
+    IsChecked?: boolean;
 }

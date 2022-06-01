@@ -1,10 +1,10 @@
-.welcome-card img {
+/*.welcome-card img {
   max-height: 35vh;
   overflow: hidden;
 }
 
 ion-card {
-  --background: #3880ff;// rgb(70, 175, 245) ;
+  --background: #344564;// rgb(70, 175, 245) ;
 }
 ion-card-title{
   color: white;
@@ -18,6 +18,7 @@ ion-card-content{
 ion-datetime { 
   //font-size: larger;
 }
+*/
 
 ion-popover#popover-bottom::part(content) {
   top: unset !important;

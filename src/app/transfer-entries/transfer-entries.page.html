@@ -1,0 +1,150 @@
+<ion-app>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="tabs/daily_entry"></ion-back-button>
+      </ion-buttons>
+      <ion-title> Transfer Entries</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card color="tertiary" id="open-fromdate-input">
+    <ion-item color="tertiary">
+      <ion-label>From Date: </ion-label>
+      <ion-label slot="end"> {{dateFrom | date:'EEEE, MMMM d, y'}} </ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ng-container
+    *ngIf="dailyEntryFrom?.TotalCalories > 0; then showentriesFrom else nothingFoundFrom"
+  >
+  </ng-container>
+
+  <!-- Skeleton: Nothing found from-->
+  <ng-template #nothingFoundFrom>
+    <ion-content>
+      <ion-card>
+        <ion-card-content>
+          There is no tracking activity yet for this date. 👨‍🍳
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
+  </ng-template>
+
+  <!-- Skeleton: Showentries from -->
+  <ng-template #showentriesFrom>
+    <ion-content>
+      <ion-list>
+        <ion-item-sliding
+          *ngFor="let entry of dailyEntryFrom?.Entries"
+          #slidingItem
+        >
+          <ion-item>
+            <ion-label class="ion-text-wrap">
+              <h2><strong>{{entry.Food.Name}}</strong></h2>
+              <h3>
+                🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
+                {{entry.Food.Protein | number:'1.0-1' }}g 🍞
+                {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
+                {{entry.Food.Fats | number:'1.0-1' }}g
+              </h3>
+            </ion-label>
+
+            <ion-chip slot="end" color="primary">
+              <strong
+                >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
+              >
+            </ion-chip>
+            <ion-checkbox
+              slot="end"          
+              [(ngModel)]="entry.IsChecked"
+            ></ion-checkbox>
+          </ion-item>
+        </ion-item-sliding>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+
+  <ion-card color="dark" disabled>
+    <ion-item color="dark">
+      <ion-label> To Date: </ion-label>
+      <ion-label slot="end"> {{dateTo | date:'EEEE, MMMM d, y'}} </ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ng-container
+    *ngIf="dailyEntryTo?.TotalCalories > 0; then showentriesTo else nothingFoundTo"
+  >
+  </ng-container>
+
+  <!-- Skeleton: Nothing found To-->
+  <ng-template #nothingFoundTo>
+    <ion-content>
+      <ion-card>
+        <ion-card-content>
+          There is no tracking activity yet for this date. 👨‍🍳
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
+  </ng-template>
+
+  <!-- Skeleton: Showentries To-->
+  <ng-template #showentriesTo>
+    <ion-content>
+      <ion-list>
+        <ion-item-sliding
+          *ngFor="let entry of dailyEntryTo?.Entries"
+          #slidingItem
+        >
+          <ion-item>
+            <ion-label class="ion-text-wrap">
+              <h2><strong>{{entry.Food.Name}}</strong></h2>
+              <h3>
+                🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
+                {{entry.Food.Protein | number:'1.0-1' }}g 🍞
+                {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
+                {{entry.Food.Fats | number:'1.0-1' }}g
+              </h3>
+            </ion-label>
+
+            <ion-chip slot="end" color="primary">
+              <strong
+                >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
+              >
+            </ion-chip>
+          </ion-item>
+        </ion-item-sliding>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+
+  <ion-button expand="block" color="primary" (click)="copyEntries()"
+    >Copy</ion-button
+  >
+  <ion-button expand="block" color="warning" (click)="moveEntries()"
+    >Move</ion-button
+  >
+
+  <!-- Date Selection Pop Over -->
+  <ion-popover
+    id="popover-bottom"
+    size="cover"
+    arrow="false"
+    trigger="open-fromdate-input"
+    show-backdrop="true"
+  >
+    <ng-template>
+      <ion-datetime
+        size="cover"
+        color="tertiary"
+        showDefaultButtons="true"
+        presentation="date"
+        displayFormat="DD/MM/YYYY"
+        [(ngModel)]="dateFrom"
+        (ionChange)="transformDateAndReadDailyEntry('FROM')"
+        value="{{dateFrom}}"
+      >
+      </ion-datetime>
+    </ng-template>
+  </ion-popover>
+</ion-app>

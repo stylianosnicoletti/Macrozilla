@@ -39,6 +39,12 @@ const routes: Routes = [
     canActivate: [CanEnterTabsPageGuard],
     loadChildren: () => import('./add-entry-search/add-entry-search.module').then(m => m.AddEntrySearchPageModule)
   },
+  // If user navigates to transfer entriespage
+  {
+    path: 'transfer_entries/:date_selected',
+    canActivate: [CanEnterTabsPageGuard],
+    loadChildren: () => import('./transfer-entries/transfer-entries.module').then(m => m.TransferEntriesPageModule)
+  },
   // If user navigates to edit entry
   {
     path: 'edit_entry_input_form/:date_selected/:entry_doc_id',

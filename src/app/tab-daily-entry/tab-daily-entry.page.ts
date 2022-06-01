@@ -65,6 +65,7 @@ export class TabDailyEntryPage {
    * Refresh action.
    */
   async doRefresh(event): Promise<void> {
+    this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     await this.initialiseItems();
     setTimeout(() => {
       event.target.complete();

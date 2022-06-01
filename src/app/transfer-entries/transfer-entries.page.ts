@@ -11,6 +11,7 @@ import { TransferEntriesService } from "../services/transfer-entries.service";
 import { DailyEntry } from "../models/dailyEntry";
 import { ToastService } from "../services/toast.service";
 import { LoadingService } from "../services/loading.service";
+import { UnsubscribeService } from "../services/unsubscribe.service";
 
 @Component({
   selector: "app-transfer-entries",
@@ -37,11 +38,12 @@ export class TransferEntriesPage {
     private _dailyTrackingService: DailyTrackingService,
     private _transferEntriesService: TransferEntriesService,
     private _toastService: ToastService,
-    private _loadingService: LoadingService
+    private _loadingService: LoadingService,
+    private _unsubscribeService: UnsubscribeService
   ) {}
 
   async ngOnInit() {
-    //console.log("ngOnInit Add New Daily Entry Search");
+    //console.log("ngOnInit transfer");
     await (
       await this._userService.getUserFields()
     ).subscribe(async (x) => {
@@ -54,7 +56,7 @@ export class TransferEntriesPage {
   }
 
   async ionViewWillEnter() {
-    //console.log("entering add entry search page");
+    //console.log("entering transfer");
 
     Network.addListener("networkStatusChange", async (status) => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
@@ -72,7 +74,8 @@ export class TransferEntriesPage {
   }
 
   ionViewWillLeave() {
-    //console.log("leaving add entry search page");
+    //console.log("leaving transfer");
+    this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     Network.removeAllListeners();
   }
 
@@ -83,18 +86,11 @@ export class TransferEntriesPage {
     this.enterGuard();
   }
 
-  async doRefresh(event) {
-    await this.initialiseItems();
-    setTimeout(() => {
-      event.target.complete();
-    }, 1000);
-  }
-
   // Check if the route param key matches a date
   enterGuard() {
     this.dateTo = this._activatedRoute.snapshot.params["date_selected"];
     this.dateFrom = this.dateTo;
-    console.log(this.dateTo);
+    //console.log(this.dateTo);
     if (!MacrozillaConstants.REGEX_DATE.test(this.dateTo)) {
       this._router.navigate(["/tabs/daily_entry"]);
     }
@@ -134,7 +130,7 @@ export class TransferEntriesPage {
         ).subscribe((x) => {
           this.dailyEntryFrom = x;
           this.dailyEntryFrom.Entries.forEach((x) => (x.IsChecked = true));
-          console.log(this.dailyEntryFrom.Entries);
+          //console.log(this.dailyEntryFrom.Entries);
         })
       );
     }
@@ -146,7 +142,7 @@ export class TransferEntriesPage {
           await this._dailyTrackingService.readDailyEntry(this.dateTo, true)
         ).subscribe((x) => {
           this.dailyEntryTo = x;
-          console.log(this.dailyEntryTo.Entries);
+          //console.log(this.dailyEntryTo.Entries);
         })
       );
     }
@@ -164,15 +160,38 @@ export class TransferEntriesPage {
       );
 
       if (checkedEntries.length > 0) {
-        var loadingElement = await this._loadingService.createAndPresentLoading('Moving..');
-        await this._router.navigate(["/tabs/daily_entry"]);
-       // await this._transferEntriesService.moveEntries(
-        //  checkedEntries,
-        //  this.dateFrom,
-        //  this.dateTo
-       // );
-        await this._loadingService.dismissLoading(loadingElement);  
-        await this._toastService.presentToast("Entries Successfully Moved!");
+        const alert = await this._alertController.create({
+          header: "Do you want to proceed moving entries?",
+          message: this.dateFrom + " ➡️ " + this.dateTo,
+          buttons: [
+            {
+              text: "No",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: () => {},
+            },
+            {
+              text: "Yes",
+              handler: async () => {
+                await this._router.navigate(["/tabs/daily_entry"]);
+                var loadingElement =
+                  await this._loadingService.createAndPresentLoading(
+                    "Moving.."
+                  );
+                await this._transferEntriesService.moveEntries(
+                  checkedEntries,
+                  this.dateFrom,
+                  this.dateTo
+                );
+                await this._loadingService.dismissLoading(loadingElement);
+                await this._toastService.presentToast(
+                  "Entries Successfully Moved!"
+                );
+              },
+            },
+          ],
+        });
+        await alert.present();
       } else {
         await this._toastService.presentToast("Please check entries to move!");
       }
@@ -191,13 +210,15 @@ export class TransferEntriesPage {
       );
 
       if (checkedEntries.length > 0) {
-        var loadingElement = await this._loadingService.createAndPresentLoading('Copying..');
         await this._router.navigate(["/tabs/daily_entry"]);
+        var loadingElement = await this._loadingService.createAndPresentLoading(
+          "Copying.."
+        );
         await this._transferEntriesService.copyEntries(
           checkedEntries,
           this.dateTo
         );
-        await this._loadingService.dismissLoading(loadingElement);  
+        await this._loadingService.dismissLoading(loadingElement);
         await this._toastService.presentToast("Entries Successfully Copied!");
       } else {
         await this._toastService.presentToast("Please check entries to copy!");

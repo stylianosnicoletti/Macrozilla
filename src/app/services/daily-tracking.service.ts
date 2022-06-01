@@ -184,24 +184,45 @@ export class DailyTrackingService {
       (u) => u.uid
     );
 
-    //TODO FIND A WAY TO GET COUNTS WITHOUT ENTERING IT AS AN ARGUMENT
     // Get current Daily Entry Doc if exists
     const existingDailyEntry = await this.getDailyEntry(selectedDate);
-    console.log(existingDailyEntry);
-    if (existingDailyEntry?.Entries?.length > 1) {
-      console.log(">1");
+    //console.log(existingDailyEntry);
+    if (existingDailyEntry?.SizeOfEntries > 1) {
       // Delete entry from Entries collections
-      //await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entry.DocumentId).delete();
+      await this._angularFireStore
+        .doc(
+          "/TheMacroDiet/Production/Users/" +
+            currentUserUid +
+            "/DailyEntries/" +
+            selectedDate +
+            "/Entries/" +
+            entry.DocumentId
+        )
+        .delete();
       // Update Existing Daily Entry
-      //await this.updateDailyEntry(selectedDate, this.prepareUpdatedDailyEntryOnEntryDelete(existingDailyEntry, entry.Food));
+      await this.updateDailyEntry(
+        selectedDate,
+        this.prepareUpdatedDailyEntryOnEntryDelete(
+          existingDailyEntry,
+          entry.Food
+        )
+      );
     } else {
-      console.log("NOT >1");
       // Delete entry from Entries collections (needed since when deleting docs subcollections remain)
-      //await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries/" + entry.DocumentId).delete();
+      await this._angularFireStore
+        .doc(
+          "/TheMacroDiet/Production/Users/" +
+            currentUserUid +
+            "/DailyEntries/" +
+            selectedDate +
+            "/Entries/" +
+            entry.DocumentId
+        )
+        .delete();
       // Remove whole Daily Entry on last Entry deletion
-      //await this.deleteDailyEntry(selectedDate);
+      await this.deleteDailyEntry(selectedDate);
       // Decrement size of collection
-      //await this._userService.DailyEntriesSizeDecrement();
+      await this._userService.DailyEntriesSizeDecrement();
     }
   }
 
@@ -255,6 +276,7 @@ export class DailyTrackingService {
             TotalCarbohydrateGrams: dailyEntry?.TotalCarbohydrateGrams,
             TotalProteinGrams: dailyEntry?.TotalProteinGrams,
             Entries: entries,
+            SizeOfEntries: dailyEntry?.SizeOfEntries,
           };
         })
       );
@@ -268,6 +290,7 @@ export class DailyTrackingService {
             TotalSaturatedGrams: dailyEntry?.TotalSaturatedGrams,
             TotalCarbohydrateGrams: dailyEntry?.TotalCarbohydrateGrams,
             TotalProteinGrams: dailyEntry?.TotalProteinGrams,
+            SizeOfEntries: dailyEntry?.SizeOfEntries,
           };
         })
       );
@@ -307,34 +330,13 @@ export class DailyTrackingService {
             TotalSaturatedGrams: c.data().TotalSaturatedGrams,
             TotalCarbohydrateGrams: c.data().TotalCarbohydrateGrams,
             TotalProteinGrams: c.data().TotalProteinGrams,
+            SizeOfEntries: c.data().SizeOfEntries,
           }))
         )
         .toPromise();
     }
   }
 
-  /**
-   * Get Entries collection length from Daily Entry doc based on date.
-   * @param selectedDate Selected date.
-   * @returns
-   */
-  //async getEntriesLengthFromDailyEntry(selectedDate: string): Promise<number> {
-
-  // Current user id
-  //  const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-  /*
-      // Reference to document
-      const userDocRef = await this._angularFireStore.doc<DailyEntry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate);
-      const doc = await userDocRef.get();
-       await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/" + selectedDate + "/Entries").get(); 
-       a.s
-       const query = firestore.collection("fruits");
-const snapshot = await query.get();
-const count = snapshot.size;
-       .subscribe( result => {
-       console.log(result.length);
-       })*/
-  // }
   /**
    * Update Daily Entry.
    * @param selectedDate Selected Date.
@@ -441,6 +443,7 @@ const count = snapshot.size;
           currentDailyEntry.TotalCarbohydrateGrams + consumedFood.Carbohydrates,
         TotalProteinGrams:
           currentDailyEntry.TotalProteinGrams + consumedFood.Protein,
+        SizeOfEntries: currentDailyEntry.SizeOfEntries + 1,
       };
     } else {
       return {
@@ -450,6 +453,7 @@ const count = snapshot.size;
         TotalSaturatedGrams: consumedFood.Saturated,
         TotalCarbohydrateGrams: consumedFood.Carbohydrates,
         TotalProteinGrams: consumedFood.Protein,
+        SizeOfEntries: 1,
       };
     }
   }
@@ -474,6 +478,7 @@ const count = snapshot.size;
         currentDailyEntry.TotalCarbohydrateGrams - consumedFood.Carbohydrates,
       TotalProteinGrams:
         currentDailyEntry.TotalProteinGrams - consumedFood.Protein,
+      SizeOfEntries: currentDailyEntry.SizeOfEntries - 1,
     };
   }
 
@@ -510,6 +515,7 @@ const count = snapshot.size;
         currentDailyEntry.TotalProteinGrams -
         consumedFoodBefore.Protein +
         consumedFoodAfter.Protein,
+      SizeOfEntries: currentDailyEntry.SizeOfEntries,
     };
   }
 }

@@ -21,6 +21,8 @@ export interface DailyEntry {
     TotalCarbohydrateGrams: number;
 
     TotalProteinGrams: number;
+    
+    SizeOfEntries: number;
 }
 
 export interface Entry {

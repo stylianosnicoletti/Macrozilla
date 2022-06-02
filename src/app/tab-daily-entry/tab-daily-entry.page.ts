@@ -8,6 +8,7 @@ import { Network } from "@capacitor/network";
 import { DailyEntry, Entry } from "../models/dailyEntry";
 import { DailyTrackingService } from "../services/daily-tracking.service";
 import { UnsubscribeService } from "../services/unsubscribe.service";
+import { UserService } from "../services/user.service";
 
 @Component({
   selector: "app-tab-daily-entry",
@@ -21,6 +22,7 @@ export class TabDailyEntryPage {
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
   lastNetworkStatusIsConnected = true;
+  transferEntriesEnabled: boolean;
 
   constructor(
     private _router: Router,
@@ -28,8 +30,17 @@ export class TabDailyEntryPage {
     private _loadingService: LoadingService,
     private _dailyTrackingService: DailyTrackingService,
     private _alertController: AlertController,
-    private _unsubscribeService: UnsubscribeService
+    private _unsubscribeService: UnsubscribeService,
+    private _userService: UserService
   ) {}
+
+  async ngOnInit() {
+    //console.log("ngOnInit Add Daily Entry");
+    await (await this._userService.getUserFields()).subscribe(async x => {
+      this.transferEntriesEnabled = x.Options.TransferEntriesEnabled;
+      //console.log(this.transferEntriesEnabled);
+    });
+  }
 
   async ionViewWillEnter() {
     //console.log("entering daily entries page");
@@ -171,4 +182,3 @@ export class TabDailyEntryPage {
     ]);
   }
 }
-

@@ -35,32 +35,24 @@
   <ng-template #showentriesFrom>
     <ion-content>
       <ion-list>
-        <ion-item-sliding
-          *ngFor="let entry of dailyEntryFrom?.Entries"
-          #slidingItem
-        >
-          <ion-item>
-            <ion-label class="ion-text-wrap">
-              <h2><strong>{{entry.Food.Name}}</strong></h2>
-              <h3>
-                🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
-                {{entry.Food.Protein | number:'1.0-1' }}g 🍞
-                {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
-                {{entry.Food.Fats | number:'1.0-1' }}g
-              </h3>
-            </ion-label>
+        <ion-item *ngFor="let entry of dailyEntryFrom?.Entries">
+          <ion-label class="ion-text-wrap">
+            <h2><strong>{{entry.Food.Name}}</strong></h2>
+            <h3>
+              🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
+              {{entry.Food.Protein | number:'1.0-1' }}g 🍞
+              {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
+              {{entry.Food.Fats | number:'1.0-1' }}g
+            </h3>
+          </ion-label>
 
-            <ion-chip slot="end" color="primary">
-              <strong
-                >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
-              >
-            </ion-chip>
-            <ion-checkbox
-              slot="end"          
-              [(ngModel)]="entry.IsChecked"
-            ></ion-checkbox>
-          </ion-item>
-        </ion-item-sliding>
+          <ion-chip slot="end" color="primary">
+            <strong
+              >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
+            >
+          </ion-chip>
+          <ion-checkbox slot="end" [(ngModel)]="entry.IsChecked"></ion-checkbox>
+        </ion-item>
       </ion-list>
     </ion-content>
   </ng-template>
@@ -92,28 +84,23 @@
   <ng-template #showentriesTo>
     <ion-content>
       <ion-list>
-        <ion-item-sliding
-          *ngFor="let entry of dailyEntryTo?.Entries"
-          #slidingItem
-        >
-          <ion-item>
-            <ion-label class="ion-text-wrap">
-              <h2><strong>{{entry.Food.Name}}</strong></h2>
-              <h3>
-                🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
-                {{entry.Food.Protein | number:'1.0-1' }}g 🍞
-                {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
-                {{entry.Food.Fats | number:'1.0-1' }}g
-              </h3>
-            </ion-label>
+        <ion-item *ngFor="let entry of dailyEntryTo?.Entries">
+          <ion-label class="ion-text-wrap">
+            <h2><strong>{{entry.Food.Name}}</strong></h2>
+            <h3>
+              🔋 {{entry.Food.Calories | number:'1.0-1' }}kcal 🥩
+              {{entry.Food.Protein | number:'1.0-1' }}g 🍞
+              {{entry.Food.Carbohydrates | number:'1.0-1' }}g 🐖
+              {{entry.Food.Fats | number:'1.0-1' }}g
+            </h3>
+          </ion-label>
 
-            <ion-chip slot="end" color="primary">
-              <strong
-                >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
-              >
-            </ion-chip>
-          </ion-item>
-        </ion-item-sliding>
+          <ion-chip slot="end" color="primary">
+            <strong
+              >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
+            >
+          </ion-chip>
+        </ion-item>
       </ion-list>
     </ion-content>
   </ng-template>

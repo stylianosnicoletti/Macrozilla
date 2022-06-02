@@ -18,6 +18,7 @@ export class TabAccountPage {
   userEmailAddress: string;
   userName: string;
   darkMode: boolean;
+  transferEntriesEnabled: boolean;
   useOnlyPersonalDb: string;
   lastNetworkStatusIsConnected = true;
 
@@ -80,6 +81,7 @@ export class TabAccountPage {
     } else {
       this.useOnlyPersonalDb = "0";
     }
+    this.transferEntriesEnabled = opt.TransferEntriesEnabled;
   }
 
   /**
@@ -88,10 +90,12 @@ export class TabAccountPage {
    * @param useOnlyPersonalDb UseOnlyPersonalDb Model.
    * @returns User Options.
    */
-  mapNgModelsToUserOptions(darkMode: boolean, useOnlyPersonalDb: String): Options {
+  mapNgModelsToUserOptions(darkMode: boolean, useOnlyPersonalDb: String, transferEntriesEnabled: boolean): Options {
     return <Options>{
       DarkMode: darkMode,
       UseOnlyPersonalDb: useOnlyPersonalDb == "1" ? true : false,
+      TransferEntriesEnabled: transferEntriesEnabled,
+      
     };
   }
 
@@ -100,7 +104,7 @@ export class TabAccountPage {
    */
   async updateUserOptions(): Promise<void> {
     const user = <User>{
-      Options: this.mapNgModelsToUserOptions(this.darkMode, this.useOnlyPersonalDb)
+      Options: this.mapNgModelsToUserOptions(this.darkMode, this.useOnlyPersonalDb, this.transferEntriesEnabled)
     }
     await this._userService.updateUserFieldOptions(user.Options);
   }

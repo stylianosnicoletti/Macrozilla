@@ -21,7 +21,6 @@ export class AddEntrySearchPage {
   searchTerm: string = "";
   filteredFoodMap = new Map<string, Food>(); // To avoid duplication and maintain insertion order (for ES6+)
   foodDbSubscriptionsList: Subscription[] = []; // Storing subscriptions calling the food databases
-  generalSubscriptionsList: Subscription[] = [];
   useOnlyPersonalDb: boolean = false;
   noPersonalFoodsFoundAfterQuery: boolean = true;
   noGlobalFoodsFoundAfterQuery: boolean = true;
@@ -56,7 +55,6 @@ export class AddEntrySearchPage {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
         //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
-        this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
         await this.initialiseItems();
         this.searchTerm = "";       
@@ -64,7 +62,6 @@ export class AddEntrySearchPage {
       else if(!status.connected) {
         //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
-        this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
         this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
         this.searchTerm = "";
         await this.goToDailyEntryTab();
@@ -77,7 +74,6 @@ export class AddEntrySearchPage {
 
   ionViewWillLeave() {
     //console.log("leaving add entry search page");
-    this._unSubscribeService.unsubscribeData(this.generalSubscriptionsList);
     this._unSubscribeService.unsubscribeData(this.foodDbSubscriptionsList);
     Network.removeAllListeners();
   }

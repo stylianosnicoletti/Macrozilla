@@ -16,6 +16,8 @@ export interface Options {
   DarkMode: boolean;
 
   UseOnlyPersonalDb: boolean;
+
+  TransferEntriesEnabled: boolean;
 }
 
 /**

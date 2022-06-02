@@ -28,6 +28,8 @@ export class TransferEntriesPage {
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
   lastNetworkStatusIsConnected = true;
+  isIndeterminate: boolean = false;
+  masterCheck: boolean = true;
 
   constructor(
     private _router: Router,
@@ -133,7 +135,7 @@ export class TransferEntriesPage {
           await this._dailyTrackingService.readDailyEntry(this.dateFrom, true)
         ).subscribe((x) => {
           this.dailyEntryFrom = x;
-          this.dailyEntryFrom.Entries.forEach((x) => (x.IsChecked = true));
+          this.checkMaster();
           //console.log(this.dailyEntryFrom.Entries);
         })
       );
@@ -248,5 +250,40 @@ export class TransferEntriesPage {
       return "dark";
     }
     return "light";
+  }
+
+  /**
+   * For Master CheckBox.
+   */
+  checkMaster() {
+    setTimeout(()=>{
+      this.dailyEntryFrom.Entries.forEach(entry => {
+        entry.IsChecked = this.masterCheck;
+      });
+    });
+  }
+
+  /**
+   * On check entry (event) logic.
+   */
+  checkEvent() {
+    const totalItems = this.dailyEntryFrom.SizeOfEntries;
+    let checked = 0;
+    this.dailyEntryFrom.Entries.map(entry => {
+      if (entry.IsChecked) checked++;
+    });
+    if (checked > 0 && checked < totalItems) {
+      //If even one item is checked but not all
+      this.isIndeterminate = true;
+      this.masterCheck = false;
+    } else if (checked == totalItems) {
+      //If all are checked
+      this.masterCheck = true;
+      this.isIndeterminate = false;
+    } else {
+      //If none is checked
+      this.isIndeterminate = false;
+      this.masterCheck = false;
+    }
   }
 }

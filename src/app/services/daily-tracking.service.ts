@@ -388,7 +388,7 @@ export class DailyTrackingService {
   }
 
   /**
-   * Delete Daily Entry.
+   * Delete Daily Entry. (Will not delete nested collections)
    * @param selectedDate Selected Date.
    * @returns
    */

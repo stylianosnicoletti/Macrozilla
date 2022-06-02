@@ -33,7 +33,7 @@
   </ion-card>
 
   <ion-card id="open-date-input">
-    <ion-item color = 'tertiary'>
+    <ion-item color="tertiary">
       <ion-label> Select Date: </ion-label>
       <ion-label slot="end"> {{date | date:'EEEE, MMMM d, y'}} </ion-label>
     </ion-item>
@@ -79,21 +79,6 @@
           There is no tracking activity yet for this date. 👨‍🍳
         </ion-card-content>
       </ion-card>
-
-      <!-- fab placed in the center of the content with a list on each side -->
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button>
-          <ion-icon name="caret-up"></ion-icon>
-        </ion-fab-button>
-        <ion-fab-list side="top">
-          <ion-fab-button (click)="transferEntries()">
-            <ion-icon name="repeat"></ion-icon>
-          </ion-fab-button>
-          <ion-fab-button (click)="addNewEntry()">
-            <ion-icon name="add"></ion-icon>
-          </ion-fab-button>
-        </ion-fab-list>
-      </ion-fab>
     </ng-template>
 
     <!-- Skeleton: Showentries -->
@@ -138,11 +123,49 @@
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
-      <!-- Fab placed to the bottom end -->
+    </ng-template>
+
+    <ng-container
+      *ngIf="(transferEntriesEnabled == true) || (deletingAllDailyEntriesEnabled == true); then listFab else singleFab"
+    >
+    </ng-container>
+
+    <!-- Fab add only -->
+    <ng-template #singleFab>
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button (click)="addNewEntry()">
+        <ion-fab-button color="success" (click)="addNewEntry()">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
+      </ion-fab>
+    </ng-template>
+
+    <!-- fab add and transfer -->
+    <ng-template #listFab>
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button color="primary">
+          <ion-icon name="caret-up"></ion-icon>
+        </ion-fab-button>
+        <ion-fab-list side="top">
+          <ion-fab-button color="success" (click)="addNewEntry()">
+            <ion-icon name="add"></ion-icon>
+          </ion-fab-button>
+
+          <ion-fab-button
+            *ngIf="transferEntriesEnabled"
+            color="tertiary"
+            (click)="transferEntries()"
+          >
+            <ion-icon name="repeat"></ion-icon>
+          </ion-fab-button>
+
+          <ion-fab-button
+            *ngIf="(deletingAllDailyEntriesEnabled) && (dailyEntry?.SizeOfEntries > 0)"
+            color="danger"
+            (click)="deleteAllDailyEntries()"
+          >
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-fab-button>
+        </ion-fab-list>
       </ion-fab>
     </ng-template>
   </ion-content>

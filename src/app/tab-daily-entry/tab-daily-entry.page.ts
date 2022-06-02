@@ -197,8 +197,10 @@ export class TabDailyEntryPage {
           handler: async () => {
             var loadingElement =
               await this._loadingService.createAndPresentLoading("Deleting..");
-            // Remove whole Daily Entry on last Entry deletion
-            this._dailyTrackingService.deleteDailyEntry(this.date);
+            // Remove all Daily Entries.
+            for (const entry of this.dailyEntry?.Entries) {
+              await this._dailyTrackingService.deleteEntryAndUpdateDailyEntryFields(this.date, entry);
+            };
             // Decrement size of collection
             await this._userService.DailyEntriesSizeDecrement();
             await this._loadingService.dismissLoading(loadingElement);

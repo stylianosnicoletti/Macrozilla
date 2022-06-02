@@ -34,6 +34,17 @@
   <!-- Skeleton: Showentries from -->
   <ng-template #showentriesFrom>
     <ion-content>
+
+        <ion-item>
+          <ion-label><h2><strong>Select All</strong></h2></ion-label>
+          <ion-checkbox
+            slot="end"
+            [(ngModel)]="masterCheck"
+            [indeterminate]="isIndeterminate"
+            (click)="checkMaster($event)"
+          ></ion-checkbox>
+        </ion-item>
+
       <ion-list>
         <ion-item *ngFor="let entry of dailyEntryFrom?.Entries">
           <ion-label class="ion-text-wrap">
@@ -51,7 +62,11 @@
               >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
             >
           </ion-chip>
-          <ion-checkbox slot="end" [(ngModel)]="entry.IsChecked"></ion-checkbox>
+          <ion-checkbox
+            slot="end"
+            [(ngModel)]="entry.IsChecked"
+            (ionChange)="checkEvent()"
+          ></ion-checkbox>
         </ion-item>
       </ion-list>
     </ion-content>

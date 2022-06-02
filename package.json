@@ -1,6 +1,6 @@
 {
   "name": "macrozilla",
-  "version": "0.6.5",
+  "version": "0.7.5",
   "author": "Stelios Nicoletti",
   "scripts": {
     "ng": "ng",
@@ -13,15 +13,15 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "~12.2.16",
-    "@angular/core": "~12.2.16",
+    "@angular/common": "~13.3.11",
+    "@angular/core": "~13.3.11",
     "@angular/fire": "^7.3.0",
-    "@angular/forms": "~12.2.16",
-    "@angular/platform-browser": "~12.2.16",
-    "@angular/platform-browser-dynamic": "~12.2.16",
-    "@angular/pwa": "^12.2.17",
-    "@angular/router": "~12.2.16",
-    "@angular/service-worker": "^12.2.16",
+    "@angular/forms": "~13.3.11",
+    "@angular/platform-browser": "~13.3.11",
+    "@angular/platform-browser-dynamic": "~13.3.11",
+    "@angular/pwa": "^13.3.7",
+    "@angular/router": "~13.3.11",
+    "@angular/service-worker": "^13.3.11",
     "@capacitor/android": "^3.5.1",
     "@capacitor/app": "^1.1.1",
     "@capacitor/cli": "^3.5.1",
@@ -40,11 +40,11 @@
     "zone.js": "~0.11.5"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~12.2.17",
-    "@angular/cli": "~12.2.17",
-    "@angular/compiler": "~12.2.16",
-    "@angular/compiler-cli": "~12.2.16",
-    "@angular/language-service": "~12.2.16",
+    "@angular-devkit/build-angular": "~13.3.6",
+    "@angular/cli": "~13.3.6",
+    "@angular/compiler": "~13.3.6",
+    "@angular/compiler-cli": "~13.3.6",
+    "@angular/language-service": "~13.3.6",
     "@ionic/angular-toolkit": "^6.1.0",
     "@ionic/lab": "3.2.11",
     "@types/jasmine": "~4.0.3",
@@ -58,12 +58,12 @@
     "karma-coverage": "~2.2.0",
     "karma-coverage-istanbul-reporter": "~3.0.3",
     "karma-jasmine": "~5.0.0",
-    "karma-jasmine-html-reporter": "^1.7.0",
+    "karma-jasmine-html-reporter": "^1io.7.0",
     "karma-spec-reporter": "0.0.34",
     "protractor": "~7.0.0",
     "ts-node": "~10.7.0",
     "tslint": "~6.1.3",
-    "typescript": "~4.2.3"
+    "typescript": "~4.6.4"
   },
   "description": "An Ionic project"
 }

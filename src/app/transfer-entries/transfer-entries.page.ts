@@ -23,10 +23,13 @@ export class TransferEntriesPage {
   dateFrom: string;
   dailyEntryTo: DailyEntry;
   dailyEntryFrom: DailyEntry;
-  subscriptionsList: Subscription[] = [];
+  subscriptionsListFrom: Subscription[] = [];
+  subscriptionsListTo: Subscription[] = [];
   disconnectSubscription: Subscription;
   connectSubscription: Subscription;
   lastNetworkStatusIsConnected = true;
+  isIndeterminate: boolean = false;
+  masterCheck: boolean = true;
 
   constructor(
     private _router: Router,
@@ -75,7 +78,8 @@ export class TransferEntriesPage {
 
   ionViewWillLeave() {
     //console.log("leaving transfer");
-    this._unsubscribeService.unsubscribeData(this.subscriptionsList);
+    this._unsubscribeService.unsubscribeData(this.subscriptionsListFrom);
+    this._unsubscribeService.unsubscribeData(this.subscriptionsListTo);
     Network.removeAllListeners();
   }
 
@@ -95,6 +99,7 @@ export class TransferEntriesPage {
       this._router.navigate(["/tabs/daily_entry"]);
     }
     this.transformDateAndReadDailyEntry("TO");
+    this.transformDateAndReadDailyEntry("FROM");
   }
 
   // No network alert
@@ -120,16 +125,17 @@ export class TransferEntriesPage {
    */
   async transformDateAndReadDailyEntry(whichDate: String) {
     if (whichDate == "FROM") {
+      this._unsubscribeService.unsubscribeData(this.subscriptionsListFrom);
       this.dateFrom = await this._datePipe.transform(
         this.dateFrom,
         "yyyy-MM-dd"
       );
-      this.subscriptionsList.push(
+      this.subscriptionsListFrom.push(
         (
           await this._dailyTrackingService.readDailyEntry(this.dateFrom, true)
         ).subscribe((x) => {
           this.dailyEntryFrom = x;
-          this.dailyEntryFrom.Entries.forEach((x) => (x.IsChecked = true));
+          this.checkMaster();
           //console.log(this.dailyEntryFrom.Entries);
         })
       );
@@ -137,7 +143,7 @@ export class TransferEntriesPage {
 
     if (whichDate == "TO") {
       this.dateTo = await this._datePipe.transform(this.dateTo, "yyyy-MM-dd");
-      this.subscriptionsList.push(
+      this.subscriptionsListTo.push(
         (
           await this._dailyTrackingService.readDailyEntry(this.dateTo, true)
         ).subscribe((x) => {
@@ -152,48 +158,56 @@ export class TransferEntriesPage {
    *  Move checked entries. (From Date Entries -> To Date Entries)
    */
   async moveEntries(): Promise<void> {
-    if (this.dailyEntryFrom.Entries.length == 0) {
-      await this._toastService.presentToast("No entries found to move!");
-    } else {
-      let checkedEntries = this.dailyEntryFrom?.Entries?.filter(
-        (x) => x.IsChecked
+    if (this.dateFrom == this.dateTo) {
+      await this._toastService.presentToast(
+        "Cannot move entries from same date!"
       );
-
-      if (checkedEntries.length > 0) {
-        const alert = await this._alertController.create({
-          header: "Do you want to proceed moving entries?",
-          message: this.dateFrom + " ➡️ " + this.dateTo,
-          buttons: [
-            {
-              text: "No",
-              role: "cancel",
-              cssClass: "secondary",
-              handler: () => {},
-            },
-            {
-              text: "Yes",
-              handler: async () => {
-                await this._router.navigate(["/tabs/daily_entry"]);
-                var loadingElement =
-                  await this._loadingService.createAndPresentLoading(
-                    "Moving.."
-                  );
-                await this._transferEntriesService.moveEntries(
-                  checkedEntries,
-                  this.dateFrom,
-                  this.dateTo
-                );
-                await this._loadingService.dismissLoading(loadingElement);
-                await this._toastService.presentToast(
-                  "Entries Successfully Moved!"
-                );
-              },
-            },
-          ],
-        });
-        await alert.present();
+    } else {
+      if (this.dailyEntryFrom.Entries.length == 0) {
+        await this._toastService.presentToast("No entries found to move!");
       } else {
-        await this._toastService.presentToast("Please check entries to move!");
+        let checkedEntries = this.dailyEntryFrom?.Entries?.filter(
+          (x) => x.IsChecked
+        );
+
+        if (checkedEntries.length > 0) {
+          const alert = await this._alertController.create({
+            header: "Do you want to proceed moving entries?",
+            message: this.dateFrom + " ➡️ " + this.dateTo,
+            buttons: [
+              {
+                text: "No",
+                role: "cancel",
+                cssClass: "secondary",
+                handler: () => {},
+              },
+              {
+                text: "Yes",
+                handler: async () => {
+                  await this._router.navigate(["/tabs/daily_entry"]);
+                  var loadingElement =
+                    await this._loadingService.createAndPresentLoading(
+                      "Moving.."
+                    );
+                  await this._transferEntriesService.moveEntries(
+                    checkedEntries,
+                    this.dateFrom,
+                    this.dateTo
+                  );
+                  await this._loadingService.dismissLoading(loadingElement);
+                  await this._toastService.presentToast(
+                    "Entries Successfully Moved!"
+                  );
+                },
+              },
+            ],
+          });
+          await alert.present();
+        } else {
+          await this._toastService.presentToast(
+            "Please check entries to move!"
+          );
+        }
       }
     }
   }
@@ -236,5 +250,40 @@ export class TransferEntriesPage {
       return "dark";
     }
     return "light";
+  }
+
+  /**
+   * For Master CheckBox.
+   */
+  checkMaster() {
+    setTimeout(()=>{
+      this.dailyEntryFrom.Entries.forEach(entry => {
+        entry.IsChecked = this.masterCheck;
+      });
+    });
+  }
+
+  /**
+   * On check entry (event) logic.
+   */
+  checkEvent() {
+    const totalItems = this.dailyEntryFrom.SizeOfEntries;
+    let checked = 0;
+    this.dailyEntryFrom.Entries.map(entry => {
+      if (entry.IsChecked) checked++;
+    });
+    if (checked > 0 && checked < totalItems) {
+      //If even one item is checked but not all
+      this.isIndeterminate = true;
+      this.masterCheck = false;
+    } else if (checked == totalItems) {
+      //If all are checked
+      this.masterCheck = true;
+      this.isIndeterminate = false;
+    } else {
+      //If none is checked
+      this.isIndeterminate = false;
+      this.masterCheck = false;
+    }
   }
 }

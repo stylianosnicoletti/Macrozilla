@@ -27,12 +27,14 @@ exports.createNewUserFields = functions.auth.user().onCreate((user) => {
         DarkMode: false,
         UseOnlyPersonalDb: false,
         TransferEntriesEnabled: true,
+        DeletingAllDailyEntriesEnabled: true,
       },
       Sizes: {
         DailyEntries: 0,
       },
     });
 });
+
 
 // Creating new food in USER DB (Production)
 exports.createUserFoodNameIndex = functions

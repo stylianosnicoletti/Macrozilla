@@ -23,6 +23,7 @@ export class TabDailyEntryPage {
   connectSubscription: Subscription;
   lastNetworkStatusIsConnected = true;
   transferEntriesEnabled: boolean;
+  deletingAllDailyEntriesEnabled: boolean;
 
   constructor(
     private _router: Router,
@@ -36,9 +37,12 @@ export class TabDailyEntryPage {
 
   async ngOnInit() {
     //console.log("ngOnInit Add Daily Entry");
-    await (await this._userService.getUserFields()).subscribe(async x => {
+    await (
+      await this._userService.getUserFields()
+    ).subscribe(async (x) => {
       this.transferEntriesEnabled = x.Options.TransferEntriesEnabled;
-      //console.log(this.transferEntriesEnabled);
+      this.deletingAllDailyEntriesEnabled =
+        x.Options.DeletingAllDailyEntriesEnabled;
     });
   }
 
@@ -171,6 +175,38 @@ export class TabDailyEntryPage {
    */
   async transferEntries(): Promise<void> {
     await this._router.navigate(["/transfer_entries/" + this.date]);
+  }
+
+  /**
+   * transfer Entries
+   */
+  async deleteAllDailyEntries(): Promise<void> {
+    const alert = await this._alertController.create({
+      header:
+        "Proceed deleting all (" + this.dailyEntry.SizeOfEntries + ") entries?",
+      message: "For " + this.dailyEntry.Date,
+      buttons: [
+        {
+          text: "No",
+          role: "cancel",
+          cssClass: "secondary",
+          handler: () => {},
+        },
+        {
+          text: "Yes",
+          handler: async () => {
+            var loadingElement =
+              await this._loadingService.createAndPresentLoading("Deleting..");
+            // Remove whole Daily Entry on last Entry deletion
+            this._dailyTrackingService.deleteDailyEntry(this.date);
+            // Decrement size of collection
+            await this._userService.DailyEntriesSizeDecrement();
+            await this._loadingService.dismissLoading(loadingElement);
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
   /**

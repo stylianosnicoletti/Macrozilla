@@ -18,6 +18,8 @@ export interface Options {
   UseOnlyPersonalDb: boolean;
 
   TransferEntriesEnabled: boolean;
+
+  DeletingAllDailyEntriesEnabled: boolean;
 }
 
 /**

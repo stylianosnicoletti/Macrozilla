@@ -22,6 +22,6 @@
         <item name="windowSplashScreenAnimationDuration">1000</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
         <item name="windowSplashScreenIconBackgroundColor">@null</item>
-        <item name="postSplashScreenTheme">@styles/AppTheme.NoActionBar</item> <!-- This will switch back to your given theme once the splash screen is gone-->
+        <item name="postSplashScreenTheme">@null</item> <!-- This will switch back to your given theme once the splash screen is gone-->
     </style>
 </resources>

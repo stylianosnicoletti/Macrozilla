@@ -12,3 +12,11 @@ ion-popover#popover-bottom::part(content) {
     margin-right: auto;
     --background: white;
   }
+
+  ion-item {
+    --ripple-color: transparent;
+  }
+
+  ion-checkbox {
+    --ripple-color: transparent;
+  }

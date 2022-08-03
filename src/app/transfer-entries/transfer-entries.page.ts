@@ -91,15 +91,15 @@ export class TransferEntriesPage {
   }
 
   // Check if the route param key matches a date
-  enterGuard() {
-    this.dateTo = this._activatedRoute.snapshot.params["date_selected"];
-    this.dateFrom = this.dateTo;
+  async enterGuard() {
+    this.dateTo = this._activatedRoute.snapshot.params["date_selected"];  
+    this.dateFrom = await this.removeOneDay(this.dateTo);
     //console.log(this.dateTo);
     if (!MacrozillaConstants.REGEX_DATE.test(this.dateTo)) {
       this._router.navigate(["/tabs/daily_entry"]);
-    }
-    this.transformDateAndReadDailyEntry("TO");
+    } 
     this.transformDateAndReadDailyEntry("FROM");
+    this.transformDateAndReadDailyEntry("TO");
   }
 
   // No network alert
@@ -286,4 +286,17 @@ export class TransferEntriesPage {
       this.masterCheck = false;
     }
   }
+
+  /**
+   *  Remove one day from a "yyyy-MM-dd" formated date.
+   */
+    async removeOneDay(string): Promise<string> {
+      const oneDayBack = new Date(this.dateTo);
+      oneDayBack.setDate(oneDayBack.getDate()-1);
+      return await this._datePipe.transform(
+        oneDayBack,
+        "yyyy-MM-dd"
+      );
+    }
+  
 }

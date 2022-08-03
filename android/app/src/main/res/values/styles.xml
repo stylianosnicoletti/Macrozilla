@@ -20,8 +20,8 @@
         <item name="android:background">@drawable/splash</item>
         <item name="windowSplashScreenBackground">@color/black</item> <!-- If it's a @drawable make sure it's in .xml format-->
         <item name="windowSplashScreenAnimationDuration">1000</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/books_logo</item>
-        <item name="windowSplashScreenIconBackgroundColor">@drawable/books_logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/black</item>
         <item name="postSplashScreenTheme">@style/Theme.Books</item> <!-- This will switch back to your given theme once the splash screen is gone-->
     </style>
 </resources>

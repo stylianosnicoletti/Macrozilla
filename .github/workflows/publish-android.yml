@@ -44,7 +44,7 @@ jobs:
         run: npx cap update
 
       - name: Capacitor copy
-        run: npx cap copy --prod
+        run: npx cap copy
 
       - name: Build app bundle
         run: cd android && gradle bundle

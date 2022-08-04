@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: Build APK
+    name: Build App Release Signed Bundle
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source

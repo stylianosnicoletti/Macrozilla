@@ -234,10 +234,10 @@ export class MaintenanceService {
 
   forceSWupdate () {
     if ('serviceWorker' in navigator) {
-      console.log("serviceWorker in navigaotor");
+      //console.log("serviceWorker in navigaotor");
       navigator.serviceWorker.getRegistrations().then(function (registrations) {
         for (let registration of registrations) {
-          console.log(registration);
+          //console.log(registration);
           registration.update()
         }
       })

@@ -184,8 +184,8 @@ export class MaintenanceService {
               //console.log("Updating ng-worker")
               this._swUpdate.activateUpdate();
             }
-            window.location.reload();
-            this.forceSWupdate();
+            //window.location.reload();
+            this.forceSWunregister();
             window.location.reload();
             // Force refresh and Navigate to root 
             const parsedUrl = new URL(window.location.href);
@@ -216,8 +216,8 @@ export class MaintenanceService {
               //console.log("Updating ng-worker")
               this._swUpdate.activateUpdate()
             }
-            window.location.reload();
-            this.forceSWupdate();
+            //window.location.reload();
+            this.forceSWunregister();
             window.location.reload();
             // Force refresh and Navigate to root 
             const parsedUrl = new URL(window.location.href);
@@ -232,13 +232,13 @@ export class MaintenanceService {
     await alert.present();
   }
 
-  forceSWupdate () {
+  forceSWunregister () {
     if ('serviceWorker' in navigator) {
-      //console.log("serviceWorker in navigaotor");
-      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+       console.log("serviceWorker in navigaotor"); 
+       navigator.serviceWorker.getRegistrations().then(function (registrations) {
         for (let registration of registrations) {
-          //console.log(registration);
-          registration.update()
+          console.log(registration);
+          registration.unregister();
         }
       })
     }

@@ -184,14 +184,13 @@ export class MaintenanceService {
               //console.log("Updating ng-worker")
               this._swUpdate.activateUpdate();
             }
-            //window.location.reload();
             this.forceSWunregister();
-            window.location.reload();
             // Force refresh and Navigate to root 
             const parsedUrl = new URL(window.location.href);
             const baseUrl = parsedUrl.origin;
             //console.log(baseUrl);
-            window.location.href = baseUrl;
+            //window.location.href = baseUrl;
+            window.location.replace(baseUrl);   
           }
         }
       ]
@@ -216,15 +215,13 @@ export class MaintenanceService {
               //console.log("Updating ng-worker")
               this._swUpdate.activateUpdate()
             }
-            //window.location.reload();
             this.forceSWunregister();
-            window.location.reload();
             // Force refresh and Navigate to root 
             const parsedUrl = new URL(window.location.href);
             const baseUrl = parsedUrl.origin;
             //console.log(baseUrl);
-            window.location.href = baseUrl;
-            
+            //window.location.href = baseUrl;
+            window.location.replace(baseUrl);    
           }
         }
       ]

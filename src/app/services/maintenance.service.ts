@@ -260,10 +260,11 @@ export class MaintenanceService {
             registration.unregister().then((unregResult) => {
               //console.log(unregResult);
 
+              window.location.reload();
               // Force refresh and Navigate to root
-              const parsedUrl = new URL(window.location.href);
-              const baseUrl = parsedUrl.origin;
-              window.location.href = baseUrl;
+              //const parsedUrl = new URL(window.location.href);
+              //const baseUrl = parsedUrl.origin;
+              //window.location.href = baseUrl;
             });
           }
         });

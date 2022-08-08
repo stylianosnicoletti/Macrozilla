@@ -1,27 +1,28 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AngularFireDatabase } from '@angular/fire/compat/database';
-import { Maintenance } from '../models/maintenance.model';
-import { AlertController } from '@ionic/angular';
-import { SwUpdate } from '@angular/service-worker';
-import { App } from '@capacitor/app';
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { AngularFireDatabase } from "@angular/fire/compat/database";
+import { Maintenance } from "../models/maintenance.model";
+import { AlertController } from "@ionic/angular";
+import { SwUpdate } from "@angular/service-worker";
+import { App } from "@capacitor/app";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class MaintenanceService {
-
   constructor(
     private _angularFireDatabase: AngularFireDatabase,
     private _alertController: AlertController,
-    private _swUpdate: SwUpdate) { }
+    private _swUpdate: SwUpdate
+  ) {}
 
   /**
    * Get Maintenance values for Android
    * @returns Maintenance Observable
    */
   async getMaintenanceAndroid(): Promise<Observable<Maintenance>> {
-    const fireObjectMaintenance = this._angularFireDatabase.object<Maintenance>('/Android');
+    const fireObjectMaintenance =
+      this._angularFireDatabase.object<Maintenance>("/Android");
     return await fireObjectMaintenance.valueChanges();
   }
 
@@ -30,7 +31,8 @@ export class MaintenanceService {
    * @returns Maintenance Observable
    */
   async getMaintenanceWeb(): Promise<Observable<Maintenance>> {
-    const fireObjectMaintenance = this._angularFireDatabase.object<Maintenance>('/Web');
+    const fireObjectMaintenance =
+      this._angularFireDatabase.object<Maintenance>("/Web");
     return await fireObjectMaintenance.valueChanges();
   }
 
@@ -40,32 +42,49 @@ export class MaintenanceService {
    * @param latestMaintenanceSettings Latest Maintenance object for Android
    * @returns Present the corresponding alert
    */
-  async checkForUpdateOrAvailabilityAndroid(currentVersion: string, latestMaintenanceSettings: Maintenance): Promise<void> {
+  async checkForUpdateOrAvailabilityAndroid(
+    currentVersion: string,
+    latestMaintenanceSettings: Maintenance
+  ): Promise<void> {
     // App unavailable
     if (!latestMaintenanceSettings.Enabled) {
       // Maintenance site
       // TODO
 
-      // Android hardware back button actions 
-      App.addListener('backButton', data => {
+      // Android hardware back button actions
+      App.addListener("backButton", (data) => {
         App.exitApp();
       });
-      return this.presentAlertUnavailableWeb(latestMaintenanceSettings.EnabledMessage);
+      return this.presentAlertUnavailableWeb(
+        latestMaintenanceSettings.EnabledMessage
+      );
     }
     // Check Major
-    if (Number.parseInt(currentVersion[0]) < Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[0])) {
+    if (
+      Number.parseInt(currentVersion[0]) <
+      Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[0])
+    ) {
       // Maintenance site
       // TODO
 
-      // Android hardware back button actions 
-      App.addListener('backButton', data => {
+      // Android hardware back button actions
+      App.addListener("backButton", (data) => {
         App.exitApp();
       });
-      return this.presentAlertMajorUpdateAndroid(latestMaintenanceSettings.UpdateMessageMajor, latestMaintenanceSettings.UpdateUrl);
+      return this.presentAlertMajorUpdateAndroid(
+        latestMaintenanceSettings.UpdateMessageMajor,
+        latestMaintenanceSettings.UpdateUrl
+      );
     }
     // Check Minor
-    if (Number.parseInt(currentVersion[2]) < Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[2])) {
-      return this.presentAlertMinorUpdateAndroid(latestMaintenanceSettings.UpdateMessageMinor, latestMaintenanceSettings.UpdateUrl);
+    if (
+      Number.parseInt(currentVersion[2]) <
+      Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[2])
+    ) {
+      return this.presentAlertMinorUpdateAndroid(
+        latestMaintenanceSettings.UpdateMessageMinor,
+        latestMaintenanceSettings.UpdateUrl
+      );
     }
   }
 
@@ -75,22 +94,37 @@ export class MaintenanceService {
    * @param latestMaintenanceSettings Latest Maintenance object for Web
    * @returns Present the corresponding alert
    */
-  async checkForUpdateOrAvailabilityWeb(currentVersion: string, latestMaintenanceSettings: Maintenance): Promise<void> {
+  async checkForUpdateOrAvailabilityWeb(
+    currentVersion: string,
+    latestMaintenanceSettings: Maintenance
+  ): Promise<void> {
     // App unavailable
     if (!latestMaintenanceSettings.Enabled) {
-      // Maintenance site & no back button 
+      // Maintenance site & no back button
       // TODO
-      return this.presentAlertUnavailableWeb(latestMaintenanceSettings.EnabledMessage);
+      return this.presentAlertUnavailableWeb(
+        latestMaintenanceSettings.EnabledMessage
+      );
     }
     // Check Major
-    if (Number.parseInt(currentVersion[0]) < Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[0])) {
-      // Maintenance site & no back button 
+    if (
+      Number.parseInt(currentVersion[0]) <
+      Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[0])
+    ) {
+      // Maintenance site & no back button
       // TODO
-      return this.presentAlertMajorUpdateWeb(latestMaintenanceSettings.UpdateMessageMajor);
+      return this.presentAlertMajorUpdateWeb(
+        latestMaintenanceSettings.UpdateMessageMajor
+      );
     }
     // Check Minor
-    if (Number.parseInt(currentVersion[2]) < Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[2])) {
-      return this.presentAlertMinorUpdateWeb(latestMaintenanceSettings.UpdateMessageMinor);
+    if (
+      Number.parseInt(currentVersion[2]) <
+      Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[2])
+    ) {
+      return this.presentAlertMinorUpdateWeb(
+        latestMaintenanceSettings.UpdateMessageMinor
+      );
     }
   }
 
@@ -99,9 +133,9 @@ export class MaintenanceService {
    */
   async presentAlertUnavailableAndroid(enabledMessage: string): Promise<void> {
     const alert = await this._alertController.create({
-      header: 'The app is not available at the moment!',
+      header: "The app is not available at the moment!",
       message: enabledMessage,
-      backdropDismiss: false
+      backdropDismiss: false,
     });
     await alert.present();
   }
@@ -109,20 +143,23 @@ export class MaintenanceService {
   /**
    * Present Major Update Alert for Android
    */
-  async presentAlertMajorUpdateAndroid(updateMessageMajor: string, updateUrl: string): Promise<void> {
+  async presentAlertMajorUpdateAndroid(
+    updateMessageMajor: string,
+    updateUrl: string
+  ): Promise<void> {
     const alert = await this._alertController.create({
-      header: 'A major update is required',
+      header: "A major update is required",
       message: updateMessageMajor,
       backdropDismiss: false,
       buttons: [
         {
-          text: 'Update',
+          text: "Update",
           handler: () => {
             window.location.href = updateUrl;
             return false;
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -130,27 +167,30 @@ export class MaintenanceService {
   /**
    * Present Minor Update Alert for Android
    */
-  async presentAlertMinorUpdateAndroid(updateMessageMinor: string, updateUrl: string): Promise<void> {
+  async presentAlertMinorUpdateAndroid(
+    updateMessageMinor: string,
+    updateUrl: string
+  ): Promise<void> {
     const alert = await this._alertController.create({
-      header: 'An update is available!',
+      header: "An update is available!",
       message: updateMessageMinor,
       backdropDismiss: false,
       buttons: [
         {
-          text: 'Update',
+          text: "Update",
           handler: () => {
             window.location.href = updateUrl;
-          }
+          },
         },
         {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "secondary",
           handler: () => {
             return false;
-          }
+          },
         },
-      ]
+      ],
     });
     await alert.present();
   }
@@ -160,9 +200,9 @@ export class MaintenanceService {
    */
   async presentAlertUnavailableWeb(enabledMessage: string): Promise<void> {
     const alert = await this._alertController.create({
-      header: 'The app is not available at the moment!',
+      header: "The app is not available at the moment!",
       message: enabledMessage,
-      backdropDismiss: false
+      backdropDismiss: false,
     });
     await alert.present();
   }
@@ -172,28 +212,17 @@ export class MaintenanceService {
    */
   async presentAlertMajorUpdateWeb(updateMessageMajor: string): Promise<void> {
     const alert = await this._alertController.create({
-      header: 'A major update is required!',
+      header: "A major update is required!",
       message: updateMessageMajor,
       backdropDismiss: false,
       buttons: [
         {
-          text: 'Update',
-          handler: () => {
-            // Update ng-worker
-            if (this._swUpdate.isEnabled) {
-              //console.log("Updating ng-worker")
-              this._swUpdate.activateUpdate();
-            }
-            this.forceSWunregister();
-            // Force refresh and Navigate to root 
-            const parsedUrl = new URL(window.location.href);
-            const baseUrl = parsedUrl.origin;
-            //console.log(baseUrl);
-            //window.location.href = baseUrl;
-            window.location.replace(baseUrl);   
-          }
-        }
-      ]
+          text: "Update",
+          handler: async () => {
+            await this.forceSwUnregisterAndUpdate();
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -203,42 +232,41 @@ export class MaintenanceService {
    */
   async presentAlertMinorUpdateWeb(updateMessageMinor: string): Promise<void> {
     const alert = await this._alertController.create({
-      header: 'An update is available!',
+      header: "An update is available!",
       message: updateMessageMinor,
       backdropDismiss: false,
       buttons: [
         {
-          text: 'Update',
-          handler: () => {
-            // Update ng-worker
-            if (this._swUpdate.isEnabled) {
-              //console.log("Updating ng-worker")
-              this._swUpdate.activateUpdate()
-            }
-            this.forceSWunregister();
-            // Force refresh and Navigate to root 
-            const parsedUrl = new URL(window.location.href);
-            const baseUrl = parsedUrl.origin;
-            //console.log(baseUrl);
-            //window.location.href = baseUrl;
-            window.location.replace(baseUrl);    
-          }
-        }
-      ]
+          text: "Update",
+          handler: async () => {
+            await this.forceSwUnregisterAndUpdate();
+          },
+        },
+      ],
     });
     await alert.present();
   }
 
-  forceSWunregister () {
-    if ('serviceWorker' in navigator) {
-       //console.log("serviceWorker in navigaotor"); 
-       navigator.serviceWorker.getRegistrations().then(function (registrations) {
-        for (let registration of registrations) {
-          //console.log(registration);
-          registration.unregister();
-        }
-      })
-    }
+  async forceSwUnregisterAndUpdate() {
+    if ("serviceWorker" in navigator) {
+      console.log("serviceWorker in navigator");
+      await navigator.serviceWorker
+        .getRegistrations()
+        .then(async (registrations) => {
+          console.log(registrations.length);
+          for (let registration of registrations) {
+            console.log(registration);
+            
+            registration.unregister().then((unregResult) => {
+              console.log(unregResult);
+
+              // Force refresh and Navigate to root
+              const parsedUrl = new URL(window.location.href);
+              const baseUrl = parsedUrl.origin;
+              window.location.href = baseUrl;
+            });
+          }
+        });
+      }
   }
-  
 }

@@ -249,16 +249,16 @@ export class MaintenanceService {
 
   async forceSwUnregisterAndUpdate() {
     if ("serviceWorker" in navigator) {
-      console.log("serviceWorker in navigator");
+      //console.log("serviceWorker in navigator");
       await navigator.serviceWorker
         .getRegistrations()
         .then(async (registrations) => {
-          console.log(registrations.length);
+          //console.log(registrations.length);
           for (let registration of registrations) {
-            console.log(registration);
+            //console.log(registration);
             
             registration.unregister().then((unregResult) => {
-              console.log(unregResult);
+              //console.log(unregResult);
 
               // Force refresh and Navigate to root
               const parsedUrl = new URL(window.location.href);

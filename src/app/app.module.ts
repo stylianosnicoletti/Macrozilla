@@ -10,6 +10,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { BackButtonDisableModule } from './other-modules/disable-browser-back-button';
 
 @NgModule({
   declarations: [AppComponent],
@@ -21,11 +22,13 @@ import { ServiceWorkerModule } from '@angular/service-worker';
             BrowserModule,
             IonicModule.forRoot(),
             AppRoutingModule,
+            // To disable the browser back button
+            BackButtonDisableModule.forRoot({
+              preserveScrollPosition: true
+            }),
             ServiceWorkerModule.register('ngsw-worker.js', {
               enabled: environment.production,
-              // Register the ServiceWorker as soon as the app is stable
-              // or after 30 seconds (whichever comes first).
-              registrationStrategy: 'registerWhenStable:30000'
+              registrationStrategy: 'registerImmediately'
             })],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }

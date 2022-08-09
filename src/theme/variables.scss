@@ -75,6 +75,26 @@
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  /* For color ideas: https://www.colorhexa.com/ */
+  /* To make custom tints and shades: https://maketintsandshades.com/ */
+
+  /** light sea green (custom) **/
+  --ion-color-light-sea-green: #20b2aa;
+  --ion-color-light-sea-green-rgb: 32, 178, 170;
+  --ion-color-light-sea-green-contrast: #ffffff;
+  --ion-color-light-sea-green-contrast-rgb: 255, 255, 255;
+  --ion-color-light-sea-green-shade: #1a8e88;
+  --ion-color-light-sea-green-tint: #4dc1bb;
+
+  /** darker tertiary (custom) **/
+  --ion-color-darker-tertiary: #514bff;
+  --ion-color-darker-tertiaryn-rgb: 81, 75, 255;
+  --ion-color-darker-tertiary-contrast: #ffffff;
+  --ion-color-darker-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-darker-tertiary-shade: #413ccc;
+  --ion-color-darker-tertiary-tint: #746fff;
+
 }
 
 //@media (prefers-color-scheme: dark) {
@@ -236,4 +256,22 @@
 
     --ion-card-background: #1e1e1e;
   }
-//}
+
+.ion-color-light-sea-green {
+  --ion-color-base: var(--ion-color-light-sea-green);
+  --ion-color-base-rgb: var(--ion-color-light-sea-green-rgb);
+  --ion-color-contrast: var(--ion-color-light-sea-green-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-light-sea-green-contrast-rgb);
+  --ion-color-shade: var(--ion-color-light-sea-green-shade);
+  --ion-color-tint: var(--ion-color-light-sea-green-tint);
+  }
+
+.ion-color-darker-tertiary {
+  --ion-color-base: var(--ion-color-darker-tertiary);
+  --ion-color-base-rgb: var(--ion-color-darker-tertiary-rgb);
+  --ion-color-contrast: var(--ion-color-darker-tertiary-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-darker-tertiary-contrast-rgb);
+  --ion-color-shade: var(--ion-color-darker-tertiary-shade);
+  --ion-color-tint: var(--ion-color-darker-tertiary-tint);
+  }
+

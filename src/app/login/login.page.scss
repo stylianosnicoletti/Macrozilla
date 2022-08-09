@@ -1,39 +1,40 @@
-.error-message-email
-{
- color: var(--ion-color-danger);
- padding-top: 10px;
- padding-left: 15px ;
+.error-message-email {
+  color: var(--ion-color-danger);
+  padding-top: 10px;
+  padding-left: 15px;
 }
 
-.error-message-password
-{
- color: var(--ion-color-danger);
- padding-top: 10px;
- padding-left: 15px ;
+.error-message-password {
+  color: var(--ion-color-danger);
+  padding-top: 10px;
+  padding-left: 15px;
 }
 
-.error-message-login
-{
- color: var(--ion-color-danger);
- text-align: center;
+.error-message-login {
+  color: var(--ion-color-danger);
+  text-align: center;
 
- padding-left: 15px ;
+  padding-left: 15px;
 }
 
-.go-to-forgot-password
-{
+.go-to-forgot-password {
   text-align: center;
 }
 
-.login-header{
-    background: var(--ion-color-danger);
+.login-header-icon {
+  background: var(--ion-color-tertiary);
 }
 
-.logo-img{
+.logo-img {
   display: block;
-  width: 120px;
+  width: 135px;
   margin: 0 auto;
   text-align: center;
 }
 
-
+.get-it-on-google-play-img{
+  display: block;
+  width: 170px;
+  margin: 0 auto;
+  text-align: center;
+}

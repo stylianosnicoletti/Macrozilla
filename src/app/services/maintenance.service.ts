@@ -3,7 +3,6 @@ import { Observable } from "rxjs";
 import { AngularFireDatabase } from "@angular/fire/compat/database";
 import { Maintenance } from "../models/maintenance.model";
 import { AlertController } from "@ionic/angular";
-import { SwUpdate } from "@angular/service-worker";
 import { App } from "@capacitor/app";
 
 @Injectable({
@@ -12,8 +11,7 @@ import { App } from "@capacitor/app";
 export class MaintenanceService {
   constructor(
     private _angularFireDatabase: AngularFireDatabase,
-    private _alertController: AlertController,
-    private _swUpdate: SwUpdate
+    private _alertController: AlertController
   ) {}
 
   /**

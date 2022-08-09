@@ -1,9 +1,27 @@
 <ion-header>
-  <ion-toolbar color="primary">
+
+  <div class="login-header-icon">
+    <img class="logo-img" src="assets/icons/icon-512x512.png" />
+  </div>
+
+  <ion-toolbar color="tertiary" style="text-align: center">
+    <ion-title size="large"><strong>Macrozilla</strong></ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar color="tertiary" style="text-align: center">
+    <ion-title size="small"
+      ><strong
+        >Track daily food intake, respecting your macro nutrient
+        targets.</strong
+      ></ion-title
+    >
+  </ion-toolbar>
+
+  <ion-toolbar color="darker-tertiary">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home" (click)="goToLoginPage()"></ion-back-button>
     </ion-buttons>
-    <ion-title>Register</ion-title>
+    <ion-title>Sign up</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -50,7 +68,7 @@
       </ng-container>
     </div>
 
-    <ion-button class="submit-btn" expand="block" type="submit" [disabled]="!validations_form.valid">Register
+    <ion-button color="light-sea-green" class="submit-btn" expand="block" type="submit" [disabled]="!validations_form.valid">Register
     </ion-button>
     <label class="error-message">{{errorMessage}}</label>
     <label class="success-message">{{successMessage}}</label>

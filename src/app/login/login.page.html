@@ -1,21 +1,39 @@
 <ion-header>
+  <div class="login-header-icon">
+    <img class="logo-img" src="assets/icons/icon-512x512.png" />
+  </div>
 
-<div class = "login-header ion-padding">
-  <img class="logo-img" src="assets/icons/icon-512x512.png">
-</div>
+  <ion-toolbar color="tertiary" style="text-align: center">
+    <ion-title size="large"><strong>Macrozilla</strong></ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar color="tertiary" style="text-align: center">
+    <ion-title size="small"
+      ><strong
+        >Track daily food intake, respecting your macro nutrient
+        targets.</strong
+      ></ion-title
+    >
+  </ion-toolbar>
 </ion-header>
 
 <ion-content class="form-content">
-  <form class="form" [formGroup]="validations_form" (ngSubmit)="tryLogin(validations_form.value)"
-    (keyup.enter)="tryLogin(validations_form.value)">
+  <form
+    class="form"
+    [formGroup]="validations_form"
+    (ngSubmit)="tryLogin(validations_form.value)"
+    (keyup.enter)="tryLogin(validations_form.value)"
+  >
     <ion-item>
       <ion-label position="floating" color="primary">Email</ion-label>
       <ion-input type="text" formControlName="email"></ion-input>
     </ion-item>
     <div class="validation-errors">
       <ng-container *ngFor="let validation of validation_messages.email">
-        <div class="error-message-email"
-          *ngIf="validations_form.get('email').hasError(validation.type) && (validations_form.get('email').dirty || validations_form.get('email').touched)">
+        <div
+          class="error-message-email"
+          *ngIf="validations_form.get('email').hasError(validation.type) && (validations_form.get('email').dirty || validations_form.get('email').touched)"
+        >
           {{ validation.message }}
         </div>
       </ng-container>
@@ -26,13 +44,20 @@
     </ion-item>
     <div class="validation-errors">
       <ng-container *ngFor="let validation of validation_messages.password">
-        <div class="error-message-password"
-          *ngIf="validations_form.get('password').hasError(validation.type) && (validations_form.get('password').dirty || validations_form.get('password').touched)">
+        <div
+          class="error-message-password"
+          *ngIf="validations_form.get('password').hasError(validation.type) && (validations_form.get('password').dirty || validations_form.get('password').touched)"
+        >
           {{ validation.message }}
         </div>
       </ng-container>
     </div>
-    <ion-button class="email-log-in-button" expand="block" type="submit" [disabled]="!validations_form.valid">Log In
+    <ion-button
+      class="email-log-in-button"
+      expand="block"
+      type="submit"
+      [disabled]="!validations_form.valid"
+      >Log In
     </ion-button>
 
     <p class="go-to-forgot-password">
@@ -41,10 +66,27 @@
     <!--  <ion-button class="google-log-in-button" color="danger" expand="block" (click)="presentToast('Currently not available')">
         LOG IN WITH GOOGLE
     </ion-button>-->
-    <ion-button class="register-button" color="success" expand="block" (click)="goRegisterPage()">
-      REGISTER
+    <ion-button
+      class="register-button"
+      color="light-sea-green"
+      expand="block"
+      (click)="goRegisterPage()"
+    >
+      Sign Up
     </ion-button>
     <label class="error-message-login">{{errorMessage}}</label>
   </form>
+  <ion-footer>
+    <ion-toolbar style="text-align: center">
+      <ion-title size="small">Get the app. </ion-title>
+    </ion-toolbar>
 
+    <div>
+          <img
+            class="get-it-on-google-play-img"
+            src="assets/icons/get-it-on-google-play.png"
+            (click)="goToGooglePlayStoreLink()"
+          />
+    </div>
+  </ion-footer>
 </ion-content>

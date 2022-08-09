@@ -23,7 +23,7 @@
               </ion-item>
 
             </ion-list>
-            <ion-button class="button" color="danger" expand="block" (click)="logout()">Log out</ion-button>
+            <ion-button class="button" color="warning" expand="block" (click)="logout()">Log out</ion-button>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -90,13 +90,7 @@
         <ion-grid>
           <ion-row>
             <ion-col>
-              <ion-button class="button" disabled color="warning" expand="block" (click)="erasePersonalDb()">Erase Personal Food Database
-              </ion-button>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col>
-              <ion-button class="button" disabled color="warning" expand="block" (click)="eraseDailyTrackingRecords()">Erase Daily Tracking Records
+              <ion-button class="button" disabled color="danger" expand="block" (click)="erasePersonalDb()">Delete User Data
               </ion-button>
             </ion-col>
           </ion-row>

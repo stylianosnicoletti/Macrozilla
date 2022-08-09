@@ -76,7 +76,7 @@
     </ion-button>
     <label class="error-message-login">{{errorMessage}}</label>
   </form>
-  <ion-footer>
+  <ion-footer *ngIf="isWeb">
     <ion-toolbar style="text-align: center">
       <ion-title size="small">Get the app. </ion-title>
     </ion-toolbar>

@@ -12,6 +12,7 @@ import { App } from "@capacitor/app";
 import { MaintenanceService } from "../services/maintenance.service";
 import { Subscription } from "rxjs";
 import { UnsubscribeService } from "../services/unsubscribe.service";
+import { Capacitor } from "@capacitor/core";
 
 @Component({
   selector: "app-login",
@@ -22,6 +23,7 @@ export class LoginPage implements OnInit {
   validations_form: FormGroup;
   errorMessage: string = "";
   subscriptionsList: Subscription[] = [];
+  isWeb: boolean = false;
 
   validation_messages = {
     email: [
@@ -47,7 +49,7 @@ export class LoginPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log("Entering login page");
+    //console.log("Entering login page");
     this.validations_form = this._formBuilder.group({
       email: new FormControl(
         "",
@@ -67,7 +69,7 @@ export class LoginPage implements OnInit {
    * Will be triggered, if you come back to a page.
    */
   ionViewWillEnter() {
-    console.log("Entering login page");
+    this.isWebApp();
     // Android hardware back button actions
     App.addListener("backButton", (data) => {
       App.exitApp();
@@ -75,7 +77,7 @@ export class LoginPage implements OnInit {
   }
 
   ionViewWillLeave() {
-    console.log("leaving login page");
+    //console.log("leaving login page");
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     App.removeAllListeners();
   }
@@ -119,5 +121,11 @@ export class LoginPage implements OnInit {
         window.location.href = maintenance.UpdateUrl;
       })
     );
+  }
+
+  isWebApp(): boolean{
+    const platform = Capacitor.getPlatform();
+    //console.log(platform);
+    return this.isWeb = (platform == 'web');
   }
 }

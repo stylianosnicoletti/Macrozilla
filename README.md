@@ -16,4 +16,7 @@ To Run Ios Version
 ---------------------
 * "brew install cocoapods" CocoaPods requirement is documented 
 * ionic capacitor add ios
+* ionic capacitor copy ios --prod
+* navigate to ios/App, run "pod install"
+* ionic capacitor open ios
 

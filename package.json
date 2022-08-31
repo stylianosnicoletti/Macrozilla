@@ -1,6 +1,6 @@
 {
   "name": "macrozilla",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "author": "Stelios Nicoletti",
   "scripts": {
     "ng": "ng",
@@ -33,6 +33,7 @@
     "chart.js": "^3.9.1",
     "chartjs-plugin-datalabels": "2.1.0",
     "firebase": "^9.9.1",
+    "ng2-adsense": "^11.0.0",
     "postcss": "8.4.14",
     "rxfire": "^6.0.3",
     "rxjs": "~7.5.6",

@@ -11,7 +11,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { BackButtonDisableModule } from './other-modules/disable-browser-back-button';
-import { AdsenseModule } from 'ng2-adsense';
 
 @NgModule({
   declarations: [AppComponent],
@@ -31,7 +30,6 @@ import { AdsenseModule } from 'ng2-adsense';
               enabled: environment.production,
               registrationStrategy: 'registerImmediately'
             }),
-            AdsenseModule.forRoot()
           ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }

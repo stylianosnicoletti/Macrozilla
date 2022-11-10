@@ -30,7 +30,8 @@ import { BackButtonDisableModule } from './other-modules/disable-browser-back-bu
             ServiceWorkerModule.register('ngsw-worker.js', {
               enabled: environment.production,
               registrationStrategy: 'registerImmediately'
-            })],
+            }),
+          ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

@@ -1,0 +1,35 @@
+/*.welcome-card img {
+  max-height: 35vh;
+  overflow: hidden;
+}
+
+ion-card {
+  --background: #344564;// rgb(70, 175, 245) ;
+}
+ion-card-title{
+  color: white;
+}
+
+ion-card-content{
+  font-size: larger;
+  color: white;
+}
+
+ion-datetime { 
+  //font-size: larger;
+}
+*/
+
+ion-popover#popover-bottom::part(content) {
+  top: unset !important;
+  left: 0 !important;
+  bottom: 0;
+  width: 100%;
+  border-radius: 0;
+}
+
+ion-popover.popover-bottom ion-datetime {
+  margin-left: auto;
+  margin-right: auto;
+  --background: white;
+}

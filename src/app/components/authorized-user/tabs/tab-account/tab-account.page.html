@@ -1,0 +1,104 @@
+<ion-app>
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>Account</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content fullscreen>
+    <ion-card>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-list>
+              <ion-list-header>
+                <ion-card-subtitle>Details</ion-card-subtitle>
+              </ion-list-header>
+              <ion-item>
+                <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+                <ion-label>{{userName}}</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon slot="start" name="mail-outline"></ion-icon>
+                <ion-label>{{userEmailAddress}}</ion-label>
+              </ion-item>
+
+            </ion-list>
+            <ion-button class="button" color="warning" expand="block" (click)="logout()">Log out</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+    </ion-card>
+  
+
+    <ion-card>
+      <ion-list>
+        <ion-list-header>
+          <ion-card-subtitle>User Interface</ion-card-subtitle>
+        </ion-list-header>
+        <ion-item>
+          <ion-label>Dark Mode</ion-label>
+          <ion-icon *ngIf="darkMode;" slot="start" name="moon-outline"></ion-icon>
+          <ion-icon *ngIf="!darkMode;" slot="start" name="sunny-outline"></ion-icon>
+          <ion-toggle
+           [(ngModel)]="darkMode"
+           (ionChange)="updateUserOptions()">Dark Mode</ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-label>Allow Transfering Entries</ion-label>
+          <ion-icon *ngIf="transferEntriesEnabled;" slot="start" name="repeat"></ion-icon>
+          <ion-icon *ngIf="!transferEntriesEnabled;" slot="start" name="repeat"></ion-icon>
+          <ion-toggle
+           [(ngModel)]="transferEntriesEnabled"
+           (ionChange)="updateUserOptions()">Allow Transfering Entries</ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-label>Allow Deleting All Entries</ion-label>
+          <ion-icon *ngIf="deletingAllDailyEntriesEnabled;" slot="start" name="trash-outline"></ion-icon>
+          <ion-icon *ngIf="!deletingAllDailyEntriesEnabled;" slot="start" name="trash-outline"></ion-icon>
+          <ion-toggle
+           [(ngModel)]="deletingAllDailyEntriesEnabled"
+           (ionChange)="updateUserOptions()">Allow Deleting All Entries</ion-toggle>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+    <ion-card>
+      <ion-list>
+        <ion-radio-group allowEmptySelection=false
+        [(ngModel)]="useOnlyPersonalDb"
+          (ionChange)="updateUserOptions()">
+          <ion-list-header>
+            <ion-card-subtitle>Food Database</ion-card-subtitle>
+          </ion-list-header>
+          <ion-item>
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            <ion-label>Personal</ion-label>
+            <ion-radio slot="end" value="1"></ion-radio>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon slot="start" name="earth-outline"></ion-icon>
+            <ion-label>Personal & Public</ion-label>
+            <ion-radio slot="end" value="0"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+    </ion-card>
+
+    <ion-card>
+      <ion-list>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-button class="button" disabled color="danger" expand="block" (click)="erasePersonalDb()">Delete User Data
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+      </ion-list>
+    </ion-card>
+
+
+  </ion-content>
+</ion-app>

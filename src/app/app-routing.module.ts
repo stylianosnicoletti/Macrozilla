@@ -1,72 +1,49 @@
 import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { CanEnterLoginPageGuard } from './guards/can-enter-login-page.guard';
-import { CanEnterTabsPageGuard } from './guards/can-enter-tabs-page.guard';
+import { RouterModule, Routes } from '@angular/router';
+import { SimpleLoadingStrategy } from './loadingStrategies/simpleLoadingStrategy';
 
 const routes: Routes = [
+  {
+  // If user does not enter anything in URL reroute to login..
+    path: '', 
+    redirectTo: '/login',
+    pathMatch: 'full'
+  },
   // If user inserts /login in URL then do..
   {
     path: 'login',
-    // Remember to enter the guard to check if user is already logged in and redirect to tabs
-    canActivate: [CanEnterLoginPageGuard],
-    loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)
+    loadChildren: () => import('./components/login/login.module').then(m => m.LoginPageModule)
   },
   // If user inserts /register in URL then do..
   {
     path: 'register',
-    loadChildren: () => import('./register/register.module').then(m => m.RegisterPageModule)
+    loadChildren: () => import('./components/register/register.module').then(m => m.RegisterPageModule)
   },
   // If user inserts /reset-password in URL then do..
   {
     path: 'reset_password',
-    loadChildren: () => import('./reset-password/reset-password.module').then(m => m.ResetPasswordPageModule)
+    loadChildren: () => import('./components/reset-password/reset-password.module').then(m => m.ResetPasswordPageModule)
   },
-  // If user navigates to edit food page
+  // If user does not enter anything in URL then do..
   {
-    path: 'edit_food/:food_doc_id',
-    canActivate: [CanEnterTabsPageGuard],
-    loadChildren: () => import('./edit-food/edit-food.module').then(m => m.EditFoodPageModule)
-  },
-  // If user navigates to add food page
-  {
-    path: 'add_food',
-    canActivate: [CanEnterTabsPageGuard],
-    loadChildren: () => import('./add-food/add-food.module').then(m => m.AddFoodPageModule)
-  },
-  // If user navigates to add entry search page
-  {
-    path: 'add_entry_search/:date_selected',
-    canActivate: [CanEnterTabsPageGuard],
-    loadChildren: () => import('./add-entry-search/add-entry-search.module').then(m => m.AddEntrySearchPageModule)
-  },
-  // If user navigates to transfer entriespage
-  {
-    path: 'transfer_entries/:date_selected',
-    canActivate: [CanEnterTabsPageGuard],
-    loadChildren: () => import('./transfer-entries/transfer-entries.module').then(m => m.TransferEntriesPageModule)
-  },
-  // If user navigates to edit entry
-  {
-    path: 'edit_entry_input_form/:date_selected/:entry_doc_id',
-    canActivate: [CanEnterTabsPageGuard],
-    loadChildren: () => import('./edit-entry-input-form/edit-entry-input-form.module').then(m => m.EditEntryInputFormPageModule)
-  },
-  // If user navigates to add entry input form page
-  {
-    path: 'add_entry_input_form/:date_selected/:food_doc_id',
-    canActivate: [CanEnterTabsPageGuard],
-    loadChildren: () => import('./add-entry-input-form/add-entry-input-form.module').then(m => m.AddEntryInputFormPageModule)
+    path: 'authorized_user',
+    loadChildren: () => import('./components/authorized-user/authorized-user.module').then(m => m.AuthorizedUserPageModule),
+    data: {
+      preload: true
+    },
   },
   {
-    canActivate: [CanEnterTabsPageGuard],
-    // If user does not enter anything in URL then do..
-    path: '',
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+  //If path doesn't match anything reroute to 'login' (Leave it at the end)
+    path: '**', 
+    redirectTo: '/login',
+    pathMatch: 'full'
   }
+
 ];
 @NgModule({
+  providers: [SimpleLoadingStrategy],
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { preloadingStrategy: SimpleLoadingStrategy })
   ],
   exports: [RouterModule]
 })

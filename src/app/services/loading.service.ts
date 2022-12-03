@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
+import { RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoadingService {
-  constructor(public loadingController: LoadingController) { }
+  constructor(public _loadingCtrl: LoadingController) { }
 
   async presentLoading(messageText: string, durationMiliSec: number) {
-    const loading = await this.loadingController.create({
+    const loading = await this._loadingCtrl.create({
       message: messageText,
       duration: durationMiliSec
     });
@@ -18,7 +19,7 @@ export class LoadingService {
   }
 
   async createAndPresentLoading(messageText: string): Promise<HTMLIonLoadingElement>{
-    const loading = await this.loadingController.create({
+    const loading = await this._loadingCtrl.create({
       message: messageText
     });
     await loading.present();
@@ -30,7 +31,7 @@ export class LoadingService {
   }
 
   async presentLoadingWithOptions() {
-    const loading = await this.loadingController.create({
+    const loading = await this._loadingCtrl.create({
       spinner: null,
       duration: 5000,
       message: 'Click the backdrop to dismiss early...',
@@ -41,5 +42,29 @@ export class LoadingService {
     await loading.present();
 
     const { role, data } = await loading.onDidDismiss();
+  }
+
+  async showLoadingOnRouteTransition(router: Router, isLoadingRouteConfig: boolean ) {
+    router.events.subscribe(async event => {
+      if (event instanceof RouteConfigLoadStart) {
+        //console.log("start");
+        isLoadingRouteConfig = true;
+        return await this._loadingCtrl.create({
+          spinner: 'circles',
+          duration: 5000, // in case it stucks, it will close after 5 seconds.
+        }).then(a => {
+          a.present().then(() => {
+            //console.log('presented');
+            if (!isLoadingRouteConfig) {
+              a.dismiss().then(() => {
+                //console.log('abort presenting')
+              });
+            }
+          });
+        });
+      } else if (event instanceof RouteConfigLoadEnd) {
+        isLoadingRouteConfig = false;
+      }
+    });
   }
 }

@@ -14,8 +14,9 @@ export class CanEnterLoginPageGuard implements CanActivate {
     stateSnapshot: RouterStateSnapshot) {
     return this._angularFireAuth.authState.pipe(
       map((auth) => {
+        console.log("CanEnterLoginPageGuard");
         if (auth && auth.emailVerified) {
-          this._router.navigate(["/tabs"]);
+          this._router.navigate(["/authorized_user/tabs/daily_entry"]);
           return false;
         } else {
           return true;

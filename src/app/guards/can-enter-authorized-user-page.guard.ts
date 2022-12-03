@@ -8,13 +8,13 @@ import { map } from "rxjs/operators";
   providedIn: 'root'
 })
 
-export class CanEnterTabsPageGuard implements CanActivate {  
+export class CanEnterAuthorizedUserPageGuard implements CanActivate {  
   constructor(private _angularFireAuth: AngularFireAuth,private _router: Router){}
 
   canActivate(activatedRouteSnapshot: ActivatedRouteSnapshot, stateSnapshot:RouterStateSnapshot){
       return this._angularFireAuth.authState.pipe(
         map((auth)=>{
-          console.log("CanEnterTabsPageGuard");
+          console.log("CanEnterAuthorizedUserPageGuard");
           if(!auth || !auth.emailVerified){
             this._router.navigate(["/login"]);
             return false;

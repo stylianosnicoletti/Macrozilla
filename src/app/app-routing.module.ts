@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { SimpleLoadingStrategy } from './loadingStrategies/simpleLoadingStrategy';
 
 const routes: Routes = [

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar } from '@capacitor/status-bar';
@@ -7,22 +7,32 @@ import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { environment } from '../environments/environment';
 import { MaintenanceService } from '../app/services/maintenance.service';
+import { Router } from '@angular/router';
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   platformPauseSubsciption: Subscription;
   platformResumeSubsciption: Subscription;
+  isLoadingRouteConfig: boolean;
 
   constructor(
     private _platform: Platform,
-    private _maintenanceService: MaintenanceService) {
+    private _maintenanceService: MaintenanceService,
+    private _router: Router,
+    private _loadingService: LoadingService) {
+    this.isLoadingRouteConfig = false;
     this.initializePauseResumeSubscriptions();
     this.initializeApp();
+  }
+
+  ngOnInit() {
+    this._loadingService.showLoadingOnRouteTransition(this._router, this.isLoadingRouteConfig);
   }
 
   initializeApp() {
@@ -67,7 +77,6 @@ export class AppComponent {
     });
 
     this.platformResumeSubsciption = this._platform.resume.subscribe(async () => {
-
       //console.log('resumed!');
     });
   }

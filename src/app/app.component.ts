@@ -32,7 +32,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._loadingService.showLoadingOnRouteTransition(this._router, this.isLoadingRouteConfig);
+    // ONLY WEB BRANCH !!!
+    //this._loadingService.showLoadingOnRouteTransition(this._router, this.isLoadingRouteConfig);
   }
 
   initializeApp() {

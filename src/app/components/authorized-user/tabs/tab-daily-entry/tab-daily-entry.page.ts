@@ -32,7 +32,7 @@ export class TabDailyEntryPage {
   ) { }
 
   async ngOnInit() {
-    console.log("ngOnInit Add Daily Entry");
+    //console.log("ngOnInit Add Daily Entry");
     await (
       await this._userService.getUserFields()
     ).subscribe(async (x) => {
@@ -43,12 +43,12 @@ export class TabDailyEntryPage {
   }
 
   async ionViewWillEnter() {
-    console.log("entering daily entries page");
+    //console.log("entering daily entries page");
     await this.initialiseItems();
   }
 
   ionViewWillLeave() {
-    console.log("leaving daily entries page");
+    //console.log("leaving daily entries page");
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
   }
 

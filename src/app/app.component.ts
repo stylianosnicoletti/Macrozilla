@@ -44,9 +44,6 @@ export class AppComponent implements OnInit {
       // Native Platform (Android/iOS)
       if (Capacitor.isNativePlatform()) {
         //console.log("Is Native");
-        console.log(`Hide splash screen`);
-        SplashScreen.hide().then(()=>console.log(`Splashscreen hidden`));
-        StatusBar.show();
         // Android Platform
         if (platform == 'android') {
           //console.log("Is Android");

@@ -90,7 +90,7 @@ export class LoginPage implements OnInit {
             (u) => u.emailVerified
           )
         ) {
-          console.log("loginnnn")
+          //console.log("loginnnn")
           this._router.navigate(["/authorized_user/tabs/daily_entry"]);
         } else {
           this.errorMessage = "Email not verified";

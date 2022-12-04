@@ -14,7 +14,7 @@ export class CanEnterAuthorizedUserPageGuard implements CanActivate {
   canActivate(activatedRouteSnapshot: ActivatedRouteSnapshot, stateSnapshot:RouterStateSnapshot){
       return this._angularFireAuth.authState.pipe(
         map((auth)=>{
-          console.log("CanEnterAuthorizedUserPageGuard");
+          //console.log("CanEnterAuthorizedUserPageGuard");
           if(!auth || !auth.emailVerified){
             this._router.navigate(["/login"]);
             return false;

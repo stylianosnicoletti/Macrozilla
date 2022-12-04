@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Macrozilla</string>
+    <string name="title_activity_main">Macrozilla</string>
+    <string name="package_name">io.ionic.macrozilla</string>
+    <string name="custom_url_scheme">io.ionic.macrozilla</string>
+</resources>

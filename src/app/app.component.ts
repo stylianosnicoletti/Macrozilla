@@ -32,7 +32,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._loadingService.showLoadingOnRouteTransition(this._router, this.isLoadingRouteConfig);
+    // ONLY WEB BRANCH !!!
+    //this._loadingService.showLoadingOnRouteTransition(this._router, this.isLoadingRouteConfig);
   }
 
   initializeApp() {
@@ -43,8 +44,6 @@ export class AppComponent implements OnInit {
       // Native Platform (Android/iOS)
       if (Capacitor.isNativePlatform()) {
         //console.log("Is Native");
-        SplashScreen.hide();
-        StatusBar.show();
         // Android Platform
         if (platform == 'android') {
           //console.log("Is Android");

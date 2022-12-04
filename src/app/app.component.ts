@@ -1,14 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@capacitor/splash-screen';
-import { StatusBar } from '@capacitor/status-bar';
 import { Subscription } from 'rxjs';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { environment } from '../environments/environment';
 import { MaintenanceService } from '../app/services/maintenance.service';
-import { Router } from '@angular/router';
-import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -23,17 +19,13 @@ export class AppComponent implements OnInit {
 
   constructor(
     private _platform: Platform,
-    private _maintenanceService: MaintenanceService,
-    private _router: Router,
-    private _loadingService: LoadingService) {
+    private _maintenanceService: MaintenanceService) {
     this.isLoadingRouteConfig = false;
     this.initializePauseResumeSubscriptions();
     this.initializeApp();
   }
 
   ngOnInit() {
-    // ONLY WEB BRANCH !!!
-    //this._loadingService.showLoadingOnRouteTransition(this._router, this.isLoadingRouteConfig);
   }
 
   initializeApp() {

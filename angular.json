@@ -46,11 +46,36 @@
             "namedChunks": true
           },
           "configurations": {
-            "production": {
+            "prodWeb": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "with": "src/environments/environment.prodWeb.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "ngsw-config.json"
+            },
+            "prodAndroid": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prodAndroid.ts"
                 }
               ],
               "optimization": true,
@@ -83,8 +108,11 @@
             "browserTarget": "app:build"
           },
           "configurations": {
-            "production": {
-              "browserTarget": "app:build:production"
+            "prodWeb": {
+              "browserTarget": "app:build:prodWeb"
+            },
+            "prodAndroid": {
+              "browserTarget": "app:build:prodAndroid"
             },
             "ci": {
               "progress": false
@@ -147,9 +175,13 @@
             "devServerTarget": "app:serve"
           },
           "configurations": {
-            "production": {
-              "devServerTarget": "app:serve:production"
+            "prodWeb": {
+              "devServerTarget": "app:serve:prodWeb"
             },
+            "prodAndroid": {
+              "devServerTarget": "app:serve:prodAndroid"
+            },
+            
             "ci": {
               "devServerTarget": "app:serve:ci"
             }
@@ -161,8 +193,11 @@
             "browserTarget": "app:build"
           },
           "configurations": {
-            "production": {
-              "browserTarget": "app:build:production"
+            "prodWeb": {
+              "browserTarget": "app:build:prodWeb"
+            },
+            "prodAndroid": {
+              "browserTarget": "app:build:prodAndroid"
             }
           }
         },
@@ -173,9 +208,13 @@
             "devServerTarget": "app:serve"
           },
           "configurations": {
-            "production": {
-              "cordovaBuildTarget": "app:ionic-cordova-build:production",
-              "devServerTarget": "app:serve:production"
+            "prodWeb": {
+              "cordovaBuildTarget": "app:ionic-cordova-build:prodWeb",
+              "devServerTarget": "app:serve:prodWeb"
+            },
+            "prodAndroid": {
+              "cordovaBuildTarget": "app:ionic-cordova-build:prodAndroid",
+              "devServerTarget": "app:serve:prodAndroid"
             }
           }
         }

@@ -22,11 +22,10 @@ import { BackButtonDisableModule } from './other-modules/disable-browser-back-bu
             BrowserModule,
             IonicModule.forRoot(),
             AppRoutingModule,
-            // ONLY WEB BRANCH !!!
-            // To disable the back button
-            // BackButtonDisableModule.forRoot({
-            //  preserveScrollPosition: true
-            // }),
+            // To disable the browser back button
+            BackButtonDisableModule.forRoot({
+              preserveScrollPosition: true
+            }),
             ServiceWorkerModule.register('ngsw-worker.js', {
               enabled: environment.production,
               registrationStrategy: 'registerImmediately'

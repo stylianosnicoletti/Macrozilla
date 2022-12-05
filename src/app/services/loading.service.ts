@@ -8,6 +8,8 @@ import { LoadingController } from '@ionic/angular';
 export class LoadingService {
   constructor(public _loadingCtrl: LoadingController) { }
 
+  private loadingOnAppBoot: any;
+
   async presentLoading(messageText: string, durationMiliSec: number) {
     const loading = await this._loadingCtrl.create({
       message: messageText,
@@ -66,5 +68,17 @@ export class LoadingService {
         isLoadingRouteConfig = false;
       }
     });
+  }
+
+  async startLoadingOnAppBoot() {
+    this.loadingOnAppBoot = await this._loadingCtrl.create({
+      spinner: 'circles',
+      duration: 8000, // in case it stucks, it will close after 8 seconds.
+    });
+    this.loadingOnAppBoot.present();
+  }
+
+  async stopLoadingOnAppBoot() {
+    this.loadingOnAppBoot.dismiss();
   }
 }

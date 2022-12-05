@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { LoadingService } from 'src/app/services/loading.service';
 
 @Component({
   selector: 'app-register',
@@ -35,7 +36,8 @@ export class RegisterPage implements OnInit {
   constructor(
     private authService: AuthService,
     private formBuilder: FormBuilder,
-    private router: Router
+    private router: Router,
+    private _loadingService: LoadingService,
   ) { }
 
   ngOnInit() {
@@ -55,6 +57,10 @@ export class RegisterPage implements OnInit {
         Validators.required
       ]))
     });
+  }
+
+  async ionViewWillEnter() {
+    await this._loadingService.stopLoadingOnAppBoot();
   }
 
   async tryRegister(value) {

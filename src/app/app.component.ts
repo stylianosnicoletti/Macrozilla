@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { environment } from '../environments/environment';
 import { MaintenanceService } from '../app/services/maintenance.service';
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -15,12 +16,12 @@ export class AppComponent implements OnInit {
 
   platformPauseSubsciption: Subscription;
   platformResumeSubsciption: Subscription;
-  isLoadingRouteConfig: boolean;
 
   constructor(
     private _platform: Platform,
-    private _maintenanceService: MaintenanceService) {
-    this.isLoadingRouteConfig = false;
+    private _maintenanceService: MaintenanceService,
+    private _loadingService: LoadingService) {
+    this._loadingService.startLoadingOnAppBoot();
     this.initializePauseResumeSubscriptions();
     this.initializeApp();
   }
@@ -51,8 +52,8 @@ export class AppComponent implements OnInit {
       } else {
         // Web Platform
         if (platform == 'web') {
-          //console.log("Is Web");
-          //console.log("Current Version: " + environment.appVersion);
+         //console.log("Is Web");
+         //console.log("Current Version: " + environment.appVersion);
           await (await this._maintenanceService.getMaintenanceWeb()).subscribe(async maintenance => {
             await this._maintenanceService.checkForUpdateOrAvailabilityWeb(environment.appVersion, maintenance);
           });
@@ -63,12 +64,12 @@ export class AppComponent implements OnInit {
 
   initializePauseResumeSubscriptions() {
     this.platformPauseSubsciption = this._platform.pause.subscribe(async () => {
-      //console.log('paused!');
+     //console.log('paused!');
 
     });
 
     this.platformResumeSubsciption = this._platform.resume.subscribe(async () => {
-      //console.log('resumed!');
+     //console.log('resumed!');
     });
   }
 }

@@ -13,6 +13,7 @@ import { MaintenanceService } from "../../services/maintenance.service";
 import { Subscription } from "rxjs";
 import { UnsubscribeService } from "../../services/unsubscribe.service";
 import { Capacitor } from "@capacitor/core";
+import { LoadingService } from "src/app/services/loading.service";
 
 @Component({
   selector: "app-login",
@@ -45,11 +46,12 @@ export class LoginPage implements OnInit {
     private _formBuilder: FormBuilder,
     private _router: Router,
     private _maintenanceService: MaintenanceService,
-    private _unsubscribeService: UnsubscribeService
+    private _unsubscribeService: UnsubscribeService,
+    private _loadingService: LoadingService,
   ) {}
 
   ngOnInit() {
-    //console.log("Entering login page");
+   //console.log("Entering login page");
     this.validations_form = this._formBuilder.group({
       email: new FormControl(
         "",
@@ -68,7 +70,8 @@ export class LoginPage implements OnInit {
   /**
    * Will be triggered, if you come back to a page.
    */
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
+    await this._loadingService.stopLoadingOnAppBoot();
     this.isWebApp();
     // Android hardware back button actions
     App.addListener("backButton", (data) => {
@@ -77,7 +80,7 @@ export class LoginPage implements OnInit {
   }
 
   ionViewWillLeave() {
-    //console.log("leaving login page");
+   //console.log("leaving login page");
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     App.removeAllListeners();
   }
@@ -90,7 +93,7 @@ export class LoginPage implements OnInit {
             (u) => u.emailVerified
           )
         ) {
-          //console.log("loginnnn")
+         //console.log("loginnnn")
           this._router.navigate(["/authorized_user/tabs/daily_entry"]);
         } else {
           this.errorMessage = "Email not verified";
@@ -126,7 +129,7 @@ export class LoginPage implements OnInit {
 
   isWebApp(): boolean{
     const platform = Capacitor.getPlatform();
-    //console.log(platform);
+   //console.log(platform);
     return this.isWeb = (platform == 'web');
   }
 }

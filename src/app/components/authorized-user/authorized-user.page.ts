@@ -3,6 +3,7 @@ import { Network } from '@capacitor/network';
 import { Subscription } from 'rxjs';
 import { UserService } from '../../services/user.service';
 import { PluginListenerHandle } from '@capacitor/core';
+import { LoadingService } from 'src/app/services/loading.service';
 
 
 @Component({
@@ -19,13 +20,14 @@ export class AuthorizedUserPage {
 
   constructor(
     private _renderer: Renderer2,
-    private _userService: UserService) { }
+    private _userService: UserService,
+    private _loadingService: LoadingService) { }
 
   /**
    * Will not be triggered, if you come back to a page after putting it into a stack.
    */
   async ngOnInit() {
-    //console.log("ngOnInit AuthorizedUserPage.");
+   //console.log("ngOnInit AuthorizedUserPage.");
     await (await this._userService.getUserFields()).subscribe(async x => {
       this._renderer.setAttribute(document.body, 'color-theme', this.mapThemeModeToBodyName(x.Options.DarkMode))
     });
@@ -34,17 +36,17 @@ export class AuthorizedUserPage {
   }
 
   async ionViewWillEnter() {
-    //console.log("ionViewWillEnter AuthorizedUserPage.");
+   //console.log("ionViewWillEnter AuthorizedUserPage.");
     // await this.presentNetworkAlert();
-
+    await this._loadingService.stopLoadingOnAppBoot();
   }
 
   async ionViewWillLeave() {
-    //console.log("ionViewWillLeave AuthorizedUserPage.");
+   //console.log("ionViewWillLeave AuthorizedUserPage.");
   }
 
   async ngOnDestroy() {
-    //console.log("ngOnDestroy AuthorizedUserPage.");
+   //console.log("ngOnDestroy AuthorizedUserPage.");
     if (this.networkListener) {
       this.networkListener.remove();
     }
@@ -67,18 +69,18 @@ export class AuthorizedUserPage {
       this.networkListener.remove();
     }
     this.lastNetworkStatusIsConnected = await (await Network.getStatus()).connected;
-    //console.log(this.lastNetworkStatusIsConnected);
+   //console.log(this.lastNetworkStatusIsConnected);
     this.networkListener = await this.initNetworkListener();
   }
 
   async initNetworkListener(): Promise<PluginListenerHandle> {
     return await Network.addListener('networkStatusChange', async status => {
       if (status.connected && !this.lastNetworkStatusIsConnected) {
-        //console.log('Network connected!');
+       //console.log('Network connected!');
         this.lastNetworkStatusIsConnected = true;
       }
       else if (!status.connected) {
-        //console.log('Network disconnected!');
+       //console.log('Network disconnected!');
         this.lastNetworkStatusIsConnected = false;
       }
     });

@@ -3,6 +3,7 @@ import { Validators, FormBuilder, FormGroup, FormControl } from '@angular/forms'
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
+import { LoadingService } from 'src/app/services/loading.service';
 @Component({
   selector: 'app-reset-password',
   templateUrl: './reset-password.page.html',
@@ -25,7 +26,8 @@ export class ResetPasswordPage implements OnInit {
     private toastService: ToastService,
     private authService: AuthService,
     private formBuilder: FormBuilder,
-    private router: Router
+    private router: Router,
+    private _loadingService: LoadingService,
   ) { }
 
   ngOnInit() {
@@ -36,7 +38,11 @@ export class ResetPasswordPage implements OnInit {
       ]))
     });
   }
-
+  
+  async ionViewWillEnter() {
+    await this._loadingService.stopLoadingOnAppBoot();
+  }
+  
   async tryPasswordReset(value) {
     await this.authService.doPasswordReset(value)
       .then(async res => {

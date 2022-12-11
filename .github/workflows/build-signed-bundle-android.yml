@@ -37,6 +37,11 @@ jobs:
       - name: Install app dependencies
         run: npm install
 
+      - name: Run config (Set envs)
+        run: npm run config
+        env:
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+
       - name: Build app
         run: ionic build --prod --configuration prodAndroid --release
 

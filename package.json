@@ -3,9 +3,10 @@
   "version": "2.5.1",
   "author": "Stelios Nicoletti",
   "scripts": {
+    "config": "ts-node src/environments/set-env.ts",
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "npm run config && ng serve",
+    "build": "npm run config && ng build",
     "test": "ng test",
     "test-headless": "ng test --browsers=ChromeHeadless",
     "lint": "ng lint",

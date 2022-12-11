@@ -1,60 +1,60 @@
 # Macrozilla
 
-To Run Web Version
--------------------
-* Install nodejs and npm.
-* npm install -g @ionic/cli (Install ionic cli globally using npm)
-* npm install (to install all packages needed from packages.json)
-* ionic build
-* ionic serve
+Macrozilla allows you to create your own food database or even use existing publicly available food database to register & track daily food intake 🗃️, respecting your carbohydrate, protein and fat targets 🥪. You can get a graphical summary of your average macro nutrient ratios, together with your average calorie intake within specific date ranges 📊.
 
-When adding a new package
---------------------------
-* npm install XYZ --save-prod (to put it in the package.json and avoid future rebuilt issues)
+## Cross-platform
 
-To Run Andoid Version OLD
----------------------
-* npx cap init (select names,etc)
-* npx cap android
-* make sure that capacitor.config.json has the correct path for android studio
-* ionic cap sync
-* sudo npx cap open android
+Native and web app experience.
 
-To Run Andoid Version NEW
----------------------
-* Link: https://ionicframework.com/docs/developing/android
-* ionic capacitor add android
-* make sure that capacitor.config.json has the correct path for android studio, names, etc
-* gitgnore will be configured to skip asset files automatically commit it to skip always 
-* ionic capacitor copy android
-* ionic capacitor run android (might need sudo if Android Studio in root folders)
-* run app in Android Studio
+| Application | URL |
+| ------ | ------ |
+| Web | https://themacrozilla.com |
+| Android | https://play.google.com/store/apps/details?id=io.ionic.macrozilla |
 
-Development Environment in Windows
-----------------------------------
-* Configure Ubuntu WSL on Windows 
-* Add Remote-WSL on VSCode
-* Install Nodejs and npm using: https://github.com/nodesource/distributions/blob/master/README.md
-* sudo npm install -g @ionic/cli
-* Pull the app in a non NTFS direcotry (E.g. home/user/) 
-* Use Remote-WSL and bash for development
-* ionic serve --external (use external ip not local since local fails ERR_CONNECTION_REFUSED)
+## Screenshots
 
-Deployment Android
--------------------
-* ionic capacitor add andoid
-* ionic capacitor copy android --prod
-* export CAPACITOR_ANDROID_STUDIO_PATH='..the path to android studio sh..' >> ~/.bashrc
-* source ~./bashrc
-* ionic capacitor open android
+<table>
+    <tr>
+        <td valign="top"><img src="https://play-lh.googleusercontent.com/oltWux_wlGN1paWT28y9_ao9wxvDOTLACryq3nB0I_HmtNGw0amLcDuwGKxQ53Ka-EDB=w2560-h1440-rw" width="156" height="300"></td>
+        <td valign="top"><img src="https://play-lh.googleusercontent.com/eEzANk0CLdqsBSl7QyMvp8xL2zDHc00GxdlueaDbuotBZRxLGO-0Lz5M3MzbBoFB3t9a=w2560-h1440-rw" width="156" height="300"></td>
+        <td valign="top"><img src="https://play-lh.googleusercontent.com/8jHKeym-ryehNmHU2WWXZktilzh2Kc15NRhM8FnKaDkVBVjLsRW0qO4UkgjF0ak0u_A=w2560-h1440-rw" width="156" height="300"></td>
+        <td valign="top"><img src="https://play-lh.googleusercontent.com/K86DGBU3mBHe0pvCd-UOcBN4HgTMOqPId7wJKRM5vkxVfuue7HoR4Zy8XodqoU5IkAI=w2560-h1440-rw" width="156" height="300"></td>
+    </tr>
+    <tr>
+        <td valign="top"><img src="https://play-lh.googleusercontent.com/ZdNAFXwM7F4aK93pY_GhcAghF0dqXss_0KBwzKHwMlGD6w8S18OJqopB7WfwSC2w2yhC=w2560-h1440-rw" width="156" height="300"></td>
+        <td valign="top"><img src="https://play-lh.googleusercontent.com/ijfw2cqihEYIDKrP31FB4hx6DArzdJHsIbnaX4WbH3OeWEG_pEB7gOVwPdVmdhH27U4=w2560-h1440-rw" width="156" height="300"></td>
+        <td valign="top"><img src="https://play-lh.googleusercontent.com/wGZeB9-_4emQfz3Nz19TiuRw5husk4tjEFz7Afr5s8XDR_2s_IP995GQTbD-Reo8Xh5V=w2560-h1440-rw" width="156" height="300"></td>
+        <td valign="top"><img src="https://play-lh.googleusercontent.com/wLAxEITN0XrCDxihNPw5C2bPRMUdg7zFRSVKs-RUKHmOVI9w8ZMKltqNeEq0yRLydJw=w2560-h1440-rw" width="156" height="300"></td>
+    </tr>
+</table>
 
-Deployment Firebase
--------------------
-* Use guide: https://ionicframework.com/docs/angular/pwa
-* sudo npm install -g firebase-tools
-* sudo npm install -g @angular/cli
-* Configure pwa angular
-* Set no cache for "ngsw-worker.js", etc in firabase.json
-* firebase login
-* firebase init hosting (follow steps and also create workflows for github)
-* firebase login:ci (To get token) - You might need to update the ${{ secrets.FIREBASE_SERVICE_ACCOUNT_THEMACRODIET_S }} by rerunning this command if you face any issues with automatic deployment.
+## Features
+
+- __Authentication__:
+    - Register
+    - Login
+    - Confirm email
+    - Reset password
+- __Track daily food__
+- __Analytics__
+    - Average macro ratio
+    - Average calories
+- __Food database__
+    - Use publicly available food database
+    - Add/Edit/Delete your own private foods
+- __Theme__
+    - Dark
+    - Light
+
+## Technologies
+
+- [Ionic] - Mobile app framework
+- [Angular] - Web framework
+- [Firebase] - Web app hosting
+- [Firestore] - Cloud-hosted, NoSQL database
+- [Cloud Functions for Firebase] - Serverless event triggers
+- [Capacitor] - Cross-platform native runtime for web apps
+- [RxJS] - Reactive extensions library
+- [Actions for GitHub] - CI/CD
+- [Android SDK] - Building Android app
+

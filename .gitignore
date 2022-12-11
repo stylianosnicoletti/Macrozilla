@@ -3,3 +3,4 @@ www
 public
 package-lock.json
 .angular
+src/environments

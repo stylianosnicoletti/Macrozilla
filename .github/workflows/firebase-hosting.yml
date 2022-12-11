@@ -31,7 +31,7 @@ jobs:
         npm run config
         ionic build --prod --configuration prodWeb --release
       env:
-          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }} npm run build
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
     - name: Archive Build
       uses: actions/upload-artifact@v2
       with:

@@ -1,8 +1,15 @@
-import {environment as mainEnvironment} from '../environments/environment'
-
 export const environment = {
-  appVersion: mainEnvironment.appVersion,
-  production: true,
-  platform: "web",
-  firebase: mainEnvironment.firebase
+  appVersion: "",
+  production: false,
+  platform: "",
+  firebase: {
+    apiKey: "",
+    authDomain: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
+    measurementId: ""
+  }
 };

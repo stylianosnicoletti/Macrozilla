@@ -4,3 +4,4 @@ public
 package-lock.json
 .angular
 src/environments
+src/environments/*

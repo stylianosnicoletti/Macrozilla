@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Capacitor } from '@capacitor/core';
@@ -12,7 +12,7 @@ import { LoadingService } from './services/loading.service';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent{
 
   platformPauseSubsciption: Subscription;
   platformResumeSubsciption: Subscription;
@@ -24,9 +24,6 @@ export class AppComponent implements OnInit {
     this._loadingService.startLoadingOnAppBoot();
     this.initializePauseResumeSubscriptions();
     this.initializeApp();
-  }
-
-  ngOnInit() {
   }
 
   initializeApp() {

@@ -135,15 +135,20 @@ export class AddEntryInputFormPage {
    * Submit changes.
    **/
   async submitForm() {
-    this.isSubmitted = true;
+
     if (!this.addEntryForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!');
       return false;
-    } else {
-      // Add entry in sub-collection of Entries on DailyEntry doc
-      await this._dailyTrackingService.addEntryAndUpdateDailyEntryFields(this.date, this.consumedFood);
-      await this._router.navigate(["/authorized_user/tabs/daily_entry"]);
-      await this._toastService.presentToast('Entry Successfully Added!');
+    }
+
+    if (this.isSubmitted == false) {
+      this.isSubmitted = true;
+      setTimeout(async () => {
+        // Add entry in sub-collection of Entries on DailyEntry doc
+        await this._dailyTrackingService.addEntryAndUpdateDailyEntryFields(this.date, this.consumedFood);
+        await this._router.navigate(["/authorized_user/tabs/daily_entry"]);
+        await this._toastService.presentToast('Entry Successfully Added!');
+      })
     }
   }
 

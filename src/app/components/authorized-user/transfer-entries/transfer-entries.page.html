@@ -37,7 +37,7 @@
 
         <ion-item>
           <ion-label><h2><strong>Select All</strong></h2></ion-label>
-          <ion-checkbox
+          <ion-checkbox aria-label="masterCheckBox"
             slot="end"
             [(ngModel)]="masterCheck"
             [indeterminate]="isIndeterminate"
@@ -62,7 +62,7 @@
               >{{entry.Food.ServingAmount}}{{entry.Food.ServingUnitShortCode}}</strong
             >
           </ion-chip>
-          <ion-checkbox
+          <ion-checkbox aria-label="entryCheckBox"
             slot="end"
             [(ngModel)]="entry.IsChecked"
             (ionChange)="checkEvent()"

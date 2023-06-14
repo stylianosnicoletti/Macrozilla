@@ -14,7 +14,6 @@ import { BackButtonDisableModule } from './other-modules/disable-browser-back-bu
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [],
   imports: [
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,

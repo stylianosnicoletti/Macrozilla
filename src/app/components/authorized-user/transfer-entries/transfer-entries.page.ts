@@ -217,6 +217,7 @@ export class TransferEntriesPage {
       this.dailyEntryFrom.Entries.forEach(entry => {
         entry.IsChecked = this.masterCheck;
       });
+      this.checkEvent();
     });
   }
 

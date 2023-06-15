@@ -8,7 +8,7 @@
 
   <!-- Searchbar with cancel button shown on focus -->
   
-  <ion-searchbar debounce="370" [(ngModel)]="searchTerm" (ionChange)="filterFoods()">
+  <ion-searchbar debounce="370" [(ngModel)]="searchTerm" (ionInput)="filterFoods()">
   </ion-searchbar>
 
   <ion-content>

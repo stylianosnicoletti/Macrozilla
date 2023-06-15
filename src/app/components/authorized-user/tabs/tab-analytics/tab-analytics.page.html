@@ -29,7 +29,7 @@
   <ion-card style="text-align: center;">
     <ion-card-header>
       <ion-card-subtitle><strong>Selected Range:</strong> Last {{lastDaysToRetrieve}} tracked days</ion-card-subtitle>
-      <ion-range [min]="minDaysThatCanBeRetrieved" [max]="maxDaysThatCanBeRetrieved" debounce="350"
+      <ion-range [min]="minDaysThatCanBeRetrieved" [max]="maxDaysThatCanBeRetrieved"
         [(ngModel)]="lastDaysToRetrieve" (ionChange)="selectedRange()" pin color="primary">
         <ion-badge slot="start"><strong>Last Day</strong></ion-badge>
         <ion-badge slot="end"><strong>All Time</strong></ion-badge>

@@ -5,3 +5,4 @@ package-lock.json
 .angular
 src/environments
 src/environments/*
+output

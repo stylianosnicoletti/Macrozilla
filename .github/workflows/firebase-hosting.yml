@@ -1,5 +1,5 @@
 # Firebase deploy
-name: Firebase CI/CD
+name: Firebase Hosting
 
 on:
   push:

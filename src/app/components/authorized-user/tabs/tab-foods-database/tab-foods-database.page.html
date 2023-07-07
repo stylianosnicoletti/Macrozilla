@@ -7,7 +7,7 @@
 
 
   <!-- Searchbar with cancel button shown on focus -->
-  
+
   <ion-searchbar debounce="370" [(ngModel)]="searchTerm" (ionInput)="filterFoods()">
   </ion-searchbar>
 
@@ -18,8 +18,7 @@
     </ion-refresher>
 
     <!-- Normal screen -->
-    <ion-list
-      *ngIf="searchTerm.length == 0; then viewIntroMessage else beginSearch">
+    <ion-list *ngIf="searchTerm.length == 0; then viewIntroMessage else beginSearch">
       <!-- Skeleton in here-->
     </ion-list>
 
@@ -29,7 +28,7 @@
         <ion-item class="ion-text-center">
           <ion-label class="ion-text-center" color="tertiary"><strong>Search by Food Name</strong></ion-label>
         </ion-item>
-      
+
         <ion-card-content class="ion-text-center">
           Start typing the name of food you want to find.
         </ion-card-content>
@@ -91,7 +90,8 @@
       <ion-item-sliding *ngFor="let food of filteredFoodMap | keyvalue: asIsOrder" #slidingItem>
         <ion-item>
           <ion-label class="ion-text-wrap">
-            <h2><strong>{{food.value.Name}}</strong>&nbsp;({{food.value.ServingAmount}}{{food.value.ServingUnitShortCode}})
+            <h2>
+              <strong>{{food.value.Name}}</strong>&nbsp;({{food.value.ServingAmount}}{{food.value.ServingUnitShortCode}})
             </h2>
 
             <h3>🔋 {{food.value.Calories}} kcal</h3>
@@ -111,24 +111,21 @@
         </ion-item>
 
         <!-- Enable sliding on personal foods -->
-        <ion-item-options *ngIf="food.value.IsFromPersonalDb" side="end">
-          <ion-item-option color="warning" (click)="editFood(food.value,slidingItem)">
+        <ion-item-options side="end">
+          <ion-item-option *ngIf="food.value.IsFromPersonalDb" color="warning"
+            (click)="editFood(food.value,slidingItem)">
             <ion-icon name="create"></ion-icon>
             Edit
           </ion-item-option>
-          <ion-item-option color="danger" (click)="presentAlertConfirmDelete(food.value,slidingItem)">
+          <ion-item-option *ngIf="food.value.IsFromPersonalDb" color="danger"
+            (click)="presentAlertConfirmDelete(food.value,slidingItem)">
             <ion-icon name="trash"></ion-icon>
             Delete
           </ion-item-option>
-        </ion-item-options>
-
-        <!-- Lock sliding on public foods -->
-        <ion-item-options *ngIf="!food.value.IsFromPersonalDb" side="end">
-          <ion-item-option color="light" disabled>
+          <ion-item-option *ngIf="!food.value.IsFromPersonalDb" color="light" disabled>
             🔒
           </ion-item-option>
         </ion-item-options>
-
 
       </ion-item-sliding>
     </ng-template>

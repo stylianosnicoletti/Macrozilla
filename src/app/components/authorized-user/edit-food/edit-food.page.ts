@@ -218,7 +218,6 @@ export class EditFoodPage {
         }, {
           text: 'Yes',
           handler: async () => {
-            console.log(food)
             await this._foodDatabaseService.updateFood(food);
             await this._router.navigate(["/authorized_user/tabs/foods_database"]);
             await this._toastService.presentToast('Food Successfully Edited!')

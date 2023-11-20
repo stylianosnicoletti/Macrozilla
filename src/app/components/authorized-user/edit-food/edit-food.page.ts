@@ -142,8 +142,8 @@ export class EditFoodPage {
       Saturated: formValue.Saturated,
       Calories: formValue.Calories,
       ServingAmount: formValue.ServingAmount,
-      ServingUnit: formValue.ServingUnit.Name,
-      ServingUnitShortCode: this.mapServingUnitToShortCode(formValue.ServingAmount, formValue.ServingUnit)
+      ServingUnit: formValue.ServingUnit,
+      ServingUnitShortCode: formValue.ServingUnitShortCode,
     };
   }
 
@@ -218,7 +218,8 @@ export class EditFoodPage {
         }, {
           text: 'Yes',
           handler: async () => {
-            await this._foodDatabaseService.updateFood(this.food);
+            console.log(food)
+            await this._foodDatabaseService.updateFood(food);
             await this._router.navigate(["/authorized_user/tabs/foods_database"]);
             await this._toastService.presentToast('Food Successfully Edited!')
           }

@@ -27,7 +27,7 @@ export class EditFoodPage {
   isSubmitted = false;
   subscriptionsList: Subscription[] = [];
   isFormReadyToBuild = false;
- 
+
 
   constructor(
     private _router: Router,
@@ -142,8 +142,9 @@ export class EditFoodPage {
       Saturated: formValue.Saturated,
       Calories: formValue.Calories,
       ServingAmount: formValue.ServingAmount,
-      ServingUnit: formValue.ServingUnit,
-      ServingUnitShortCode: formValue.ServingUnitShortCode,
+      // 2 Scenarios -> a) ServingUnit changes b) Preselected (does not change)
+      ServingUnit: this.isString(formValue.ServingUnit) ? formValue.ServingUnit : formValue.ServingUnit.Name,
+      ServingUnitShortCode: this.isString(formValue.ServingUnit) ? this.mapServingUnitToShortCode(formValue.ServingAmount, this.preselectedServingUnit) : this.mapServingUnitToShortCode(formValue.ServingAmount, formValue.ServingUnit),
     };
   }
 
@@ -234,5 +235,14 @@ export class EditFoodPage {
   asIsOrder(a, b) {
     return 1;
   }
-  
+
+  /**
+   * Is string value
+   * @param value 
+   * @returns True or False
+   */
+  isString(value): boolean {
+    return typeof value === 'string' || value instanceof String;
+  }
+
 }

@@ -1,6 +1,6 @@
 {
   "name": "macrozilla",
-  "version": "2.10.0",
+  "version": "3.0.0",
   "author": "Stelios Nicoletti",
   "scripts": {
     "config": "ts-node src/environments/set-env.ts",

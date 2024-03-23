@@ -37,7 +37,6 @@
           <ion-card-subtitle>User Interface</ion-card-subtitle>
         </ion-list-header>
         <ion-item>
-          <ion-label>Dark Mode</ion-label>
           <ion-icon *ngIf="darkMode;" slot="start" name="moon-outline"></ion-icon>
           <ion-icon *ngIf="!darkMode;" slot="start" name="sunny-outline"></ion-icon>
           <ion-toggle
@@ -45,7 +44,6 @@
            (ionChange)="updateUserOptions()">Dark Mode</ion-toggle>
         </ion-item>
         <ion-item>
-          <ion-label>Allow Transfering Entries</ion-label>
           <ion-icon *ngIf="transferEntriesEnabled;" slot="start" name="repeat"></ion-icon>
           <ion-icon *ngIf="!transferEntriesEnabled;" slot="start" name="repeat"></ion-icon>
           <ion-toggle
@@ -53,7 +51,6 @@
            (ionChange)="updateUserOptions()">Allow Transfering Entries</ion-toggle>
         </ion-item>
         <ion-item>
-          <ion-label>Allow Deleting All Entries</ion-label>
           <ion-icon *ngIf="deletingAllDailyEntriesEnabled;" slot="start" name="trash-outline"></ion-icon>
           <ion-icon *ngIf="!deletingAllDailyEntriesEnabled;" slot="start" name="trash-outline"></ion-icon>
           <ion-toggle

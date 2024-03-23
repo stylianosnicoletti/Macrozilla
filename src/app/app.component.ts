@@ -36,10 +36,10 @@ export class AppComponent{
         //console.log("Is Native");
         // Android Platform
         if (platform == 'android') {
-          //console.log("Is Android");
+          console.log("Android Platform");
           let appVersionAndroid: string;
           App.getInfo().then(e => {
-            //console.log("Current Version: " + e.version);
+            console.log("Current Version: " + e.version);
             appVersionAndroid = e.version;
           });
           await (await this._maintenanceService.getMaintenanceAndroid()).subscribe(async maintenance => {
@@ -49,8 +49,8 @@ export class AppComponent{
       } else {
         // Web Platform
         if (platform == 'web') {
-         //console.log("Is Web");
-         //console.log("Current Version: " + environment.appVersion);
+         console.log("Web Platform");
+         console.log("Current Version: " + environment.appVersion);
           await (await this._maintenanceService.getMaintenanceWeb()).subscribe(async maintenance => {
             await this._maintenanceService.checkForUpdateOrAvailabilityWeb(environment.appVersion, maintenance);
           });

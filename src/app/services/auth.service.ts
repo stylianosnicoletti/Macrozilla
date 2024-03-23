@@ -79,6 +79,20 @@ export class AuthService {
     });
   }
 
+  async doDeleteAccount(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      if (await this.afAuth.currentUser) {
+        await (await this.afAuth.currentUser).delete()
+        .then(res => {
+          resolve(res);
+        }, err => reject(err))
+      }
+      else {
+        reject();
+      }
+    });
+  }
+
   /*
   doFacebookLogin(){
     return new Promise<any>((resolve, reject) => {

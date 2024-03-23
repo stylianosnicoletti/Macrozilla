@@ -4,6 +4,7 @@ import { UserService } from "../../../../services/user.service";
 import { Subscription } from "rxjs";
 import { User, Options } from "../../../../models/user.model";
 import { UnsubscribeService } from "../../../../services/unsubscribe.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-tab-account",
@@ -21,6 +22,7 @@ export class TabAccountPage {
   subscriptionsList: Subscription[] = [];
 
   constructor(
+    private _router: Router,
     private _authService: AuthService,
     private _userService: UserService,
     private _unsubscribeService: UnsubscribeService
@@ -111,18 +113,11 @@ export class TabAccountPage {
   }
 
   /**
-   * Erases personal database.
+   * Go to delete user and data page.
    */
-  async erasePersonalDb(): Promise<void> {
-    //console.log("TODO: Erasing personal database!!");
-  }
-
-  /**
-   * Erases all daily tracking records.
-   */
-  async eraseDailyTrackingRecords(): Promise<void> {
-    //console.log("TODO: Erase all daily tracking records!!");
-  }
+    async goToDeleteUserDataPage(): Promise<void> {
+      await this._router.navigate(["/authorized_user/delete_user_data"]);
+    }
 
   /**
    * Clears cookies.

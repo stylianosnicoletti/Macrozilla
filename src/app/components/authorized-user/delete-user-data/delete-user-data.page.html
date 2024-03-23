@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="authorized_user/tabs/account"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Delete User and Data</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>What happens if I procceed with deletion?</ion-card-title>
+    </ion-card-header>
+  
+    <ion-card-content>
+      - Your Macrozilla account and authentication data such as email and password will be deleted. <br>
+      - Any data linked to this account such as daily entries will be deleted. <br>
+      - You will be logged out automatically. <br>
+    </ion-card-content>
+  </ion-card>
+  <ion-button class="button" color="danger" expand="block" (click)="tryDeleteUserDataAndLogout()">Delete User & Data
+  </ion-button>
+  <label class="error-message">{{errorMessage}}</label>
+  <label class="success-message">{{successMessage}}</label>
+</ion-content>
+

@@ -25,6 +25,11 @@ const routes: Routes = [
         path: 'add_food',
         loadChildren: () => import('./add-food/add-food.module').then(m => m.AddFoodPageModule),
       },
+      // If user navigates to delete user data page
+      {
+        path: 'delete_user_data',
+        loadChildren: () => import('./delete-user-data/delete-user-data.module').then(m => m.DeleteUserDataPageModule),
+      },
       // If user navigates to add entry search page
       {
         path: 'add_entry_search/:date_selected',

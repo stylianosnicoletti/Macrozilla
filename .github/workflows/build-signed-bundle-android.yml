@@ -61,7 +61,7 @@ jobs:
         run: jarsigner -keystore android/MacrozillaKeyStore.decrypted.jks -storepass "${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab macrozillakey
 
       - name: Upload release bundle
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: android/app/build/outputs/bundle/release/app-release-signed.aab

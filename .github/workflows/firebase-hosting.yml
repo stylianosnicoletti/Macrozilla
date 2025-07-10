@@ -31,7 +31,7 @@ jobs:
       env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
     - name: Archive Build
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: www 
         path: www # The name of the public folder from firebase

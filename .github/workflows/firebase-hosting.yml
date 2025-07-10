@@ -22,7 +22,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: sudo npm install -g @ionic/cli
-    #- run: sudo npm install -g @angular/cli
     - name: npm install, Run config (Set envs), build prod
       run: |
         npm install
@@ -33,8 +32,8 @@ jobs:
     - name: Archive Build
       uses: actions/upload-artifact@v4
       with:
-        name: www 
-        path: www # The name of the public folder from firebase
+        name: public 
+        path: public # The name of the public folder from firebase
         
   deploy:
     name: Deploy
@@ -45,11 +44,12 @@ jobs:
       - name: Download Build
         uses: actions/download-artifact@v4
         with:
-          name: www
-          path: www
+          name: public
+          path: public
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_THEMACRODIET_S }}
+          channelId: live
           projectId: themacrodiet-s

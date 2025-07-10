@@ -3,7 +3,7 @@
   "appName": "Macrozilla",
   "bundledWebRuntime": false,
   "npmClient": "npm",
-  "webDir": "www",
+  "webDir": "public",
   "plugins": {
     "SplashScreen": {
       "launchAutoHide": false,

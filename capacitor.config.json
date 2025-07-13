@@ -1,25 +1,28 @@
 {
-  "appId": "io.ionic.macrozilla",
-  "appName": "Macrozilla",
-  "bundledWebRuntime": false,
-  "npmClient": "npm",
-  "webDir": "public",
-  "plugins": {
-    "SplashScreen": {
-      "launchAutoHide": false,
-      "backgroundColor": "#ffffffff",
-      "androidSplashResourceName": "splash",
-      "androidScaleType": "CENTER_CROP",
-      "androidSpinnerStyle": "large",
-      "iosSpinnerStyle": "small",
-      "spinnerColor": "#999999",
-      "showSpinner": false,
-      "splashFullScreen": true,
-      "splashImmersive": true
-    },
-    "StatusBar": {
-      "overlaysWebView": false,
-      "backgroundColor": "#ffffffff"
-    }
-  }
+	"appId": "io.ionic.macrozilla",
+	"appName": "Macrozilla",
+	"bundledWebRuntime": false,
+	"npmClient": "npm",
+	"webDir": "public",
+	"plugins": {
+		"SplashScreen": {
+			"launchAutoHide": false,
+			"backgroundColor": "#ffffffff",
+			"androidSplashResourceName": "splash",
+			"androidScaleType": "CENTER_CROP",
+			"androidSpinnerStyle": "large",
+			"iosSpinnerStyle": "small",
+			"spinnerColor": "#999999",
+			"showSpinner": false,
+			"splashFullScreen": true,
+			"splashImmersive": true
+		},
+		"EdgeToEdge": {
+			"backgroundColor": "#222222"
+		}
+	},
+	"android": {
+		"adjustMarginsForEdgeToEdge": "force"
+
+	}
 }

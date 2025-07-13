@@ -4,6 +4,10 @@
 		"classpath": "com.capacitorjs.plugins.app.AppPlugin"
 	},
 	{
+		"pkg": "@capacitor/device",
+		"classpath": "com.capacitorjs.plugins.device.DevicePlugin"
+	},
+	{
 		"pkg": "@capacitor/network",
 		"classpath": "com.capacitorjs.plugins.network.NetworkPlugin"
 	},
@@ -12,7 +16,7 @@
 		"classpath": "com.capacitorjs.plugins.splashscreen.SplashScreenPlugin"
 	},
 	{
-		"pkg": "@capacitor/status-bar",
-		"classpath": "com.capacitorjs.plugins.statusbar.StatusBarPlugin"
+		"pkg": "@capawesome/capacitor-android-edge-to-edge-support",
+		"classpath": "io.capawesome.capacitorjs.plugins.androidedgetoedgesupport.EdgeToEdgePlugin"
 	}
 ]

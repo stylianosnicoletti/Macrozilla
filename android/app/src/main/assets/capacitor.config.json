@@ -17,9 +17,11 @@
 			"splashFullScreen": true,
 			"splashImmersive": true
 		},
-		"StatusBar": {
-			"overlaysWebView": false,
-			"backgroundColor": "#ffffffff"
+		"EdgeToEdge": {
+			"backgroundColor": "#222222"
 		}
+	},
+	"android": {
+		"adjustMarginsForEdgeToEdge": "force"
 	}
 }

@@ -16,6 +16,10 @@
       "showSpinner": false,
       "splashFullScreen": true,
       "splashImmersive": true
+    },
+    "StatusBar": {
+      "overlaysWebView": false,
+      "backgroundColor": "#ffffffff"
     }
   }
 }

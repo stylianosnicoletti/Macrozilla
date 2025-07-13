@@ -4,7 +4,9 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { map } from "rxjs/operators";
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
-import { StatusBar } from '@capacitor/status-bar';
+import { Device } from '@capacitor/device';
+//import { StatusBar, Style } from '@capacitor/status-bar';
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 
 
 @Injectable({
@@ -17,15 +19,25 @@ export class CanEnterLoginPageGuard implements CanActivate {
     stateSnapshot: RouterStateSnapshot) {
     return this._angularFireAuth.authState.pipe(
       map((auth) => {
-        const platform = Capacitor.getPlatform();    
+        const platform = Capacitor.getPlatform();
         // Native Platform (Android/iOS)
         if (Capacitor.isNativePlatform()) {
-          //console.log("Is Native");
+          //EdgeToEdge.enable();
+          console.log("Is Nativeee");
           //console.log(`Hide splash screen`);
-          SplashScreen.hide().then(() => { 
+          SplashScreen.hide().then(() => {
             //console.log(`Splashscreen hidden`);
-           });
-          StatusBar.show();
+          });
+          Device.getInfo().then(deviceInfo => {
+            if (platform === 'android' && Number(deviceInfo.osVersion) >= 15) {
+              console.log("EdgeToEdge  enabled for this version");
+              EdgeToEdge.enable(); // Enable only on Android 15+
+            } else {
+              console.log("EdgeToEdge not enabled for this version");
+              EdgeToEdge.disable(); // Prevents layout issues on older Android versions
+            }
+          });
+          //StatusBar.show();
         }
         //console.log("CanEnterLoginPageGuard");
         if (auth && auth.emailVerified) {

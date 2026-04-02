@@ -52,7 +52,7 @@ jobs:
         run: npx cap copy
 
       - name: Build app assembleDebug apk
-        run: cd android && gradle assembleDebug 
+        run: cd android && ./gradlew assembleDebug
 
       - name: Upload debug apk
         uses: actions/upload-artifact@v4

@@ -27,7 +27,7 @@ export class DailyTrackingService {
     private _firestore: Firestore,
     private _authService: AuthService,
     private _userService: UserService
-  ) {}
+  ) { }
 
   /**
    * Get entry of a food consumed that date.
@@ -71,7 +71,7 @@ export class DailyTrackingService {
     consumedFoodAfter: Food
   ): Promise<any> {
     // Current user id.
-      const currentUserUid = await this._authService.auth.currentUser.uid;
+    const currentUserUid = await this._authService.auth.currentUser.uid;
 
     // Get current Daily Entry Doc if exists
     const existingDailyEntry = await this.getDailyEntry(selectedDate);
@@ -192,6 +192,12 @@ export class DailyTrackingService {
     }
   }
 
+  /**
+   * Read Daily Entry doc with fields based on date. (Sub-collection of Entries can be fetched in descending orded of the time added.)
+   * @param selectedDate Selected date.
+   * @param includeSubCollection If true the Entries sub-collection is included. (Default = false)
+   * @returns Observable of Daily Entry with or without Entries sub-collection based on includeSubCollection parameter.
+   */
   async readDailyEntry(
     selectedDate: string,
     includeSubCollection: boolean = false

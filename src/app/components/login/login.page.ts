@@ -16,6 +16,7 @@ import { Capacitor } from "@capacitor/core";
 import { LoadingService } from "src/app/services/loading.service";
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: "app-login",
   templateUrl: "./login.page.html",
   styleUrls: ["./login.page.scss"],
@@ -89,9 +90,7 @@ export class LoginPage implements OnInit {
     await this._authService.doLogin(value).then(
       async () => {
         if (
-          await this._authService.afAuth.currentUser.then(
-            (u) => u.emailVerified
-          )
+          await this._authService.auth.currentUser.emailVerified
         ) {
          //console.log("loginnnn")
           this._router.navigate(["/authorized_user/tabs/daily_entry"]);

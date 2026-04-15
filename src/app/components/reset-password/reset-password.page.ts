@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { LoadingService } from 'src/app/services/loading.service';
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-reset-password',
   templateUrl: './reset-password.page.html',
   styleUrls: ['./reset-password.page.scss'],

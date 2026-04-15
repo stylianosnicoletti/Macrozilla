@@ -13,6 +13,7 @@ import { ServingUnit } from '../../../models/servingUnit.model';
 import { DailyTrackingService } from '../../../services/daily-tracking.service';
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-edit-entry-input-form',
   templateUrl: './edit-entry-input-form.page.html',
   styleUrls: ['./edit-entry-input-form.page.scss'],
@@ -141,6 +142,7 @@ export class EditEntryInputFormPage {
       await this._router.navigate(["/authorized_user/tabs/daily_entry"]);
       await this._toastService.presentToast('Entry Successfully Edited!');
     }
+    return null;
   }
 
   /**

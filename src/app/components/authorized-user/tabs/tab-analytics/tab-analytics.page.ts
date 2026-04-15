@@ -36,6 +36,7 @@ import {
 } from 'chart.js';
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-tab-analytics',
   templateUrl: './tab-analytics.page.html',
   styleUrls: ['./tab-analytics.page.scss'],

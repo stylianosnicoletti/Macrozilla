@@ -14,6 +14,7 @@ import { ServingUnit } from '../../../models/servingUnit.model';
 import { DailyTrackingService } from '../../../services/daily-tracking.service';
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-add-entry-input-form',
   templateUrl: './add-entry-input-form.page.html',
   styleUrls: ['./add-entry-input-form.page.scss'],
@@ -150,6 +151,7 @@ export class AddEntryInputFormPage {
         await this._toastService.presentToast('Entry Successfully Added!');
       })
     }
+    return null;
   }
 
   /**

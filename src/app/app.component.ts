@@ -8,6 +8,7 @@ import { MaintenanceService } from '../app/services/maintenance.service';
 import { LoadingService } from './services/loading.service';
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']

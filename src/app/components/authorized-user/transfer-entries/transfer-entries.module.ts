@@ -11,7 +11,7 @@ import { TransferEntriesPage } from './transfer-entries.page';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule.forChild([{ 
+    RouterModule.forChild([{
       path: '',
      component: TransferEntriesPage
      }

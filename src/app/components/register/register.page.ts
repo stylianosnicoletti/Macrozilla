@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LoadingService } from 'src/app/services/loading.service';
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],

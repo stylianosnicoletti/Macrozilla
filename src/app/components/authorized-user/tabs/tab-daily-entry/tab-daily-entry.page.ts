@@ -10,6 +10,7 @@ import { UnsubscribeService } from "../../../../services/unsubscribe.service";
 import { UserService } from "../../../../services/user.service";
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: "app-tab-daily-entry",
   templateUrl: "tab-daily-entry.page.html",
   styleUrls: ["tab-daily-entry.page.scss"],

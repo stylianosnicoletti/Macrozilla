@@ -13,6 +13,7 @@ import { UnsubscribeService } from '../../../services/unsubscribe.service';
 
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-edit-food',
   templateUrl: './edit-food.page.html',
   styleUrls: ['./edit-food.page.scss'],
@@ -184,6 +185,7 @@ export class EditFoodPage {
 
     await this.presentAlertConfirmEdit(this.food);
 
+    return null;
   }
 
     /**

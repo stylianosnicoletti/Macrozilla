@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth.service';
 
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-delete-user-data',
   templateUrl: './delete-user-data.page.html',
   styleUrls: ['./delete-user-data.page.scss'],

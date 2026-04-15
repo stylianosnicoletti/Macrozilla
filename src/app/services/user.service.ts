@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Firestore, doc, getDoc, updateDoc, onSnapshot } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Options, Sizes, User } from '../models/user.model';
 
@@ -10,7 +10,7 @@ import { Options, Sizes, User } from '../models/user.model';
 export class UserService {
 
   constructor(
-    private _angularFireStore: AngularFirestore,
+    private _firestore: Firestore,
     private _authService: AuthService) { }
 
   /**
@@ -18,73 +18,76 @@ export class UserService {
    * @returns Observable of User.
    */
   async getUserFields(): Promise<Observable<User>> {
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-    return this._angularFireStore.doc<User>("/TheMacroDiet/Production/Users/" + currentUserUid).valueChanges();
-  }
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const docRef = doc(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}`);
 
+    return new Observable<User>(subscriber => {
+      const unsubscribe = onSnapshot(docRef, docSnap => {
+        if (docSnap.exists()) {
+          subscriber.next(docSnap.data() as User);
+        } else {
+          subscriber.next(null);
+        }
+      }, err => subscriber.error(err));
+
+      return unsubscribe;
+    });
+  }
 
   /**
    * Updates current user doc Options field.
    * @param user User.
    */
   async updateUserFieldOptions(options: Options): Promise<void> {
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-    this._angularFireStore.doc<User>("/TheMacroDiet/Production/Users/" + currentUserUid).update({
-      Options: options
-    });
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const docRef = doc(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}`);
+    return await updateDoc(docRef, { Options: options });
   }
 
   /**
    * Daily Entries Size Increment.
    */
   async DailyEntriesSizeIncrement(): Promise<any> {
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const docRef = doc(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}`);
 
-    // Current User uid
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-
-    // Current Fields
-    const userDoc = await this._angularFireStore.doc<User>("/TheMacroDiet/Production/Users/" + currentUserUid).get().toPromise();
-
-    // Prepare new sizes
-    const sizes = userDoc.data().Sizes
-    sizes.DailyEntries += 1;
-
-    // Update Sizes field without overwriting other fields
-    await this._angularFireStore.doc<User>("/TheMacroDiet/Production/Users/" + currentUserUid).update({
-      Sizes: sizes
-    });
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data() as User;
+      const sizes = data.Sizes;
+      sizes.DailyEntries += 1;
+      return await updateDoc(docRef, { Sizes: sizes });
+    }
   }
 
   /**
    * Daily Entries Size Decrement.
    */
   async DailyEntriesSizeDecrement(): Promise<any> {
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const docRef = doc(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}`);
 
-    // Current User uid
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-
-    // Current Fields
-    const userDoc = await this._angularFireStore.doc<User>("/TheMacroDiet/Production/Users/" + currentUserUid).get().toPromise();
-
-    // Prepare new sizes
-    const sizes = userDoc.data().Sizes
-    sizes.DailyEntries -= 1;
-
-    // Update Sizes field without overwriting other fields
-    await this._angularFireStore.doc<User>("/TheMacroDiet/Production/Users/" + currentUserUid).update({
-      Sizes: sizes
-    });
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data() as User;
+      const sizes = data.Sizes;
+      sizes.DailyEntries -= 1;
+      return await updateDoc(docRef, { Sizes: sizes });
+    }
   }
 
   /**
    * Retrieve sizes field from User doc.
    */
   async GetSizes(): Promise<Sizes> {
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const docRef = doc(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}`);
 
-    // Current User uid
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-
-    return await (await this._angularFireStore.doc<User>("/TheMacroDiet/Production/Users/" + currentUserUid).get().toPromise()).data().Sizes;
-
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data() as User;
+      return data.Sizes;
+    }
+    return null;
   }
 }

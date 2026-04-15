@@ -13,6 +13,7 @@ import { GlobalVariablesService } from '../../../services/global-variables.servi
 
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-add-food',
   templateUrl: './add-food.page.html',
   styleUrls: ['./add-food.page.scss'],
@@ -144,6 +145,7 @@ export class AddFoodPage {
     await this._foodDbService.addFood(this.food);
     await this._router.navigate(["/authorized_user/tabs/foods_database"]);
     await this._toastService.presentToast('Food Successfully Added');
+    return null;
   }
 
   /**

@@ -9,6 +9,7 @@ import { UnsubscribeService } from '../../../../services/unsubscribe.service';
 import { UserService } from '../../../../services/user.service';
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-tab-foods-database',
   templateUrl: 'tab-foods-database.page.html',
   styleUrls: ['tab-foods-database.page.scss']

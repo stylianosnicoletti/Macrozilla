@@ -1,15 +1,14 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "defaultProject": "app",
   "newProjectRoot": "projects",
   "projects": {
     "app": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
-      "prefix": "app",
       "schematics": {},
+      "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -43,7 +42,8 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "ngswConfigPath": "ngsw-config.json"
           },
           "configurations": {
             "prodWeb": {
@@ -100,29 +100,29 @@
               "progress": false
             }
           },
-          "defaultConfiguration": ""
+          "defaultConfiguration": "prodWeb"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "app:build"
+            "buildTarget": "app:build"
           },
           "configurations": {
             "prodWeb": {
-              "browserTarget": "app:build:prodWeb"
+              "buildTarget": "app:build:prodWeb"
             },
             "prodAndroid": {
-              "browserTarget": "app:build:prodAndroid"
+              "buildTarget": "app:build:prodAndroid"
             },
             "ci": {
-              "progress": false
+              "buildTarget": "app:build:ci"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "app:build"
+            "buildTarget": "app:build"
           }
         },
         "test": {
@@ -181,7 +181,6 @@
             "prodAndroid": {
               "devServerTarget": "app:serve:prodAndroid"
             },
-            
             "ci": {
               "devServerTarget": "app:serve:ci"
             }
@@ -222,7 +221,6 @@
     }
   },
   "cli": {
-    "defaultCollection": "@ionic/angular-toolkit",
     "analytics": false
   },
   "schematics": {

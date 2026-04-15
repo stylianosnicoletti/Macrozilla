@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ElementRef } from "@angular/core";
 import {
   Validators,
   FormBuilder,
@@ -49,6 +49,7 @@ export class LoginPage implements OnInit {
     private _maintenanceService: MaintenanceService,
     private _unsubscribeService: UnsubscribeService,
     private _loadingService: LoadingService,
+    private _elementRef: ElementRef
   ) {}
 
   ngOnInit() {
@@ -82,6 +83,12 @@ export class LoginPage implements OnInit {
 
   ionViewWillLeave() {
    //console.log("leaving login page");
+    if (
+      document.activeElement instanceof HTMLElement &&
+      this._elementRef.nativeElement.contains(document.activeElement)
+    ) {
+      document.activeElement.blur();
+    }
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     App.removeAllListeners();
   }

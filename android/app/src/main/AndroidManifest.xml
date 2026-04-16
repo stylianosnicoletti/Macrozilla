@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme.NoActionBar">
 
         <activity
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:screenOrientation= "portrait"
             android:name="io.ionic.macrozilla.MainActivity"
             android:label="@string/title_activity_main"

@@ -17,6 +17,9 @@
 			"splashFullScreen": true,
 			"splashImmersive": true
 		},
+		"SystemBars": {
+			"insetsHandling": "disable"
+		},
 		"EdgeToEdge": {
 			"backgroundColor": "#222222"
 		}

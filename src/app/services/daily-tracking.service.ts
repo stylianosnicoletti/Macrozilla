@@ -13,8 +13,8 @@ import {
   orderBy,
   onSnapshot
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
-import { map, withLatestFrom } from "rxjs/operators";
+import { Observable, combineLatest } from 'rxjs';
+import { map } from "rxjs/operators";
 import { DailyEntry, Entry } from "../models/dailyEntry";
 import { Food } from "../models/food.model";
 import { UserService } from "./user.service";
@@ -235,14 +235,14 @@ export class DailyTrackingService {
             ...docSnap.data()
           } as Entry));
           subscriber.next(entries);
+          //console.log(entries);
         }, err => subscriber.error(err));
         return unsubscribe;
       });
 
       //console.log(entries$);
 
-      return dailyEntry$.pipe(
-        withLatestFrom(entries$),
+      return combineLatest([dailyEntry$, entries$]).pipe(
         map(([dailyEntry, entries]) => ({
           Date: dailyEntry?.Date,
           TotalCalories: dailyEntry?.TotalCalories,

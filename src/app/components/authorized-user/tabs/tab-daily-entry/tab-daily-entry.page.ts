@@ -170,8 +170,13 @@ export class TabDailyEntryPage {
             for (const entry of this.dailyEntry?.Entries) {
               await this._dailyTrackingService.deleteEntryAndUpdateDailyEntryFields(this.date, entry);
             };
-            // Decrement size of collection
-            await this._userService.DailyEntriesSizeDecrement();
+            if(this.dailyEntry != null && this.dailyEntry.SizeOfEntries > 0 && this.dailyEntry?.Entries?.length == 0)
+            {
+              // To handle rare case of entries being added while deleting all entries, if there are no entries left after deletion, delete the daily entry doc as well
+              await this._dailyTrackingService.deleteDailyEntry(this.date);
+              // Decrement size of collection in case of deleting all entries of the day, to keep it consistent with actual number of daily entry docs in the collection
+              await this._userService.DailyEntriesSizeDecrement();
+            }
             await this._loadingService.dismissLoading(loadingElement);
           },
         },

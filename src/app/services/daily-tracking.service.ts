@@ -152,8 +152,6 @@ export class DailyTrackingService {
         ),
         entry
       );
-      // Increment size of collection
-      await this._userService.DailyEntriesSizeIncrement();
     }
   }
 
@@ -188,7 +186,6 @@ export class DailyTrackingService {
     } else {
       await deleteDoc(entryDocRef);
       await this.deleteDailyEntry(selectedDate);
-      await this._userService.DailyEntriesSizeDecrement();
     }
   }
 

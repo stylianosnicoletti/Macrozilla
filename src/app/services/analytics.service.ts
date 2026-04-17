@@ -20,7 +20,7 @@ export class AnalyticsService {
    */
   async getDailyEntries(limitVal: number): Promise<Observable<DailyEntry[]>> {
     // To avoid query with 0 and throwing exceptions
-    if (limitVal < 1){
+    if (limitVal < 1) {
       limitVal = 1;
     }
 
@@ -28,12 +28,7 @@ export class AnalyticsService {
     const currentUserUid = await this._authService.auth.currentUser.uid;
 
     const colRef = collection(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}/DailyEntries`);
-    
-    // Get count of daily entries for current use, COMMENT OUT FOR NOW, HEAVEY OPERATION, TESTING PURPOSES ONLY
-    // TODO: Implement it if it is efficient without manually incrementing, decrementing size from client side. 
-    //const snapshot = await getCountFromServer(colRef);
-    //console.log('count: ', snapshot.data().count);
-    
+
     const q = query(colRef, orderBy('Date', 'desc'), limit(limitVal));
 
     return new Observable<DailyEntry[]>(subscriber => {
@@ -44,6 +39,17 @@ export class AnalyticsService {
 
       return unsubscribe;
     });
+  }
+
+  async getDailyEntriesCount(): Promise<number> {
+    // Current user id
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const colRef = collection(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}/DailyEntries`);
+
+    const snapshot = await getCountFromServer(colRef);
+    console.log('count: ', snapshot.data().count);
+
+    return snapshot.data().count;
   }
 }
 

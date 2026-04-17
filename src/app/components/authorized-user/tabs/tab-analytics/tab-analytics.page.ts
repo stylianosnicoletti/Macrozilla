@@ -109,7 +109,7 @@ export class TabAnalyticsPage {
     this.allTimeSaturatedCalories = 0;
     this.allTimeUnsaturatedCalories = 0;
     this.allTimeCaloriesCalculatedFromMacros = 0;
-    this.maxDaysThatCanBeRetrieved = (await this._userService.GetSizes()).DailyEntries;
+    this.maxDaysThatCanBeRetrieved = await this._analyticsService.getDailyEntriesCount();
     this.minDaysThatCanBeRetrieved = this.maxDaysThatCanBeRetrieved == 0 ? 0 : 1;
     // Bring the last 15 tracked days (if exist)
     this.lastDaysToRetrieve = this.maxDaysThatCanBeRetrieved < 15 ? this.maxDaysThatCanBeRetrieved : 15;

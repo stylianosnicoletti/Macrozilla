@@ -1,20 +1,22 @@
 .error-message-email {
   color: var(--ion-color-danger);
-  padding-top: 10px;
+  padding-top: 5px;
   padding-left: 15px;
+  font-size: 0.8rem;
 }
 
 .error-message-password {
   color: var(--ion-color-danger);
-  padding-top: 10px;
+  padding-top: 5px;
   padding-left: 15px;
+  font-size: 0.8rem;
 }
 
 .error-message-login {
   color: var(--ion-color-danger);
   text-align: center;
-
   padding-left: 15px;
+  font-size: 0.8rem;
 }
 
 .go-to-forgot-password {

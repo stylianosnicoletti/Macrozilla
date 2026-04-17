@@ -8,80 +8,82 @@
 </ion-header>
 
 <ion-content>
-  <!--(keyup.enter)="submitForm()"-->
   <div *ngIf="isFormReadyToBuild">
-    <form [formGroup]="editForm" (ngSubmit)="submitForm()" (keyup.enter)="submitForm()" novalidate>
-     
+    <form [formGroup]="editForm" (ngSubmit)="submitForm()" novalidate>
+
       <ion-item-divider>
         <ion-label>General Information</ion-label>
       </ion-item-divider>
-      
+
       <ion-card>
-        <ion-item lines="full">
-          <ion-label position="floating">Name</ion-label>
-          <ion-input formControlName="Name" type="text" #nameInput></ion-input>
+        <ion-item>
+          <ion-input formControlName="Name" type="text" label="Name" labelPlacement="floating"
+            placeholder="Enter the food name" #nameInput>
+          </ion-input>
         </ion-item>
       </ion-card>
-  
+
       <ion-item-divider>
         <ion-label>Serving Size</ion-label>
       </ion-item-divider>
-  
-      <ion-card>
-        <ion-grid>
+
+      <ion-grid>
+        <ion-card>
           <ion-row>
-  
+
             <ion-col>
-              <ion-item lines="full">
-                <ion-input formControlName="ServingAmount" placeholder="Enter Amount" type="text" inputmode="numeric">
+              <ion-item>
+                <ion-input formControlName="ServingAmount" type="text" labelPlacement="stacked"
+                  placeholder="Enter the amount" inputmode="numeric">
                 </ion-input>
               </ion-item>
             </ion-col>
-  
+
             <ion-col>
-              <ion-item lines="full">
-                <ion-select interface="popover" formControlName="ServingUnit" placeholder="Choose Unit" [value]="preselectedServingUnit">
-                  <ion-select-option *ngFor="let servingUnit of servingUnitsMap | keyvalue: asIsOrder" [value]="servingUnit.value">{{ servingUnit.value.Name }}</ion-select-option>
+              <ion-item>
+                <ion-select interface="popover" formControlName="ServingUnit" labelPlacement="stacked" [value]="preselectedServingUnit"
+                  placeholder="Choose Unit">
+                  <ion-select-option *ngFor="let servingUnit of servingUnitsMap | keyvalue: asIsOrder"
+                    [value]="servingUnit.value">{{ servingUnit.value.Name }}</ion-select-option>
                 </ion-select>
               </ion-item>
-            </ion-col> 
-  
+            </ion-col>
+
           </ion-row>
-        </ion-grid>
-      </ion-card>
-  
+        </ion-card>
+      </ion-grid>
+
       <ion-item-divider>
         <ion-label>Nutritional Information</ion-label>
       </ion-item-divider>
-  
-  
-  
+
       <ion-card>
-        <ion-item lines="full">
-          <ion-label position="floating">Calories 🔋</ion-label>
-          <ion-input formControlName="Calories" type="text" inputmode="numeric"></ion-input>
+        <ion-item>
+          <ion-input formControlName="Calories" type="text" label="Calories 🔋" labelPlacement="floating"
+            placeholder="Enter calories" inputmode="numeric"></ion-input>
         </ion-item>
-  
-        <ion-item lines="full">
-          <ion-label position="floating">Fats 🐖</ion-label>
-          <ion-input formControlName="Fats" type="text" inputmode="numeric"></ion-input>
+
+        <ion-item>
+          <ion-input formControlName="Fats" type="text" label="Fats 🐖" labelPlacement="floating"
+            placeholder="Enter fats" inputmode="numeric"></ion-input>
         </ion-item>
-  
-        <ion-item lines="full">
-          <ion-label position="floating">Saturated Fats ❌</ion-label>
-          <ion-input formControlName="Saturated" type="text" inputmode="numeric"></ion-input>
+
+        <ion-item>
+          <ion-input formControlName="Saturated" type="text" label="Saturated Fats ❌" labelPlacement="floating"
+            placeholder="Enter saturated fats" inputmode="numeric"></ion-input>
         </ion-item>
-  
-        <ion-item lines="full">
-          <ion-label position="floating">Carbohydrates 🍞</ion-label>
-          <ion-input formControlName="Carbohydrates" type="text" inputmode="numeric"></ion-input>
+
+        <ion-item>
+          <ion-input formControlName="Carbohydrates" type="text" label="Carbohydrates 🍞" labelPlacement="floating"
+            placeholder="Enter carbohydrates" inputmode="numeric"></ion-input>
         </ion-item>
-  
-        <ion-item lines="full">
-          <ion-label position="floating">Protein 🥩</ion-label>
-          <ion-input formControlName="Protein" type="text" inputmode="numeric"></ion-input>
+
+        <ion-item>
+          <ion-input formControlName="Protein" type="text" label="Protein 🥩" labelPlacement="floating"
+            placeholder="Enter protein" inputmode="numeric"></ion-input>
         </ion-item>
       </ion-card>
+
       <ion-row>
         <ion-col>
           <ion-button type="submit" color="warning" expand="block">Change</ion-button>

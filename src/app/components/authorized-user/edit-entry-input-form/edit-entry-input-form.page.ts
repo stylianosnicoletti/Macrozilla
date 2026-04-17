@@ -31,7 +31,7 @@ export class EditEntryInputFormPage {
   servingUnitsMap = new Map<String, ServingUnit>();
   entry: Entry;
   editEntryForm: FormGroup;
-  isSubmitted = false;
+  isSubmitting = false;
   generalSubscriptionsList: Subscription[] = [];
   isFormReadyToBuild = false;
 
@@ -132,9 +132,15 @@ export class EditEntryInputFormPage {
    * Submit changes.
    **/
   async submitForm() {
-    this.isSubmitted = true;
+    if (this.isSubmitting) {
+      return false;
+    }
+
+    this.isSubmitting = true;
+
     if (!this.editEntryForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!');
+      this.isSubmitting = false;
       return false;
     } else {
       // Update entry in sub-collection of Entries on DailyEntry doc. 

@@ -1,14 +1,16 @@
 .error-message
 {
   color: var(--ion-color-danger);
-  padding-left: 15px ;
+  padding-left: 15px;
+  font-size: 0.8rem;
 }
 
 .success-message
 {
   color: var(--ion-color-success);
-  padding-top: 30px;
-  padding-left: 0px ;
+  padding-top: 15px;
+  padding-left: 0px;
+  font-size: 0.8rem;
 }
 
 .go-to-login

@@ -25,7 +25,7 @@ export class AddFoodPage {
 
   food: Food;
   addForm: FormGroup;
-  isSubmitted = false;
+  isSubmitting = false;
   servingUnits: ServingUnit[];
   subscriptionsList: Subscription[] = [];
 
@@ -124,11 +124,16 @@ export class AddFoodPage {
    * @returns True when submission was successful.
    */
   async submitForm() {
-    this.isSubmitted = true;
+    if (this.isSubmitting) {
+      return false;
+    }
+
+    this.isSubmitting = true;
 
     // Validation Check
     if (!this.addForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!');
+      this.isSubmitting = false;
       return false;
     }
 
@@ -138,6 +143,7 @@ export class AddFoodPage {
     // Saturated Fats Check
     if (!this.fatDifferenceCheckPassed(this.food.Fats, this.food.Saturated)) {
       await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
+      this.isSubmitting = false;
       return false;
     }
 

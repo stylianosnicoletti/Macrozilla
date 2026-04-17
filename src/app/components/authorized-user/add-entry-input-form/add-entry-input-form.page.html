@@ -35,8 +35,11 @@
 
       <ion-card>
         <ion-item>
-          <ion-label position="floating">{{food.ServingUnit}}</ion-label>
-          <ion-input formControlName="qty" type="text" inputmode="numeric"
+          <ion-input formControlName="qty" type="text" 
+            placeholder="Enter the amount you consumed"
+            label={{food.ServingUnit}}
+            labelPlacement="floating"
+            inputmode="numeric"
             (ionInput)="prepareConsumedFood($event.target.value)" #qtyInput></ion-input>
         </ion-item>
       </ion-card>

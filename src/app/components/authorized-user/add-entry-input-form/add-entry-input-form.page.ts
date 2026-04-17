@@ -32,7 +32,7 @@ export class AddEntryInputFormPage {
   servingUnitsMap = new Map<String, ServingUnit>();
   entry: Entry;
   addEntryForm: FormGroup;
-  isSubmitted = false;
+  isSubmitting = false;
   generalSubscriptionsList: Subscription[] = [];
   isFormReadyToBuild = false;
 
@@ -142,8 +142,8 @@ export class AddEntryInputFormPage {
       return false;
     }
 
-    if (this.isSubmitted == false) {
-      this.isSubmitted = true;
+    if (this.isSubmitting == false) {
+      this.isSubmitting = true;
       setTimeout(async () => {
         // Add entry in sub-collection of Entries on DailyEntry doc
         await this._dailyTrackingService.addEntryAndUpdateDailyEntryFields(this.date, this.consumedFood);

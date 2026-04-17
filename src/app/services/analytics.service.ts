@@ -47,7 +47,7 @@ export class AnalyticsService {
     const colRef = collection(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}/DailyEntries`);
 
     const snapshot = await getCountFromServer(colRef);
-    console.log('count: ', snapshot.data().count);
+    //console.log('count: ', snapshot.data().count);
 
     return snapshot.data().count;
   }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Firestore, collection, query, orderBy, limit, onSnapshot, getCountFromServer } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { DailyEntry } from '../models/dailyEntry';
 
@@ -9,32 +9,49 @@ import { DailyEntry } from '../models/dailyEntry';
 })
 export class AnalyticsService {
   constructor(
-    private _angularFireStore: AngularFirestore,
+    private _firestore: Firestore,
     private _authService: AuthService) { }
 
   /**
    * Get Daily Entries for current user in ascending order.
    * (By default, a query retrieves all documents that satisfy the query in ascending order by document ID)
-   * @param limit Last x tracked days to retrieve.
-   * @returns 
+   * @param limitVal Last x tracked days to retrieve.
+   * @returns Observable of DailyEntry array.
    */
-  async getDailyEntries(limit: number): Promise<Observable<DailyEntry[]>> {
-
+  async getDailyEntries(limitVal: number): Promise<Observable<DailyEntry[]>> {
     // To avoid query with 0 and throwing exceptions
-    if (limit < 1){
-      limit = 1;
+    if (limitVal < 1) {
+      limitVal = 1;
     }
 
     // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.auth.currentUser.uid;
 
-    const collectionRef = await this._angularFireStore.collection<DailyEntry>("/TheMacroDiet/Production/Users/" + currentUserUid + "/DailyEntries/", ref => ref.orderBy('Date','desc').limit(limit));
-    return await collectionRef.valueChanges();
+    const colRef = collection(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}/DailyEntries`);
+
+    const q = query(colRef, orderBy('Date', 'desc'), limit(limitVal));
+
+    return new Observable<DailyEntry[]>(subscriber => {
+      const unsubscribe = onSnapshot(q, snapshot => {
+        const entries = snapshot.docs.map(docSnap => docSnap.data() as DailyEntry);
+        subscriber.next(entries);
+      }, err => subscriber.error(err));
+
+      return unsubscribe;
+    });
   }
 
+  async getDailyEntriesCount(): Promise<number> {
+    // Current user id
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const colRef = collection(this._firestore, `/TheMacroDiet/Production/Users/${currentUserUid}/DailyEntries`);
+
+    const snapshot = await getCountFromServer(colRef);
+    //console.log('count: ', snapshot.data().count);
+
+    return snapshot.data().count;
+  }
 }
-
-
 
 
 

@@ -12,6 +12,7 @@ import { LoadingService } from "../../../services/loading.service";
 import { UnsubscribeService } from "../../../services/unsubscribe.service";
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: "app-transfer-entries",
   templateUrl: "./transfer-entries.page.html",
   styleUrls: ["./transfer-entries.page.scss"],

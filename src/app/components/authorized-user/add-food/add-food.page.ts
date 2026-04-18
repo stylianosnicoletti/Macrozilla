@@ -13,6 +13,7 @@ import { GlobalVariablesService } from '../../../services/global-variables.servi
 
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-add-food',
   templateUrl: './add-food.page.html',
   styleUrls: ['./add-food.page.scss'],
@@ -24,7 +25,7 @@ export class AddFoodPage {
 
   food: Food;
   addForm: FormGroup;
-  isSubmitted = false;
+  isSubmitting = false;
   servingUnits: ServingUnit[];
   subscriptionsList: Subscription[] = [];
 
@@ -123,11 +124,16 @@ export class AddFoodPage {
    * @returns True when submission was successful.
    */
   async submitForm() {
-    this.isSubmitted = true;
+    if (this.isSubmitting) {
+      return false;
+    }
+
+    this.isSubmitting = true;
 
     // Validation Check
     if (!this.addForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!');
+      this.isSubmitting = false;
       return false;
     }
 
@@ -137,6 +143,7 @@ export class AddFoodPage {
     // Saturated Fats Check
     if (!this.fatDifferenceCheckPassed(this.food.Fats, this.food.Saturated)) {
       await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
+      this.isSubmitting = false;
       return false;
     }
 
@@ -144,6 +151,7 @@ export class AddFoodPage {
     await this._foodDbService.addFood(this.food);
     await this._router.navigate(["/authorized_user/tabs/foods_database"]);
     await this._toastService.presentToast('Food Successfully Added');
+    return null;
   }
 
   /**

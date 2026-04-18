@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Firestore, doc, onSnapshot } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { GlobalVariables} from '../models/globalVariables.model';
 
@@ -8,17 +8,26 @@ import { GlobalVariables} from '../models/globalVariables.model';
 })
 export class GlobalVariablesService {
   constructor(
-    private _angularFireStore: AngularFirestore) { }
+    private _firestore : Firestore
+  ) { }
 
   /**
    * Get Global Variables Doc
    * @returns Observable of Variables Doc.
    */
   getServingUnits(): Observable<GlobalVariables> {
+    const docRef = doc(this._firestore, "/TheMacroDiet/Production/Configuration/GlobalVariables");
 
-    // Get globalVariables doc 
-    return this._angularFireStore.doc<GlobalVariables>("/TheMacroDiet/Production/Configuration/GlobalVariables").valueChanges();
-    
-    }
+    return new Observable<GlobalVariables>(subscriber => {
+      const unsubscribe = onSnapshot(docRef, docSnap => {
+        if (docSnap.exists()) {
+          subscriber.next(docSnap.data() as GlobalVariables);
+        } else {
+          subscriber.next(null);
+        }
+      }, err => subscriber.error(err));
 
+      return unsubscribe;
+    });
+  }
 }

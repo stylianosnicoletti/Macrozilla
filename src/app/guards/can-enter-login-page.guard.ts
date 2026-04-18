@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, Router, CanActivate } from '@angular/router';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Auth, authState } from '@angular/fire/auth';
 import { map } from "rxjs/operators";
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -13,17 +13,20 @@ import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
   providedIn: 'root'
 })
 export class CanEnterLoginPageGuard implements CanActivate {
-  constructor(private _angularFireAuth: AngularFireAuth, private _router: Router) { }
+  constructor(
+    private _auth: Auth,
+    private _router: Router) { }
+
   canActivate(
     activatedRouteSnapshot: ActivatedRouteSnapshot,
     stateSnapshot: RouterStateSnapshot) {
-    return this._angularFireAuth.authState.pipe(
+    return authState(this._auth).pipe(
       map((auth) => {
         const platform = Capacitor.getPlatform();
         // Native Platform (Android/iOS)
         if (Capacitor.isNativePlatform()) {
           //EdgeToEdge.enable();
-          console.log("Is Nativeee");
+          console.log("Is Native");
           //console.log(`Hide splash screen`);
           SplashScreen.hide().then(() => {
             //console.log(`Splashscreen hidden`);

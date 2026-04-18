@@ -26,12 +26,12 @@
 </ion-header>
 
 <ion-content class="form-content">
-  <form class="form" [formGroup]="validations_form" (ngSubmit)="tryRegister(validations_form.value)"
-    (keyup.enter)="tryRegister(validations_form.value)">
+  <form class="form" [formGroup]="validations_form" (ngSubmit)="tryRegister(validations_form.value)">
 
     <ion-item>
-      <ion-label position="floating" color="primary">Name</ion-label>
-      <ion-input type="text" formControlName="userName"></ion-input>
+        <ion-input formControlName="userName" type="text" label="Name" labelPlacement="stacked"
+          placeholder="Enter your name" #nameInput>
+        </ion-input>
     </ion-item>
     <div class="validation-errors">
       <ng-container *ngFor="let validation of validation_messages.userName">
@@ -43,8 +43,9 @@
     </div>
 
     <ion-item>
-      <ion-label position="floating" color="primary">Email</ion-label>
-      <ion-input type="text" formControlName="email"></ion-input>
+        <ion-input formControlName="email" type="text" label="Email" labelPlacement="stacked"
+          placeholder="Enter your email" #emailInput>
+        </ion-input>
     </ion-item>
     <div class="validation-errors">
       <ng-container *ngFor="let validation of validation_messages.email">
@@ -56,8 +57,9 @@
     </div>
 
     <ion-item>
-      <ion-label position="floating" color="primary">Password</ion-label>
-      <ion-input type="password" formControlName="password"></ion-input>
+        <ion-input formControlName="password" type="password" label="Password" labelPlacement="stacked"
+          placeholder="Enter your password">
+        </ion-input>
     </ion-item>
     <div class="validation-errors">
       <ng-container *ngFor="let validation of validation_messages.password">

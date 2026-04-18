@@ -13,6 +13,7 @@ import { UnsubscribeService } from '../../../services/unsubscribe.service';
 
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-edit-food',
   templateUrl: './edit-food.page.html',
   styleUrls: ['./edit-food.page.scss'],
@@ -24,7 +25,7 @@ export class EditFoodPage {
   preselectedServingUnit: ServingUnit;
   servingUnitsMap = new Map<String, ServingUnit>();
   editForm: FormGroup;
-  isSubmitted = false;
+  isSubmitting = false;
   subscriptionsList: Subscription[] = [];
   isFormReadyToBuild = false;
 
@@ -166,11 +167,16 @@ export class EditFoodPage {
    * @returns True when submission was successful.
    */
   async submitForm(): Promise<boolean> {
-    this.isSubmitted = true;
+    if (this.isSubmitting) {
+      return false;
+    }
+
+    this.isSubmitting = true;
 
     // Validation
     if (!this.editForm.valid) {
       await this._toastService.presentToast('Please provide all the required values!')
+      this.isSubmitting = false;
       return false;
     }
 
@@ -179,11 +185,13 @@ export class EditFoodPage {
     // Saturated Fats Check
     if (!this.fatDifferenceCheckPassed(this.food.Fats, this.food.Saturated)) {
       await this._toastService.presentToast('Cannot have more Saturated Fats than Total Fats!');
+      this.isSubmitting = false;
       return false;
     }
 
     await this.presentAlertConfirmEdit(this.food);
 
+    return null;
   }
 
     /**
@@ -214,7 +222,8 @@ export class EditFoodPage {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
-           return false;
+            this.isSubmitting = false;
+            return false;
           }
         }, {
           text: 'Yes',

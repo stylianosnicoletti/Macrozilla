@@ -10,6 +10,7 @@ import { UnsubscribeService } from "../../../../services/unsubscribe.service";
 import { UserService } from "../../../../services/user.service";
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: "app-tab-daily-entry",
   templateUrl: "tab-daily-entry.page.html",
   styleUrls: ["tab-daily-entry.page.scss"],
@@ -169,8 +170,11 @@ export class TabDailyEntryPage {
             for (const entry of this.dailyEntry?.Entries) {
               await this._dailyTrackingService.deleteEntryAndUpdateDailyEntryFields(this.date, entry);
             };
-            // Decrement size of collection
-            await this._userService.DailyEntriesSizeDecrement();
+            if(this.dailyEntry != null && this.dailyEntry.SizeOfEntries > 0 && this.dailyEntry?.Entries?.length == 0)
+            {
+              // To handle rare case of entries being added while deleting all entries, if there are no entries left after deletion, delete the daily entry doc as well
+              await this._dailyTrackingService.deleteDailyEntry(this.date);
+            }
             await this._loadingService.dismissLoading(loadingElement);
           },
         },

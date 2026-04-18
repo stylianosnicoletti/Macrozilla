@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, CanActivate, Router } from '@angular/router';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Auth, authState } from '@angular/fire/auth';
 import { map } from "rxjs/operators";
 
 @Injectable({
@@ -8,10 +8,14 @@ import { map } from "rxjs/operators";
 })
 
 export class CanEnterTabsPageGuard implements CanActivate {
-  constructor(private _angularFireAuth: AngularFireAuth, private _router: Router) { }
+  constructor(
+    private _auth: Auth,
+    private _router: Router) { }
 
-  canActivate(activatedRouteSnapshot: ActivatedRouteSnapshot, stateSnapshot: RouterStateSnapshot) {
-    return this._angularFireAuth.authState.pipe(
+  canActivate(
+    activatedRouteSnapshot: ActivatedRouteSnapshot,
+    stateSnapshot: RouterStateSnapshot) {
+    return authState(this._auth).pipe(
       map((auth) => {
         //console.log("CanEnterTabsPageGuard");
         if (!auth || !auth.emailVerified) {

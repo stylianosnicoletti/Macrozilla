@@ -7,6 +7,7 @@ import { UnsubscribeService } from "../../../../services/unsubscribe.service";
 import { Router } from "@angular/router";
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: "app-tab-account",
   templateUrl: "tab-account.page.html",
   styleUrls: ["tab-account.page.scss"],
@@ -41,12 +42,8 @@ export class TabAccountPage {
    * Initialises items.
    */
   async initialiseItems(): Promise<void> {
-    this.userEmailAddress = await this._authService.afAuth.currentUser.then(
-      (u) => u.email
-    );
-    this.userName = await this._authService.afAuth.currentUser.then(
-      (u) => u.displayName
-    );
+    this.userEmailAddress = await this._authService.auth.currentUser.email;
+    this.userName = await this._authService.auth.currentUser.displayName;
     this.subscriptionsList.push(
       (await this._userService.getUserFields()).subscribe((x) =>
         this.mapUserOptionsToNgModels(x.Options)

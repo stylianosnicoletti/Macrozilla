@@ -7,7 +7,7 @@ const setEnv = (targetPath: string, platform: string, production: boolean) => {
   production: ${production},
   platform: "${platform}",
   firebase: {
-    apiKey:  "${process.env.FIREBASE_API_KEY}",
+    apiKey:  "${process.env['FIREBASE_API_KEY']}",
     authDomain: "themacrodiet-s.firebaseapp.com",
     databaseURL: "https://macrozilla-maintenance.europe-west1.firebasedatabase.app",
     projectId: "themacrodiet-s",

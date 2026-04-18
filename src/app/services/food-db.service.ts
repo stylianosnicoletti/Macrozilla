@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
+import { Firestore, collection, query, orderBy, doc, getDoc, addDoc, updateDoc, deleteDoc, limit, onSnapshot } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Food } from '../models/food.model';
 import { map } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { map } from 'rxjs/operators';
 })
 export class FoodDatabaseService {
   constructor(
-    private _angularFireStore: AngularFirestore,
+    private _firestore: Firestore,
     private _authService: AuthService) { }
 
 
@@ -21,30 +21,39 @@ export class FoodDatabaseService {
  * @param inDescending If true, descending order will be used for ordering (Default: False -> Ascending order)
  * @returns Observable of list of Foods.
  */
-  async getFoodsFromDb(orderField: string, inDescending: boolean = false): Promise<Observable<Food[]>> {
+  async getFoodsFromDb(orderField: string, inDescending: boolean = false): Promise<Observable<Food[]>>  {
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const path = `TheMacroDiet/Production/Users/${currentUserUid}/FoodDatabase`;
+    //console.log(path);
+    const ref = collection(this._firestore, path);
+    const q = query(
+      ref,
+      orderBy(orderField, inDescending ? "desc" : "asc")
+    );
 
-    // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-
-    return this._angularFireStore.collection<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase", ref => ref
-      .orderBy(orderField, inDescending ? "desc" : "asc"))
-      .snapshotChanges().pipe(map(changes =>
-        // Maps doc data to Food
-        changes.map(c => ({
-          DocumentId: c.payload.doc.id,
-          Name: c.payload.doc.data().Name,
-          Calories: c.payload.doc.data().Calories,
-          Carbohydrates: c.payload.doc.data().Carbohydrates,
-          Fats: c.payload.doc.data().Fats,
-          Protein: c.payload.doc.data().Protein,
-          Saturated: c.payload.doc.data().Saturated,
-          ServingAmount: c.payload.doc.data().ServingAmount,
-          ServingUnit: c.payload.doc.data().ServingUnit,
-          ServingUnitShortCode: c.payload.doc.data().ServingUnitShortCode,
-          IsFromPersonalDb: true,
-          // ...c.payload.val()  To fill the rest
-        }))
-      ));
+    return new Observable<Food[]>(subscriber => {
+      const unsubscribe = onSnapshot(q, snapshot => {
+        const foods = snapshot.docs.map(docSnap => ({
+          DocumentId: docSnap.id,
+          ...docSnap.data()
+        } as any));
+        const mappedFoods = foods.map(f => ({
+          DocumentId: f.DocumentId,
+          Name: f.Name,
+          Calories: f.Calories,
+          Carbohydrates: f.Carbohydrates,
+          Fats: f.Fats,
+          Protein: f.Protein,
+          Saturated: f.Saturated,
+          ServingAmount: f.ServingAmount,
+          ServingUnit: f.ServingUnit,
+          ServingUnitShortCode: f.ServingUnitShortCode,
+          IsFromPersonalDb: true
+        }));
+        subscriber.next(mappedFoods);
+      }, err => subscriber.error(err));
+      return unsubscribe;
+    });
   }
 
   /**
@@ -54,44 +63,43 @@ export class FoodDatabaseService {
    * @param limitVal Limit in the number of returned Foods (Default = 20).
    * @returns Observable of list of Foods.
    */
-  async getFoodsFromDbWithFilter(filter: string, useLimit: boolean, limitVal: number = 20): Promise<Observable<Food[]>> {
+    async getFoodsFromDbWithFilter(filter: string, useLimit: boolean, limitVal: number = 20) {
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const path = `TheMacroDiet/Production/Users/${currentUserUid}/FoodDatabase`;
+    const ref = collection(this._firestore, path);
 
-    // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    let q = query(
+      ref,
+      orderBy(`searchableFoodNameIndex.${filter}`)
+    );
 
-    let foodCollection: AngularFirestoreCollection<Food>;
-
-    // Use limit
     if (useLimit) {
-      foodCollection = this._angularFireStore.collection<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase", ref => ref
-        .orderBy(`searchableFoodNameIndex.${filter}`)
-        .limit(limitVal));
+      q = query(q, limit(limitVal));
     }
 
-
-    // No limit
-    if (!useLimit) {
-      foodCollection = this._angularFireStore.collection<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase", ref => ref
-        .orderBy(`searchableFoodNameIndex.${filter}`));
-    }
-
-    return foodCollection.snapshotChanges().pipe(map(changes =>
-      // Maps doc data to Food
-      changes.map(c => ({
-        DocumentId: c.payload.doc.id,
-        Name: c.payload.doc.data().Name,
-        Calories: c.payload.doc.data().Calories,
-        Carbohydrates: c.payload.doc.data().Carbohydrates,
-        Fats: c.payload.doc.data().Fats,
-        Protein: c.payload.doc.data().Protein,
-        Saturated: c.payload.doc.data().Saturated,
-        ServingAmount: c.payload.doc.data().ServingAmount,
-        ServingUnit: c.payload.doc.data().ServingUnit,
-        ServingUnitShortCode: c.payload.doc.data().ServingUnitShortCode,
-        IsFromPersonalDb: true,
-        // ...c.payload.val()  To fill the rest
-      }))
-    ));
+    return new Observable<Food[]>(subscriber => {
+      const unsubscribe = onSnapshot(q, snapshot => {
+        const foods = snapshot.docs.map(docSnap => ({
+          DocumentId: docSnap.id,
+          ...docSnap.data()
+        } as any));
+        const mappedFoods = foods.map(f => ({
+          DocumentId: f.DocumentId,
+          Name: f.Name,
+          Calories: f.Calories,
+          Carbohydrates: f.Carbohydrates,
+          Fats: f.Fats,
+          Protein: f.Protein,
+          Saturated: f.Saturated,
+          ServingAmount: f.ServingAmount,
+          ServingUnit: f.ServingUnit,
+          ServingUnitShortCode: f.ServingUnitShortCode,
+          IsFromPersonalDb: true
+        }));
+        subscriber.next(mappedFoods);
+      }, err => subscriber.error(err));
+      return unsubscribe;
+    });
   }
 
   /**
@@ -102,51 +110,56 @@ export class FoodDatabaseService {
      * @returns Observable of list of Foods.
      */
   async getGlobalFoodsFromDbWithFilter(filter: string, useLimit: boolean = true, limitVal: number = 20): Promise<Observable<Food[]>> {
+    const path = `TheMacroDiet/Production/GlobalFoodDatabase`;
+    //console.log(path);
+    const ref = collection(this._firestore, path);
 
-    let foodCollection: AngularFirestoreCollection<Food>;
+    let q = query(
+      ref,
+      orderBy(`searchableFoodNameIndex.${filter}`)
+    );
 
-    // Use limit
     if (useLimit) {
-      foodCollection = this._angularFireStore.collection<Food>("/TheMacroDiet/Production/GlobalFoodDatabase", ref => ref
-        .orderBy(`searchableFoodNameIndex.${filter}`)
-        .limit(limitVal));
+      q = query(q, limit(limitVal));
     }
 
-    // No limit
-    if (!useLimit) {
-      foodCollection = this._angularFireStore.collection<Food>("/TheMacroDiet/Production/GlobalFoodDatabase", ref => ref
-        .orderBy(`searchableFoodNameIndex.${filter}`));
-    }
+    //console.log(q);
 
-    return foodCollection.snapshotChanges().pipe(map(changes =>
-      // Maps doc data to Food
-      changes.map(c => ({
-        DocumentId: c.payload.doc.id,
-        Name: c.payload.doc.data().Name,
-        Calories: c.payload.doc.data().Calories,
-        Carbohydrates: c.payload.doc.data().Carbohydrates,
-        Fats: c.payload.doc.data().Fats,
-        Protein: c.payload.doc.data().Protein,
-        Saturated: c.payload.doc.data().Saturated,
-        ServingAmount: c.payload.doc.data().ServingAmount,
-        ServingUnit: c.payload.doc.data().ServingUnit,
-        ServingUnitShortCode: c.payload.doc.data().ServingUnitShortCode,
-        IsFromPersonalDb: false,
-        // ...c.payload.val()  To fill the rest
-      }))
-    ));
+    return new Observable<Food[]>(subscriber => {
+      const unsubscribe = onSnapshot(q, snapshot => {
+        const foods = snapshot.docs.map(docSnap => ({
+          DocumentId: docSnap.id,
+          ...docSnap.data()
+        } as any));
+        const mappedFoods = foods.map(f => ({
+          DocumentId: f.DocumentId,
+          Name: f.Name,
+          Calories: f.Calories,
+          Carbohydrates: f.Carbohydrates,
+          Fats: f.Fats,
+          Protein: f.Protein,
+          Saturated: f.Saturated,
+          ServingAmount: f.ServingAmount,
+          ServingUnit: f.ServingUnit,
+          ServingUnitShortCode: f.ServingUnitShortCode,
+          IsFromPersonalDb: false
+        }));
+        subscriber.next(mappedFoods);
+      }, err => subscriber.error(err));
+      return unsubscribe;
+    });
   }
 
-  /**
+    /**
    * Delete food document from Personal database for the current user.
    * @param docId Food Doc Id.
    */
   async deleteFood(docId: string): Promise<void> {
-    // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-
-    // Delete food doc 
-    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).delete();
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const path = `TheMacroDiet/Production/Users/${currentUserUid}/FoodDatabase/${docId}`;
+    //console.log(path);
+    const docRef = doc(this._firestore, path);
+    return await deleteDoc(docRef);
   }
 
 
@@ -155,12 +168,12 @@ export class FoodDatabaseService {
    * @param food Food.
    */
   async updateFood(food: Food): Promise<void> {
-    // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-
-    // Update food doc 
-    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + food.DocumentId).update({
-      Name: food.Name, // Investigate if the cloud function gets executed if the name remains the same
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const path = `TheMacroDiet/Production/Users/${currentUserUid}/FoodDatabase/${food.DocumentId}`;
+    //console.log(path);
+    const docRef = doc(this._firestore, path);
+    return await updateDoc(docRef, {
+      Name: food.Name,
       Calories: food.Calories,
       Carbohydrates: food.Carbohydrates,
       Fats: food.Fats,
@@ -177,13 +190,13 @@ export class FoodDatabaseService {
    * Add food document on personl database for the current user.
    * @param food Food.
    */
-  async addFood(food: Food): Promise<any> {
-    // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-
-    // Update food doc 
-    return await this._angularFireStore.collection("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase").add({
-      Name: food.Name, // Investigate if the cloud function gets executed if the name remains the same
+    async addFood(food: Food): Promise<any> {
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const path = `TheMacroDiet/Production/Users/${currentUserUid}/FoodDatabase`;
+    //console.log(path);
+    const colRef = collection(this._firestore, path);
+    return await addDoc(colRef, {
+      Name: food.Name,
       Calories: food.Calories,
       Carbohydrates: food.Carbohydrates,
       Fats: food.Fats,
@@ -192,36 +205,45 @@ export class FoodDatabaseService {
       ServingAmount: food.ServingAmount,
       ServingUnit: food.ServingUnit,
       ServingUnitShortCode: food.ServingUnitShortCode
-    })
+    });
   }
 
 
-  /**
+    /**
    * Get food document from Personal database for the current user.
    * @param docId Food Doc Id.
    * @returns Observable of Food doc.
    */
   async getFood(docId: any): Promise<Observable<Food>> {
-    // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const path = `TheMacroDiet/Production/Users/${currentUserUid}/FoodDatabase/${docId}`;
+    //console.log(path);
+    const docRef = doc(this._firestore, path);
 
-    // Get food doc 
-    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).get()
-      .pipe(map(c => ({
-        DocumentId: c.id,
-        Name: c.data().Name,
-        Calories: c.data().Calories,
-        Carbohydrates: c.data().Carbohydrates,
-        Fats: c.data().Fats,
-        Protein: c.data().Protein,
-        Saturated: c.data().Saturated,
-        ServingAmount: c.data().ServingAmount,
-        ServingUnit: c.data().ServingUnit,
-        ServingUnitShortCode: c.data().ServingUnitShortCode,
-        IsFromPersonalDb: true,
-        // ...c.payload.val()  To fill the rest
-      }))
-      );
+    return new Observable<Food>(subscriber => {
+      const unsubscribe = onSnapshot(docRef, docSnap => {
+        if (docSnap.exists()) {
+          const data = docSnap.data() as any;
+          subscriber.next({
+            DocumentId: docSnap.id,
+            Name: data?.Name,
+            Calories: data?.Calories,
+            Carbohydrates: data?.Carbohydrates,
+            Fats: data?.Fats,
+            Protein: data?.Protein,
+            Saturated: data?.Saturated,
+            ServingAmount: data?.ServingAmount,
+            ServingUnit: data?.ServingUnit,
+            ServingUnitShortCode: data?.ServingUnitShortCode,
+            IsFromPersonalDb: true
+          } as Food);
+        } else {
+          subscriber.next(null);
+        }
+      }, err => subscriber.error(err));
+
+      return unsubscribe;
+    });
   }
 
   /**
@@ -229,20 +251,13 @@ export class FoodDatabaseService {
    * @param docId Document Id
    * @returns True if food document exists. False if food document does not exists.
    */
-  async doesPersonalFoodDocExists(docId: any): Promise<Boolean> {
-    // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
-
-    // Get food doc 
-    return await this._angularFireStore.doc("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).get().toPromise()
-      .then(docSnapshot => {
-        if (docSnapshot.exists) {
-          return true;
-        }
-        else {
-          return false;
-        }
-      });
+  async doesPersonalFoodDocExists(docId: any): Promise<boolean> {
+    const currentUserUid = await this._authService.auth.currentUser.uid;
+    const path = `TheMacroDiet/Production/Users/${currentUserUid}/FoodDatabase/${docId}`;
+    //console.log(path);
+    const docRef = doc(this._firestore, path);
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists();
   }
 
   /**
@@ -251,37 +266,57 @@ export class FoodDatabaseService {
  * @returns Food if food document exists. Null if food document does not exists.
  */
   async getPersonalOrGlobalFoodDocExists(docId: any): Promise<Food> {
-    
-    // Current user id
-    const currentUserUid = await this._authService.afAuth.currentUser.then(u => u.uid);
+    const currentUserUid = await this._authService.auth.currentUser.uid;
 
-    // Get food doc (global)
-    return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/GlobalFoodDatabase/" + docId).get().toPromise()
-      .then(async docSnapshot => {
-        if (docSnapshot.exists) {
-          return <Food>{
-            DocumentId: docSnapshot.id,
-            IsFromPersonalDb: false,
-            ...docSnapshot.data()
-          }
-        }    
-        else {
-          // Get food doc (personal)
-          return await this._angularFireStore.doc<Food>("/TheMacroDiet/Production/Users/" + currentUserUid + "/FoodDatabase/" + docId).get().toPromise()
-          .then(docSnapshot => {
-            if (docSnapshot.exists) {
-              return <Food>{
-                DocumentId: docSnapshot.id,
-                IsFromPersonalDb: false,
-                ...docSnapshot.data()
-              }
-            }
-            else {
-              return null;
-            }
-          });
-        }
-      });
+    // Check global first
+    const globalPath = `TheMacroDiet/Production/GlobalFoodDatabase/${docId}`;
+    //console.log(globalPath);
+    const globalDocRef = doc(this._firestore, globalPath);
+    const globalDocSnap = await getDoc(globalDocRef);
+
+    if (globalDocSnap.exists()) {
+      const data = globalDocSnap.data() as any;
+      return {
+        DocumentId: globalDocSnap.id,
+        IsFromPersonalDb: false,
+        Name: data?.Name,
+        Calories: data?.Calories,
+        Carbohydrates: data?.Carbohydrates,
+        Fats: data?.Fats,
+        Protein: data?.Protein,
+        Saturated: data?.Saturated,
+        ServingAmount: data?.ServingAmount,
+        ServingUnit: data?.ServingUnit,
+        ServingUnitShortCode: data?.ServingUnitShortCode
+      } as Food;
+    } else {
+      // Check personal
+      const personalPath = `TheMacroDiet/Production/Users/${currentUserUid}/FoodDatabase/${docId}`;
+      const personalDocRef = doc(this._firestore, personalPath);
+      //console.log(personalPath);
+      //console.log(personalDocRef);
+      const personalDocSnap = await getDoc(personalDocRef);
+
+
+      if (personalDocSnap.exists()) {
+        const data = personalDocSnap.data() as any;
+        return {
+          DocumentId: personalDocSnap.id,
+          IsFromPersonalDb: true,
+          Name: data?.Name,
+          Calories: data?.Calories,
+          Carbohydrates: data?.Carbohydrates,
+          Fats: data?.Fats,
+          Protein: data?.Protein,
+          Saturated: data?.Saturated,
+          ServingAmount: data?.ServingAmount,
+          ServingUnit: data?.ServingUnit,
+          ServingUnitShortCode: data?.ServingUnitShortCode
+        } as Food;
+      } else {
+        return null;
+      }
+    }
   }
 
 }

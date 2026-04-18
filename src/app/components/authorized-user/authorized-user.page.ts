@@ -7,6 +7,7 @@ import { LoadingService } from 'src/app/services/loading.service';
 
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-authorized-user',
   templateUrl: 'authorized-user.page.html',
   styleUrls: ['authorized-user.page.scss']

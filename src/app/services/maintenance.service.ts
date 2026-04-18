@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { AngularFireDatabase } from "@angular/fire/compat/database";
+import { Database, ref, objectVal } from "@angular/fire/database";
 import { Maintenance } from "../models/maintenance.model";
 import { AlertController } from "@ionic/angular";
 import { App } from "@capacitor/app";
@@ -10,7 +10,7 @@ import { App } from "@capacitor/app";
 })
 export class MaintenanceService {
   constructor(
-    private _angularFireDatabase: AngularFireDatabase,
+    private _database: Database,
     private _alertController: AlertController
   ) {}
 
@@ -19,9 +19,8 @@ export class MaintenanceService {
    * @returns Maintenance Observable
    */
   async getMaintenanceAndroid(): Promise<Observable<Maintenance>> {
-    const fireObjectMaintenance =
-      this._angularFireDatabase.object<Maintenance>("/Android");
-    return await fireObjectMaintenance.valueChanges();
+    const dbRef = ref(this._database, "/Android");
+    return objectVal<Maintenance>(dbRef);
   }
 
   /**
@@ -29,9 +28,8 @@ export class MaintenanceService {
    * @returns Maintenance Observable
    */
   async getMaintenanceWeb(): Promise<Observable<Maintenance>> {
-    const fireObjectMaintenance =
-      this._angularFireDatabase.object<Maintenance>("/Web");
-    return await fireObjectMaintenance.valueChanges();
+    const dbRef = ref(this._database, "/Web");
+    return objectVal<Maintenance>(dbRef);
   }
 
   /**
@@ -76,6 +74,9 @@ export class MaintenanceService {
     }
     // Check Minor
     if (
+      Number.parseInt(currentVersion[0]) ==
+      Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[0])
+      &&
       Number.parseInt(currentVersion[2]) <
       Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[2])
     ) {
@@ -117,6 +118,9 @@ export class MaintenanceService {
     }
     // Check Minor
     if (
+      Number.parseInt(currentVersion[0]) ==
+      Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[0])
+      &&
       Number.parseInt(currentVersion[2]) <
       Number.parseInt(latestMaintenanceSettings.UpdateLatestVersion[2])
     ) {

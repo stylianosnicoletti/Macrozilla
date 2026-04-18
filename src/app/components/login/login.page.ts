@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ElementRef } from "@angular/core";
 import {
   Validators,
   FormBuilder,
@@ -16,6 +16,7 @@ import { Capacitor } from "@capacitor/core";
 import { LoadingService } from "src/app/services/loading.service";
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: "app-login",
   templateUrl: "./login.page.html",
   styleUrls: ["./login.page.scss"],
@@ -48,6 +49,7 @@ export class LoginPage implements OnInit {
     private _maintenanceService: MaintenanceService,
     private _unsubscribeService: UnsubscribeService,
     private _loadingService: LoadingService,
+    private _elementRef: ElementRef
   ) {}
 
   ngOnInit() {
@@ -81,6 +83,12 @@ export class LoginPage implements OnInit {
 
   ionViewWillLeave() {
    //console.log("leaving login page");
+    if (
+      document.activeElement instanceof HTMLElement &&
+      this._elementRef.nativeElement.contains(document.activeElement)
+    ) {
+      document.activeElement.blur();
+    }
     this._unsubscribeService.unsubscribeData(this.subscriptionsList);
     App.removeAllListeners();
   }
@@ -89,9 +97,7 @@ export class LoginPage implements OnInit {
     await this._authService.doLogin(value).then(
       async () => {
         if (
-          await this._authService.afAuth.currentUser.then(
-            (u) => u.emailVerified
-          )
+          await this._authService.auth.currentUser.emailVerified
         ) {
          //console.log("loginnnn")
           this._router.navigate(["/authorized_user/tabs/daily_entry"]);

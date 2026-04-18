@@ -8,6 +8,7 @@ import { UnsubscribeService } from '../../../services/unsubscribe.service';
 import { MacrozillaConstants } from '../../../macrozilla-constants';
 
 @Component({
+  standalone: false,  // this is now required when using NgModule
   selector: 'app-add-entry-search',
   templateUrl: './add-entry-search.page.html',
   styleUrls: ['./add-entry-search.page.scss'],

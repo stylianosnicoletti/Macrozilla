@@ -4,8 +4,6 @@
 export interface User {
 
   Options: Options;
-
-  Sizes: Sizes;
 }
 
 /**
@@ -20,12 +18,4 @@ export interface Options {
   TransferEntriesEnabled: boolean;
 
   DeletingAllDailyEntriesEnabled: boolean;
-}
-
-/**
- * Collection sizes.
- */
-export interface Sizes {
-
-  DailyEntries: number;
 }

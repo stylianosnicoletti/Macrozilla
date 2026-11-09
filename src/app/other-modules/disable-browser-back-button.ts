@@ -1,4 +1,5 @@
-import { NgModule, Injectable, ModuleWithProviders, Inject } from '@angular/core';
+import { NgModule, Injectable, Inject } from '@angular/core';
+import type { ModuleWithProviders } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 
 function _window(): any {
